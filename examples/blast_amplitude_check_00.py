@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from libquantum import atoms, entropy, scales, spectral, utils, synthetics
-import plot_templates.plot_time_frequency_reps as pltq
+import libquantum.plot_templates.plot_time_frequency_reps as pltq
 import libwwz
 
 if __name__ == "__main__":
