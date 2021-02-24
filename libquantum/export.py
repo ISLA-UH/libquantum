@@ -21,6 +21,7 @@ def print_scales_to_screen(scale_order_input: float, scale_base_input: float,
                                                 scale_center_geometric[i], scale_center_algebraic[i],
                                                 scale_start[i], scale_end[i]))
 
+
 def print_frequencies_to_screen(frequency_order_input: float, frequency_base_input: float,
                                 frequency_ref_input: float,
                                 frequency_low_input: float, frequency_sample_rate_input: float):
@@ -38,6 +39,7 @@ def print_frequencies_to_screen(frequency_order_input: float, frequency_base_inp
         print('%+8i%12.4e%12.4e%12.4e%12.4e' % (int(frequency_band_number[i]),
                                                 frequency_center_geometric[i], frequency_center_algebraic[i],
                                                 frequency_start[i], frequency_end[i]))
+
 
 def plot_parameters():
     # Aspect ratio of 1920 x 1080 (1080p), 16:9

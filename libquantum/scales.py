@@ -43,8 +43,8 @@ class Slice:
     PREF_KPA = 101.325  # sea level pressure, kPa
     PREF_PA = 10132500.  # sea level pressure, kPa
 
-def planck_scale_s(scale_order):
 
+def planck_scale_s(scale_order):
     # Assumes base 2, Slice.G2
     cycles_M, quality_factor_Q = wavelet_MQ_from_N(scale_order)
     scale_edge = Slice.G2 ** (1.0 / (2.0 * scale_order))
@@ -117,10 +117,10 @@ def band_frequencies_nyquist(frequency_order_input: float, frequency_base_input:
 
 
 def band_frequencies_low_high(frequency_order_input: float, frequency_base_input: float,
-                             frequency_ref_input: float,
-                             frequency_low_input: float,
-                             frequency_high_input: float,
-                             frequency_sample_rate_input: float) -> \
+                              frequency_ref_input: float,
+                              frequency_low_input: float,
+                              frequency_high_input: float,
+                              frequency_sample_rate_input: float) -> \
         (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
     """Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
     """
@@ -399,14 +399,14 @@ def cqt_frequency_bands_g2f1(scale_order_input: float,
     # TODO: Document resolution of bandwidth discrepancy
     hann_bandwidth = 1.50018310546875
     _, q_gabor = wavelet_MQ_from_N(order_Nth)
-    # From Librosa/filters: threshold =  freq[-1] * (1 + 0.5 * window_bandwidth(window) / Q) # > frequency_sample_rate_hz / 2.0:
+    # From Librosa/filters: threshold =  freq[-1] * (1 + 0.5 * window_bandwidth(window) / Q)
+    # > frequency_sample_rate_hz / 2.0:
     threshold = frequency_hz_center * (1 + 0.5 * hann_bandwidth / q_gabor)  # > frequency_sample_rate_hz / 2.0:
     # print('threshold:', threshold)
     # print(scale_number_bins_0)
     # Remember frequency order is inverted because solution is in periods.
-    id = np.argmax(threshold < 0.9*frequency_sample_rate_input/2.0)
-    scale_number_bins = int(len(frequency_hz_center[id:]))
-
+    idn = np.argmax(threshold < 0.9*frequency_sample_rate_input/2.0)
+    scale_number_bins = int(len(frequency_hz_center[idn:]))
 
     frequency_hz_center_min = np.min(frequency_hz_center)
     cqt_points_hop_min = int(2**(np.floor(scale_number_bins/order_Nth)-1.))
@@ -524,7 +524,3 @@ def wavelet_inputs_morlet2(band_order_Nth: float, time_s: np.ndarray, offset_tim
 #                                        frequency_ref_input=440,
 #                                        frequency_low_input=16.35,
 #                                        frequency_sample_rate_input=16000)
-
-
-
-

@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-# TODO: Aspect ratio, background color, font size, animation.
+
 
 def location_2d(x, y, color_guide,
                 fig_title: str, x_label: str, y_label: str, color_label: str,
@@ -13,7 +13,7 @@ def location_2d(x, y, color_guide,
     :param x_label:
     :param y_label:
     :param color_label:
-    :param scatter_dot_size:
+    :param dot_size:
     :param color_map:
     :return:
     """
@@ -49,10 +49,10 @@ def location_3d(x, y, z, color_guide,
 
 
 def loc_quiver_3d(x, y, z, u, v, w, color_guide,
-                   fig_title: str, x_label: str, y_label: str, z_label: str, color_label: str,
-                   dot_size: int = 16, color_map: str = "inferno",
-                   azimuth_degrees: float = -115, elevation_degrees: float = 34,
-                   arrow_length: float = 0.5):
+                  fig_title: str, x_label: str, y_label: str, z_label: str, color_label: str,
+                  dot_size: int = 16, color_map: str = "inferno",
+                  azimuth_degrees: float = -115, elevation_degrees: float = 34,
+                  arrow_length: float = 0.5):
     # TODO: Add arrow color
     fig = plt.figure()
     ax = fig.gca(projection='3d')

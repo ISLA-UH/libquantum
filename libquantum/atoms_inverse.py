@@ -23,7 +23,8 @@ def inv_morlet2_prep(band_order_Nth, time_s, offset_time_s, scale_frequency_cent
     return xtime_shifted, morlet2_scale, cycles_M, reconstruct
 
 
-def inv_morlet2_real(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, cwt_amp_real, frequency_sample_rate_hz):
+def inv_morlet2_real(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, cwt_amp_real,
+                     frequency_sample_rate_hz):
 
     xtime_shifted, xscale, cycles_M, rescale = \
         inv_morlet2_prep(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, frequency_sample_rate_hz)
@@ -37,7 +38,8 @@ def inv_morlet2_real(band_order_Nth, time_s, offset_time_s, scale_frequency_cent
     return morlet2_inv_real
 
 
-def inv_morlet2_imag(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, cwt_amp_imag, frequency_sample_rate_hz):
+def inv_morlet2_imag(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, cwt_amp_imag,
+                     frequency_sample_rate_hz):
     # TODO: Explain why pi/2 shift has to be removed!
     xtime_shifted, xscale, cycles_M, rescale = \
         inv_morlet2_prep(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, frequency_sample_rate_hz)

@@ -53,8 +53,8 @@ def rc_high_pass(x_new, x_old, y_old, sample_rate_hz, frequency_cut_low_hz):
 
 
 def rc_iterator_highlow(sensor_wf, sample_rate_hz,
-               frequency_cut_low_hz,
-               frequency_cut_high_hz):
+                        frequency_cut_low_hz,
+                        frequency_cut_high_hz):
     # Initialize. This can be improved to match wikipedia.
     x_prev = 0
     y_prev_high = 0
@@ -69,8 +69,7 @@ def rc_iterator_highlow(sensor_wf, sample_rate_hz,
         yield y_prev_high, y_prev_low
 
 
-def rc_iterator_highpass(sensor_wf, sample_rate_hz,
-               frequency_cut_low_hz):
+def rc_iterator_highpass(sensor_wf, sample_rate_hz, frequency_cut_low_hz):
     # Initialize. This can be improved to match wikipedia.
     x_prev = 0
     y_prev_high = 0
@@ -111,36 +110,6 @@ def highpass_obspy(sensor_wf, frequency_low_Hz, sample_rate_Hz, filter_order=4):
                                                    sample_rate_Hz, corners=filter_order,
                                                    zerophase=True)
     return sensor_highpass
-
-
-
-# def barometer_highpass(station: Station,
-#                        mean_type: str = "simple",
-#                        raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float, np.ndarray]:
-#     """
-#     gets barometer data from a station. Returns raw data
-#     :param station: the station with data
-#     :param mean_type: under development
-#     :param raw: if false (default), boolean or nan mean removed
-#     :return: the barometer data, the timestamps, the estimated sample rate, and the indexes of the nans
-#     The nan indexes should be preserver throughout the computation and used in all the plots.
-#     """
-#     barometer_sample_rate_hz = station.barometer_sensor().sample_rate
-#     barometer_raw = station.barometer_sensor().get_data_channel("pressure")
-#     barometer_epoch_s = station.barometer_sensor().data_timestamps() * MICROS_TO_S
-#     barometer_nans = np.argwhere(np.isnan(barometer_raw))
-#
-#     if raw:
-#         barometer_wf = np.array(barometer_raw)
-#     else:
-#         if mean_type == "simple":
-#             # Simple demean and replace nans with zeros. Suboptimal for bar
-#             barometer_wf = demean(barometer_raw)
-#         else:
-#             # Placeholder for diff solution with nans
-#             barometer_wf = demean(barometer_raw)
-#
-#     return barometer_wf, barometer_epoch_s, barometer_sample_rate_hz, barometer_nans
 
 
 def highpass_from_diff(sensor_waveform: np.ndarray,
@@ -193,6 +162,7 @@ def highpass_from_diff(sensor_waveform: np.ndarray,
     # Initialize
     # sensor_waveform_reconstruct[0] = sensor_waveform_dp_filtered[0]
 
+    # TODO: make sure this works if sensor_waveform_dp_filtered[i] is not set
     for i in range(1, len(sensor_waveform) - 1):
         sensor_waveform_reconstruct[i] = sensor_waveform_dp_filtered[i] + sensor_waveform_reconstruct[i-1]
 
@@ -273,7 +243,6 @@ def sensor_uneven_3c(sensor_x, sensor_y, sensor_z, sensor_epoch, sensor_sample_r
     # plot setup for mag intensity plot
     df2 = pd.DataFrame({'x': mag_epoch_diff, 'y': mag_intensity_all})
 
-    
     # # calculate the fft
     # mag_sample_rate = [mag_sample_rate]
     # mag_intensity_array = [np.array(mag_intensity_all)]
