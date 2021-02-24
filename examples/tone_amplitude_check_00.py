@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from libquantum import atoms, entropy, scales, spectra, utils, synthetics
+from libquantum import atoms, entropy, scales, spectral, utils, synthetics
 import plot_templates.plot_time_frequency_reps as pltq
 
 import libwwz
@@ -72,10 +72,10 @@ if __name__ == "__main__":
 
     # Compute constant Q transform (CQT) from segmented signal duration
     mic_cqt, mic_cqt_bits, mic_cqt_time_s, mic_cqt_frequency_hz = \
-        spectra.cqt_from_sig(sig_wf=mic_sig,
-                             frequency_sample_rate_hz=mic_sig_sample_rate_hz,
-                             band_order_Nth=order_number_input,
-                             dictionary_type="tone")
+        spectral.cqt_from_sig(sig_wf=mic_sig,
+                              frequency_sample_rate_hz=mic_sig_sample_rate_hz,
+                              band_order_Nth=order_number_input,
+                              dictionary_type="tone")
     mic_cqt_snr, mic_cqt_snr_bits, mic_cqt_snr_entropy = entropy.snr_mean_max(mic_cqt)
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=mic_sig,
@@ -95,11 +95,11 @@ if __name__ == "__main__":
     # Compute constant Q transform (CQT) from segmented signal duration using Gaussian window
     # TODO: Verify the math
     mic_cqtg, mic_cqtg_bits, mic_cqt_time_s, mic_cqt_frequency_hz = \
-        spectra.cqt_from_sig(sig_wf=mic_sig,
-                             frequency_sample_rate_hz=mic_sig_sample_rate_hz,
-                             band_order_Nth=order_number_input,
-                             cqt_window="cqt_gauss",
-                             dictionary_type="tone")
+        spectral.cqt_from_sig(sig_wf=mic_sig,
+                              frequency_sample_rate_hz=mic_sig_sample_rate_hz,
+                              band_order_Nth=order_number_input,
+                              cqt_window="cqt_gauss",
+                              dictionary_type="tone")
     mic_cqtg_snr, mic_cqtg_snr_bits, mic_cqtg_snr_entropy = entropy.snr_mean_max(mic_cqt)
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=mic_sig,
@@ -118,9 +118,9 @@ if __name__ == "__main__":
 
     # Compute short term Fourier transform (STFT) from segmented signal duration
     mic_stft, mic_stft_bits, mic_stft_time_s, mic_stft_frequency_hz = \
-        spectra.stft_from_sig(sig_wf=mic_sig,
-                              frequency_sample_rate_hz=mic_sig_sample_rate_hz,
-                              band_order_Nth=order_number_input)
+        spectral.stft_from_sig(sig_wf=mic_sig,
+                               frequency_sample_rate_hz=mic_sig_sample_rate_hz,
+                               band_order_Nth=order_number_input)
     mic_stft_snr, mic_stft_snr_bits, mic_stft_snr_entropy = entropy.snr_mean_max(mic_stft)
     # Log frequency is the default
     pltq.plot_wf_mesh_mesh_vert(frequency_scaling="log",
