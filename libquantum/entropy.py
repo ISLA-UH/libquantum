@@ -1,6 +1,6 @@
 import numpy as np
-from analysis_beta.quantum import utils
-from analysis_beta.quantum.scales import EPSILON
+from libquantum import utils
+from libquantum.scales import EPSILON
 
 """
 Entropy

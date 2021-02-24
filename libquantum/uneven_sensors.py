@@ -1,7 +1,7 @@
 import numpy as np
 import obspy.signal.filter
 import pandas as pd
-from analysis_beta.quantum import scales, utils
+from libquantum import scales, utils
 import scipy.signal as signal
 import matplotlib.pyplot as plt
 

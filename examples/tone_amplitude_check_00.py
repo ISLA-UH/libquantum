@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from analysis_beta.quantum import atoms, entropy, scales, spectra, utils, synthetics
-from analysis_beta.quantum import plots_next_level as pnl
+from libquantum import atoms, entropy, scales, spectra, utils, synthetics
+import plot_templates.plot_time_frequency_reps as pltq
+
 import libwwz
 
 if __name__ == "__main__":
@@ -53,21 +54,21 @@ if __name__ == "__main__":
                                  band_order_Nth=order_number_input,
                                  dictionary_type="tone")
     mic_cwt_snr, mic_cwt_snr_bits, mic_cwt_snr_entropy = entropy.snr_mean_max(mic_cwt)
-    pnl.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
-                               wf_panel_2_sig=mic_sig,
-                               wf_panel_2_time=mic_sig_epoch_s,
-                               mesh_time=mic_cwt_time_s,
-                               mesh_frequency=mic_cwt_frequency_hz,
-                               mesh_panel_1_trf=mic_cwt_bits,
-                               mesh_panel_1_colormap_scaling="range",
-                               mesh_panel_0_tfr=mic_cwt_snr_entropy,
-                               wf_panel_2_units="Norm",
-                               mesh_panel_1_cbar_units="bits",
-                               mesh_panel_0_cbar_units="eSNR bits",
-                               start_time_epoch=event_reference_time_epoch_s,
-                               figure_title="CWT for " + EVENT_NAME,
-                               frequency_hz_ymin=fmin,
-                               frequency_hz_ymax=fmax)
+    pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
+                                wf_panel_2_sig=mic_sig,
+                                wf_panel_2_time=mic_sig_epoch_s,
+                                mesh_time=mic_cwt_time_s,
+                                mesh_frequency=mic_cwt_frequency_hz,
+                                mesh_panel_1_trf=mic_cwt_bits,
+                                mesh_panel_1_colormap_scaling="range",
+                                mesh_panel_0_tfr=mic_cwt_snr_entropy,
+                                wf_panel_2_units="Norm",
+                                mesh_panel_1_cbar_units="bits",
+                                mesh_panel_0_cbar_units="eSNR bits",
+                                start_time_epoch=event_reference_time_epoch_s,
+                                figure_title="CWT for " + EVENT_NAME,
+                                frequency_hz_ymin=fmin,
+                                frequency_hz_ymax=fmax)
 
     # Compute constant Q transform (CQT) from segmented signal duration
     mic_cqt, mic_cqt_bits, mic_cqt_time_s, mic_cqt_frequency_hz = \
@@ -76,20 +77,20 @@ if __name__ == "__main__":
                              band_order_Nth=order_number_input,
                              dictionary_type="tone")
     mic_cqt_snr, mic_cqt_snr_bits, mic_cqt_snr_entropy = entropy.snr_mean_max(mic_cqt)
-    pnl.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
-                               wf_panel_2_sig=mic_sig,
-                               wf_panel_2_time=mic_sig_epoch_s,
-                               mesh_time=mic_cqt_time_s,
-                               mesh_frequency=mic_cqt_frequency_hz,
-                               mesh_panel_1_trf=mic_cqt_bits,
-                               mesh_panel_1_colormap_scaling="range",
-                               mesh_panel_0_tfr=mic_cqt_snr_entropy,
-                               wf_panel_2_units="Norm",
-                               mesh_panel_1_cbar_units="bits",
-                               mesh_panel_0_cbar_units="eSNR bits",
-                               figure_title="CQT Hann for " + EVENT_NAME,
-                               frequency_hz_ymin=fmin,
-                               frequency_hz_ymax=fmax)
+    pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
+                                wf_panel_2_sig=mic_sig,
+                                wf_panel_2_time=mic_sig_epoch_s,
+                                mesh_time=mic_cqt_time_s,
+                                mesh_frequency=mic_cqt_frequency_hz,
+                                mesh_panel_1_trf=mic_cqt_bits,
+                                mesh_panel_1_colormap_scaling="range",
+                                mesh_panel_0_tfr=mic_cqt_snr_entropy,
+                                wf_panel_2_units="Norm",
+                                mesh_panel_1_cbar_units="bits",
+                                mesh_panel_0_cbar_units="eSNR bits",
+                                figure_title="CQT Hann for " + EVENT_NAME,
+                                frequency_hz_ymin=fmin,
+                                frequency_hz_ymax=fmax)
 
     # Compute constant Q transform (CQT) from segmented signal duration using Gaussian window
     # TODO: Verify the math
@@ -100,20 +101,20 @@ if __name__ == "__main__":
                              cqt_window="cqt_gauss",
                              dictionary_type="tone")
     mic_cqtg_snr, mic_cqtg_snr_bits, mic_cqtg_snr_entropy = entropy.snr_mean_max(mic_cqt)
-    pnl.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
-                               wf_panel_2_sig=mic_sig,
-                               wf_panel_2_time=mic_sig_epoch_s,
-                               mesh_time=mic_cqt_time_s,
-                               mesh_frequency=mic_cqt_frequency_hz,
-                               mesh_panel_1_trf=mic_cqtg_bits,
-                               mesh_panel_1_colormap_scaling="range",
-                               mesh_panel_0_tfr=mic_cqtg_snr_entropy,
-                               wf_panel_2_units="Norm",
-                               mesh_panel_1_cbar_units="bits",
-                               mesh_panel_0_cbar_units="eSNR bits",
-                               figure_title="CQT Gauss for " + EVENT_NAME,
-                               frequency_hz_ymin=fmin,
-                               frequency_hz_ymax=fmax)
+    pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
+                                wf_panel_2_sig=mic_sig,
+                                wf_panel_2_time=mic_sig_epoch_s,
+                                mesh_time=mic_cqt_time_s,
+                                mesh_frequency=mic_cqt_frequency_hz,
+                                mesh_panel_1_trf=mic_cqtg_bits,
+                                mesh_panel_1_colormap_scaling="range",
+                                mesh_panel_0_tfr=mic_cqtg_snr_entropy,
+                                wf_panel_2_units="Norm",
+                                mesh_panel_1_cbar_units="bits",
+                                mesh_panel_0_cbar_units="eSNR bits",
+                                figure_title="CQT Gauss for " + EVENT_NAME,
+                                frequency_hz_ymin=fmin,
+                                frequency_hz_ymax=fmax)
 
     # Compute short term Fourier transform (STFT) from segmented signal duration
     mic_stft, mic_stft_bits, mic_stft_time_s, mic_stft_frequency_hz = \
@@ -122,37 +123,37 @@ if __name__ == "__main__":
                               band_order_Nth=order_number_input)
     mic_stft_snr, mic_stft_snr_bits, mic_stft_snr_entropy = entropy.snr_mean_max(mic_stft)
     # Log frequency is the default
-    pnl.plot_wf_mesh_mesh_vert(frequency_scaling="log",
-                               redvox_id=station_id_str,
-                               wf_panel_2_sig=mic_sig,
-                               wf_panel_2_time=mic_sig_epoch_s,
-                               mesh_time=mic_stft_time_s,
-                               mesh_frequency=mic_stft_frequency_hz,
-                               mesh_panel_1_trf=mic_stft_bits,
-                               mesh_panel_1_colormap_scaling="range",
-                               mesh_panel_0_tfr=mic_stft_snr_entropy,
-                               wf_panel_2_units="Norm",
-                               mesh_panel_1_cbar_units="bits",
-                               mesh_panel_0_cbar_units="eSNR bits",
-                               figure_title="STFT for " + EVENT_NAME,
-                               frequency_hz_ymin=fmin,
-                               frequency_hz_ymax=fmax)
+    pltq.plot_wf_mesh_mesh_vert(frequency_scaling="log",
+                                redvox_id=station_id_str,
+                                wf_panel_2_sig=mic_sig,
+                                wf_panel_2_time=mic_sig_epoch_s,
+                                mesh_time=mic_stft_time_s,
+                                mesh_frequency=mic_stft_frequency_hz,
+                                mesh_panel_1_trf=mic_stft_bits,
+                                mesh_panel_1_colormap_scaling="range",
+                                mesh_panel_0_tfr=mic_stft_snr_entropy,
+                                wf_panel_2_units="Norm",
+                                mesh_panel_1_cbar_units="bits",
+                                mesh_panel_0_cbar_units="eSNR bits",
+                                figure_title="STFT for " + EVENT_NAME,
+                                frequency_hz_ymin=fmin,
+                                frequency_hz_ymax=fmax)
     # Linear frequency scale must be specified
-    pnl.plot_wf_mesh_mesh_vert(frequency_scaling="linear",
-                               redvox_id=station_id_str,
-                               wf_panel_2_sig=mic_sig,
-                               wf_panel_2_time=mic_sig_epoch_s,
-                               mesh_time=mic_stft_time_s,
-                               mesh_frequency=mic_stft_frequency_hz,
-                               mesh_panel_1_trf=mic_stft_bits,
-                               mesh_panel_1_colormap_scaling="range",
-                               mesh_panel_0_tfr=mic_stft_snr_entropy,
-                               wf_panel_2_units="Norm",
-                               mesh_panel_1_cbar_units="bits",
-                               mesh_panel_0_cbar_units="eSNR bits",
-                               figure_title="STFT for " + EVENT_NAME,
-                               frequency_hz_ymin=fmin,
-                               frequency_hz_ymax=fmax)
+    pltq.plot_wf_mesh_mesh_vert(frequency_scaling="linear",
+                                redvox_id=station_id_str,
+                                wf_panel_2_sig=mic_sig,
+                                wf_panel_2_time=mic_sig_epoch_s,
+                                mesh_time=mic_stft_time_s,
+                                mesh_frequency=mic_stft_frequency_hz,
+                                mesh_panel_1_trf=mic_stft_bits,
+                                mesh_panel_1_colormap_scaling="range",
+                                mesh_panel_0_tfr=mic_stft_snr_entropy,
+                                wf_panel_2_units="Norm",
+                                mesh_panel_1_cbar_units="bits",
+                                mesh_panel_0_cbar_units="eSNR bits",
+                                figure_title="STFT for " + EVENT_NAME,
+                                frequency_hz_ymin=fmin,
+                                frequency_hz_ymax=fmax)
 
     # Compute the WWZ
     # TODO: Should this be the signal frequency?
@@ -179,18 +180,18 @@ if __name__ == "__main__":
     mic_wwz = wwz[3].T
     mic_wwz_bits = utils.log2epsilon(mic_wwz)
     mic_wwz_snr, mic_wwz_snr_bits, mic_wwz_snr_entropy = entropy.snr_mean_max(mic_wwz)
-    pnl.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
-                               wf_panel_2_sig=mic_sig,
-                               wf_panel_2_time=mic_sig_epoch_s,
-                               mesh_time=mic_cqt_time_s,
-                               mesh_frequency=mic_cqt_frequency_hz,
-                               mesh_panel_1_trf=mic_wwz_bits,
-                               mesh_panel_1_colormap_scaling="range",
-                               mesh_panel_0_tfr=mic_wwz_snr_entropy,
-                               wf_panel_2_units="Norm",
-                               mesh_panel_1_cbar_units="bits",
-                               mesh_panel_0_cbar_units="eSNR bits",
-                               figure_title="WWZ for " + EVENT_NAME,
-                               frequency_hz_ymin=fmin,
-                               frequency_hz_ymax=fmax)
+    pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
+                                wf_panel_2_sig=mic_sig,
+                                wf_panel_2_time=mic_sig_epoch_s,
+                                mesh_time=mic_cqt_time_s,
+                                mesh_frequency=mic_cqt_frequency_hz,
+                                mesh_panel_1_trf=mic_wwz_bits,
+                                mesh_panel_1_colormap_scaling="range",
+                                mesh_panel_0_tfr=mic_wwz_snr_entropy,
+                                wf_panel_2_units="Norm",
+                                mesh_panel_1_cbar_units="bits",
+                                mesh_panel_0_cbar_units="eSNR bits",
+                                figure_title="WWZ for " + EVENT_NAME,
+                                frequency_hz_ymin=fmin,
+                                frequency_hz_ymax=fmax)
     plt.show()

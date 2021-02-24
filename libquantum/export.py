@@ -1,10 +1,7 @@
 import numpy as np
-import scipy.signal as signal
-import redvox.common.date_time_utils as dt
 import matplotlib.pyplot as plt
-import scales
-import atoms
-from typing import Dict, List, Tuple, Optional, Any, Callable
+from libquantum import scales
+from libquantum import atoms
 
 
 def print_scales_to_screen(scale_order_input: float, scale_base_input: float,

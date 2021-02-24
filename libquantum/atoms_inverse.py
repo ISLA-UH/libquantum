@@ -1,5 +1,5 @@
 import numpy as np
-from analysis_beta.quantum import scales, utils
+from libquantum import scales
 
 """
 Atom Reconstruction - inverse CWT for Dictionary 0. Not for chirps, yet.

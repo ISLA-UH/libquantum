@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.signal as signal
-from analysis_beta.quantum import scales, utils
+from libquantum import scales
+from libquantum import utils
 
 """LAST UPDATED: 20201021 MAG
 The purpose of this code is to construct quantized, standardized information packets

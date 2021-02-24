@@ -8,7 +8,7 @@ from typing import Tuple
 import numpy as np
 from scipy import signal
 
-from analysis_beta.quantum.scales import EPSILON, MICROS_TO_S, KPA_TO_PA
+from libquantum.scales import EPSILON, MICROS_TO_S, KPA_TO_PA
 from redvox.common import date_time_utils as dt
 from redvox.common.station import Station
 

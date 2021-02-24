@@ -1,8 +1,8 @@
 import numpy as np
 import scipy.signal as signal
 import librosa
-from analysis_beta.quantum import atoms, scales, utils
-from analysis_beta.quantum.scales import EPSILON
+from libquantum import atoms, scales, utils
+from libquantum.scales import EPSILON
 
 
 # def mesh_peaks_from_passband(mesh_2d, frequency_1d, frequency_min, frequency_max):
