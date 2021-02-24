@@ -2,3 +2,7 @@
 *.iml
 *.pyc
 *.png
+.mypy_cache
+build
+dist
+libquantum.egg-info
