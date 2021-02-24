@@ -13,7 +13,7 @@ setup(name="libquantum",
       description='Library for implementing standardized time-frequency representations.',
       packages=find_packages(include=[
           "libquantum",
-          "plot_templates",
+          "libquantum.plot_templates",
       ],
           exclude=['tests']),
       long_description_content_type='text/markdown',
