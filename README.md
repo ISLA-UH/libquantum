@@ -4,7 +4,7 @@ built on Gabor uncertainty principle for
 logarithmic base 2 (binary) frequency bands 
 of quantized order N.
 
-From:
+Refer to the open access publications:
 
 Garces (2020), Quantized Constant-Q Gabor Atoms for 
 Sparse Binary Representations of Cyber-Physical Signatures
