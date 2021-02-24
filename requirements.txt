@@ -1,5 +1,8 @@
+librosa
+libwwz >= 1.0.0
 matplotlib >= 3.3.0
 numpy >= 1.19.1
-scipy
-libwwz >= 0.16.0
 redvox
+scipy
+
+
