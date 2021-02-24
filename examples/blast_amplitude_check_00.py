@@ -4,6 +4,7 @@ from libquantum import atoms, entropy, scales, spectral, utils, synthetics
 import libquantum.plot_templates.plot_time_frequency_reps as pltq
 import libwwz
 
+
 if __name__ == "__main__":
     """
     # The primary goal of standardization is to permit multimodal sensor analysis for different sample rates
