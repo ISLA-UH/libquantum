@@ -8,6 +8,7 @@ The purpose of this code is to construct quantized, standardized information pac
 using binary metrics. Based on Garces (2020). 
 Cleaned up and compartmentalized for debugging"""
 
+
 def chirp_complex(band_order_Nth: float,
                   time_s: np.ndarray,
                   offset_time_s: float,
@@ -64,10 +65,10 @@ def chirp_spectrum(frequency_hz,
     :param band_order_Nth: Nth order of constant Q bands
     :param scale_frequency_center_hz: band center frequency in Hz
     :param frequency_sample_rate_hz: sample rate on Hz
+    :param index_shift: TODO
+    :param scale_base: TODO
     :return: Fourier transform of the Gabor atom
     """
-
-
     # TODO: Accept range of frequencies, construct matrix
     cycles_M, quality_factor_Q, gamma = \
         chirp_MQG_from_N(band_order_Nth, index_shift, scale_base)
@@ -98,6 +99,8 @@ def chirp_MQG_from_N(band_order_Nth: float,
     Compute the quality factor Q and multiplier M for a specified band order N
     N is THE quantization parameter for the binary constant Q wavelet filters
     :param band_order_Nth: Band order, must be > 0.75 or reverts to N=3
+    :param index_shift: TODO
+    :param scale_base: TODO
     :return: float, float
     """
     if band_order_Nth < 0.7:
@@ -138,8 +141,8 @@ def chirp_scale_from_order(band_order_Nth: float,
     :param cycles_M: number of cycles per band period
     :param scale_frequency_center_hz: scale frequency in hz
     :param frequency_sample_rate_hz: sample rate in hz
-    :param index_shift:
-    :param scale_base:
+    :param index_shift: TODO
+    :param scale_base: TODO
     :return: floats or np.ndarray
     """
     cycles_M, _, _ = chirp_MQG_from_N(band_order_Nth,
@@ -154,9 +157,10 @@ def chirp_uncertainty(scale_atom: np.ndarray,
                       gamma, index_shift):
     """
     Uncertainty
-    :param scale_atom:
+    :param scale_atom: TODO
     :param frequency_sample_rate_hz: sample rate in hz
-    :param gamma_exact: from index_shift
+    :param gamma_exact: from index_shift  TODO which one is correct, this one or the declaration?
+    :param index_shift: TODO
     :return: floats or np.ndarrays
     """
 
@@ -201,7 +205,6 @@ def chirp_time(time_s: np.ndarray,
     Scaled time-shifted time
     :param time_s:
     :param offset_time_s:
-    :param scale_frequency_center_hz:
     :param frequency_sample_rate_hz:
     :return: floats or np.ndarrays
     """
@@ -276,8 +279,9 @@ def chirp_centered_4cwt(band_order_Nth: float,
     :param band_order_Nth: Nth order of constant Q bands
     :param scale_frequency_center_hz: center frequency fc in Hz
     :param frequency_sample_rate_hz: sample rate is Hz
+    :param index_shift: TODO
     :param scale_base: G2 or G3
-    :param dictionar_type: Canonical unit-norm ("norm") or unit spectrum ("spect")
+    :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect")
     :return: waveform_complex, time_shifted_s
     """
 
@@ -350,6 +354,7 @@ def cwt_chirp_complex(band_order_Nth: float,
 
     scale_points = len(frequency_cwt_hz_flipped)
 
+    # TODO: cwt_flipped is not always set.  Flow of control needs to be updated to account for this.
     if cwt_type == "morlet2":
         scale_atom = chirp_scale(cycles_M, frequency_cwt_hz_flipped, frequency_sample_rate_hz)
         cwt = signal.cwt(sig_wf, signal.morlet2, scale_atom, w=cycles_M)
@@ -385,6 +390,7 @@ def cwt_chirp_complex(band_order_Nth: float,
     else:
         print("Incorrect cwt_type specification in cwt_chirp_complex")
 
+    # TODO: re above: cwt_flipped is not always set; must make sure this run if that's the case.
     # Time scales are increasing, which is the opposite of what is expected for the frequency. Flip.
     frequency_cwt_hz = np.flip(frequency_cwt_hz_flipped)
     cwt = np.flipud(cwt_flipped)
@@ -435,7 +441,3 @@ def cwt_chirp_from_sig(sig_wf: np.ndarray,
                           dictionary_type=dictionary_type)
 
     return cwt, cwt_bits, time_s, frequency_cwt_hz
-
-
-
-

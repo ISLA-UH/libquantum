@@ -82,10 +82,10 @@ def cqt_from_sig(sig_wf,
                                scale=True, pad_mode='reflect')
     else:
         CQT = librosa.core.cqt(sig_wf, sr=frequency_sample_rate_hz, hop_length=cqt_points_hop_min,
-                           fmin=frequency_hz_center_min, n_bins=scale_number_bins,
-                           bins_per_octave=int_order_N, tuning=0.0,
-                           filter_scale=1, norm=1, sparsity=0.0, window=cqt_window,
-                           scale=True, pad_mode='reflect')
+                               fmin=frequency_hz_center_min, n_bins=scale_number_bins,
+                               bins_per_octave=int_order_N, tuning=0.0,
+                               filter_scale=1, norm=1, sparsity=0.0, window=cqt_window,
+                               scale=True, pad_mode='reflect')
 
     time_cqt_s = librosa.times_like(CQT, sr=frequency_sample_rate_hz, hop_length=cqt_points_hop_min)
     frequency_cqt_hz = librosa.core.cqt_frequencies(scale_number_bins, frequency_hz_center_min,

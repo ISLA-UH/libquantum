@@ -6,6 +6,7 @@ from libquantum.scales import EPSILON
 Entropy
 """
 
+
 # FOR TONES
 def snr_mean_max(tfr_coeff_complex: np.ndarray):
     """
@@ -93,24 +94,6 @@ def snr_mean_max_profile(tfr_coeff_complex: np.ndarray):
     snr_entropy /= np.max(snr_lin)
 
     return snr_lin, snr_bits, snr_entropy
-
-
-def snr_mean_max_profile(tfr_coeff_complex: np.ndarray):
-    # TODO: BUILD THIS FOR TRANSIENTS
-    """
-    Computes the baseline mean energy and the snr max for a template signal
-    :param tfr_coeff_complex: Complex coefficients for time-frequency representation. Can be real.
-    :return:
-    """
-    # Evaluate Log energy entropy (LEE) = log(p) and Shannon Entropy (SE) = -p*log(p)
-    # Assumes linear spectral coefficien ts (not power), takes the square
-    energy = np.abs(tfr_coeff_complex)**2
-    energy_mean = np.mean(energy)
-    print('Energy_mean = ', energy_mean)
-    snr_lin = energy/energy_mean
-    snr_lin_max = np.max(snr_lin)
-
-    return energy_mean, snr_lin_max
 
 
 def snr_ref_max_profile(tfr_coeff_complex: np.ndarray, energy_mean: float, snr_max: float):

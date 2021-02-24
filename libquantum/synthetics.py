@@ -3,7 +3,7 @@ import scipy.signal as signal
 from typing import Optional
 
 
-### Synthetics for rdvxm testing
+# Synthetics for rdvxm testing
 def gt_rdvxm_center_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
                                 noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
     """
@@ -109,7 +109,7 @@ def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: flo
     return saw_white_aa
 
 
-### GT Test Pulse
+# GT Test Pulse
 def gt_blast_center_fast(frequency_peak_hz, sample_rate_hz):
     """
     TODO: Set default of 16 bits for std_loss_bits

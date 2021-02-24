@@ -66,8 +66,6 @@ def mesh_peaks(mesh_2d, frequency_1d):
     This is a key element, refine
     :param mesh_2d:
     :param frequency_1d:
-    :param frequency_min:
-    :param frequency_max:
     :return:
     """
 

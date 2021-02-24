@@ -122,7 +122,6 @@ def mic_wf_time_build_station(station,
     mic_sample_rate_hz = station.audio_sensor().sample_rate
     mic_wf_raw = station.audio_sensor().get_data_channel("microphone")
     mic_epoch_s = station.audio_sensor().data_timestamps() * MICROS_TO_S
-    mic_nans = np.argwhere(np.isnan(mic_wf_raw))
 
     if raw:
         mic_wf = np.array(mic_wf_raw)
@@ -134,7 +133,6 @@ def mic_wf_time_build_station(station,
             # Remove linear trend
             mic_wf = detrend_nan(mic_wf_raw)
 
-    # TODO: min_nans option?
     return mic_wf, mic_epoch_s, mic_sample_rate_hz
 
 
@@ -188,8 +186,8 @@ def accelerometer_build_station(station: Station,
 
 
 def gyroscope_build_station(station: Station,
-                               mean_type: str = "simple",
-                               raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float]:
+                            mean_type: str = "simple",
+                            raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float]:
     """
     gets gyroscope data from a station
     :param station: the station with data
@@ -216,8 +214,8 @@ def gyroscope_build_station(station: Station,
 
 
 def magnetometer_build_station(station: Station,
-                                mean_type: str = "simple",
-                                raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float]:
+                               mean_type: str = "simple",
+                               raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float]:
     """
     gets magnetometer data from a station
     :param station: the station with data
@@ -242,30 +240,6 @@ def magnetometer_build_station(station: Station,
 
     return magnetometer_wf, magnetometer_epoch_s, magnetometer_sample_rate_hz
 
-
-def location_build_station(station: Station,
-                               mean_type: str = "simple",
-                               raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float]:
-    """
-    gets location data from a station
-    :param station: the station with data
-    :param mean_type: under development
-    :param raw: if false (default), boolean or nan mean removed
-    :return: the location data, the timestamps, and the estimated sample rate
-    """
-    location_sample_rate_hz = station.location_sensor().sample_rate
-    location_raw = station.location_sensor().samples()
-    location_epoch_s = station.location_sensor().data_timestamps() * MICROS_TO_S
-
-    # latitude, longitude, altitude, speed, bearing,
-    # horizontal_accuracy, vertical_accuracy, speed_accuracy,
-    # bearing_accuracy, location_provider
-
-    latitude = location_raw[:, 0:3]
-
-
-
-# --- The next functions assume nans have been either zeroed or otherwise converted to floats
 
 class ExtractionType(Enum):
     """
@@ -410,6 +384,7 @@ def log2epsilon_max(x: np.ndarray) -> float:
 """
 Picker modules
 """
+
 
 # TODO: Migrate to their own modules
 def picker_signal_max_index(sig: np.array,

@@ -101,8 +101,6 @@ class AudioParams:
     figure_parameters: FigureParameters = FigureParameters(AspectRatioType.R1920x1080)
 
 
-# TODO: THIS FUNCTION DOES NOT BELONG HERE. Or maybe it does, but in a lesser role.
-# But it started here, so we'll see how useful it is before migration
 def origin_time_correction(time_input, start_time_epoch: float, units_time: str):
     # Sanitizing/scrubbing time is a key function.
     # TEST EXTENSIVELY!
@@ -111,7 +109,6 @@ def origin_time_correction(time_input, start_time_epoch: float, units_time: str)
     # Need to construct a function to return time from start_time_epoch if they are not the same
     if start_time_epoch != time_input[0]:
         time_from_epoch_start = time_input[0] - start_time_epoch
-        # TODO: Add as a correction from the origin time so can zoom in at large times away. Different use case.
     if start_time_epoch == 0:
         # Time sanitized if no input provided
         time_label: str = f"Time ({units_time})"
@@ -444,7 +441,6 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     # Middle panel mesh --------------------------
 
     if mesh_shading == "auto":
-        # TODO: WHY IS THIS FADED?
         pcolormesh_mid: QuadMesh = mesh_panel_1.pcolormesh(mesh_time,
                                                            mesh_frequency,
                                                            mesh_panel_1_trf,
@@ -453,7 +449,7 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
                                                            cmap=mesh_colormap,
                                                            shading=mesh_shading,
                                                            snap=True)
-    if mesh_shading == "gouraud":
+    elif mesh_shading == "gouraud":
         pcolormesh_mid: QuadMesh = mesh_panel_1.pcolormesh(mesh_time,
                                                            mesh_frequency,
                                                            mesh_panel_1_trf,
