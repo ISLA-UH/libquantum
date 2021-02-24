@@ -1,7 +1,7 @@
 # libquantum
 Standardized time-frequency representations 
 built on Gabor uncertainty principle for 
-logarithmic base 2 (binary) frequency bands 
+logarithmic constant Q base 2 (binary) frequency bands 
 of quantized order N.
 
 Refer to the open access publications:
