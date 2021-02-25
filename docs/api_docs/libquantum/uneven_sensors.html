@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>libquantum.uneven_sensors API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>libquantum.uneven_sensors</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import numpy as np
+import obspy.signal.filter
+import pandas as pd
+from libquantum import scales, utils
+import scipy.signal as signal
+import matplotlib.pyplot as plt
+
+
+# Height from barometric pressure in kPa
+def height_asl_from_pressure_below10km(bar_waveform: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Simple model for troposphere
+    :param bar_waveform: barometric pressure in kPa
+    :return: height ASL in m
+    &#34;&#34;&#34;
+    mg_rt = 0.00012  # Molar mass of air x gravity / (gas constant x standard temperature)
+    elevation_m = -np.log(bar_waveform/scales.Slice.PREF_KPA)/mg_rt
+    return elevation_m
+
+
+def model_height_from_pressure_skyfall(pressure_kPa):
+    &#34;&#34;&#34;
+    Returns empirical height in m from input pressure
+    :param pressure_kPa: barometric pressure in kPa
+    :return: height in m
+    &#34;&#34;&#34;
+    pressure_ref_kPa = 101.325
+    scaled_pressure = -np.log(pressure_kPa/pressure_ref_kPa)
+    # Empirical model constructed from
+    # c, stats = np.polynomial.polynomial.polyfit(poly_x, bounder_loc[&#39;Alt_m&#39;], 8, full=True)
+    c = [1.52981286e+02, 7.39552295e+03, 2.44663285e+03, -3.57402081e+03, 2.02653051e+03,
+         -6.26581722e+02, 1.11758211e+02, -1.08674469e+01, 4.46784010e-01]
+    elevation_m = np.polynomial.polynomial.polyval(scaled_pressure, c, tensor=False)
+    return elevation_m
+
+
+# RC filter response: mag first contribution to stack overflow as slipstream
+# https://stackoverflow.com/questions/62448904/how-to-implement-continuous-time-high-low-pass-filter-in-python
+def rc_low_pass(x_new, y_old, sample_rate_hz, frequency_cut_high_hz):
+    sample_interval_s = 1/sample_rate_hz
+    rc = 1/(2 * np.pi * frequency_cut_high_hz)
+    alpha = sample_interval_s/(rc + sample_interval_s)
+    y_new = x_new * alpha + (1 - alpha) * y_old
+    return y_new
+
+
+def rc_high_pass(x_new, x_old, y_old, sample_rate_hz, frequency_cut_low_hz):
+    sample_interval_s = 1/sample_rate_hz
+    rc = 1/(2 * np.pi * frequency_cut_low_hz)
+    alpha = rc/(rc + sample_interval_s)
+    y_new = alpha * (y_old + x_new - x_old)
+    return y_new
+
+
+def rc_iterator_highlow(sensor_wf, sample_rate_hz,
+                        frequency_cut_low_hz,
+                        frequency_cut_high_hz):
+    # Initialize. This can be improved to match wikipedia.
+    x_prev = 0
+    y_prev_high = 0
+    y_prev_low = 0
+
+    for x in sensor_wf:
+        y_prev_high = rc_high_pass(x, x_prev, y_prev_high, sample_rate_hz,
+                                   frequency_cut_low_hz)
+        y_prev_low = rc_low_pass(x, y_prev_low, sample_rate_hz,
+                                 frequency_cut_high_hz)
+        x_prev = x
+        yield y_prev_high, y_prev_low
+
+
+def rc_iterator_highpass(sensor_wf, sample_rate_hz, frequency_cut_low_hz):
+    # Initialize. This can be improved to match wikipedia.
+    x_prev = 0
+    y_prev_high = 0
+
+    for x in sensor_wf:
+        y_prev_high = rc_high_pass(x, x_prev, y_prev_high, sample_rate_hz,
+                                   frequency_cut_low_hz)
+        x_prev = x
+        yield y_prev_high
+
+
+def rc_iterator_lowpass(sensor_wf, sample_rate_hz,
+                        frequency_cut_high_hz):
+    # Initialize. This can be improved to match wikipedia.
+    y_prev_low = 0
+
+    for x in sensor_wf:
+        y_prev_low = rc_low_pass(x, y_prev_low, sample_rate_hz,
+                                 frequency_cut_high_hz)
+        yield y_prev_low
+
+
+# &#34;Traditional&#34; solution, up to Nyquist
+def bandpass_butter_uneven(sensor_wf, filter_order, frequency_cut_low_hz, sample_rate_hz):
+    # Frequencies are scaled by Nyquist, with 1 = Nyquist
+    # filter_order = 4,
+    nyquist = 0.5 * sample_rate_hz
+    edge_low = frequency_cut_low_hz / nyquist
+    edge_high = 0.5
+    b, a = signal.butter(N=filter_order, Wn=[edge_low, edge_high], btype=&#39;bandpass&#39;)
+    sensor_bandpass = signal.filtfilt(b, a, sensor_wf)
+    return sensor_bandpass
+
+
+def highpass_obspy(sensor_wf, frequency_low_Hz, sample_rate_Hz, filter_order=4):
+    sensor_highpass = obspy.signal.filter.highpass(sensor_wf,
+                                                   frequency_low_Hz,
+                                                   sample_rate_Hz, corners=filter_order,
+                                                   zerophase=True)
+    return sensor_highpass
+
+
+def highpass_from_diff(sensor_waveform: np.ndarray,
+                       sensor_epoch_s: np.ndarray,
+                       sample_rate: int or float,
+                       highpass_type: str = &#39;obspy4z&#39;,
+                       frequency_filter_low: float = 1./scales.Slice.T100S) \
+        -&gt; (np.ndarray, np.ndarray):
+    &#34;&#34;&#34;
+    Preprocess barometer data:
+    - remove nans and DC offset by getting the differential pressure in kPa
+    - apply highpass filter at 100 second periods
+    - reconstruct Pressure in kPa from differential pressure: P(i) = dP(i) + P(i-1), P(0) = 0
+    :param sensor_waveform:
+    :param sensor_epoch_s:
+    :param sample_rate:
+    :param highpass_type: &#39;obspy4&#39;, &#39;butter&#39;, &#39;rc&#39;
+    :param frequency_filter_low: 100s default
+    :return:
+    &#34;&#34;&#34;
+
+    # Apply diff to remove DC offset; difference of nans is a nan
+    # Replace nans with zeros, otherwise most things don&#39;t run
+    sensor_waveform_diff = utils.demean_nan(np.diff(sensor_waveform))
+
+    # Override default high pass at 100 seconds if signal is too short
+    # May be able to zero pad ... with ringing. Or fold as needed.
+    if sensor_epoch_s[-1] - sensor_epoch_s[0] &lt; 2/frequency_filter_low:
+        frequency_filter_low = 2/(sensor_epoch_s[-1] - sensor_epoch_s[0])
+        print(&#39;Default 100s highpass override. New highpass period = &#39;, 1/frequency_filter_low)
+
+    # Taper test:
+    # bar_waveform_diff_taper = bar_waveform_diff*utils.taper_tukey(bar_waveform_diff, 0.2)
+    # Apply highpass filter
+    # Watch out for edge ringing
+    if highpass_type == &#34;obspy4z&#34;:
+        sensor_waveform_dp_filtered = \
+            obspy.signal.filter.highpass(sensor_waveform_diff,
+                                         frequency_filter_low,
+                                         sample_rate, corners=4,
+                                         zerophase=True)
+    # bar_waveform_dp_filtered = bandpass_butter_uneven(bar_waveform_diff, filter_order=4,
+    #                                                     frequency_low_Hz=frequency_filter_low,
+    #                                                     sample_rate_Hz=sample_rate)
+
+    # TODO: Construct Reconstruct Function
+    # reconstruct from dP: P(0) = 0, P(i) = dP(i) + P(i-1)
+    sensor_waveform_reconstruct = np.zeros((len(sensor_waveform)))
+
+    # Initialize
+    # sensor_waveform_reconstruct[0] = sensor_waveform_dp_filtered[0]
+
+    # TODO: make sure this works if sensor_waveform_dp_filtered[i] is not set
+    for i in range(1, len(sensor_waveform) - 1):
+        sensor_waveform_reconstruct[i] = sensor_waveform_dp_filtered[i] + sensor_waveform_reconstruct[i-1]
+
+    return sensor_waveform_reconstruct, frequency_filter_low
+
+
+# TODO: Integrate with bar results
+def sensor_uneven_3c(sensor_x, sensor_y, sensor_z, sensor_epoch, sensor_sample_rate):
+    mag_waveform = [sensor_x, sensor_y, sensor_z]
+    
+    mag_epoch_diff = sensor_epoch[:-1]
+    
+    mag_diff = np.diff(mag_waveform)
+    
+    mag_waveform_dp_filtered_all = []
+    mag_waveform_reconstruct_all = []
+    
+    for vector in range(len(mag_waveform)):
+    
+        # condition for when the record is too short for high pass at 100 seconds.
+        # Needs to be at least 200 seconds
+        if sensor_epoch[-1] - sensor_epoch[0] &lt; 200:
+            raise ValueError(&#39;Sensor record is too short for performing scalogram computations.&#39; +
+                             &#39;Please provide a record longer than 200 seconds (3 minutes and 20 seconds).&#39;)
+    
+        # apply high pass filter at 100 seconds for sample rate calculated from the mag sensor.
+        mag_waveform_dp_filtered = obspy.signal.filter.highpass(mag_diff[vector], 0.01, sensor_sample_rate, corners=4,
+                                                                zerophase=True)
+        mag_waveform_dp_filtered_all.append(mag_waveform_dp_filtered)
+    
+        # mag data reconstruct reconstruct mag from dP: P(0) = 0, P(i) = dP(i) + P(i-1)
+        mag_waveform_reconstruct = np.zeros(len(mag_epoch_diff))
+        mag_waveform_reconstruct[0] = 0
+    
+        # loop over the time series and reconstruct each data point
+        for j in range(1, len(mag_waveform_reconstruct)):
+            mag_waveform_reconstruct[j] = mag_waveform_dp_filtered[j] + mag_waveform_reconstruct[j - 1]
+    
+        mag_waveform_reconstruct_all.append(mag_waveform_reconstruct)
+    
+    # calculate and subtract the mean of each vector from each vector to remove the &#34;DC offset&#34;.
+    # Loop through each vector.
+    mag_waveform_mean_removed_all = []
+    
+    for vector in range(len(mag_waveform_reconstruct_all)):
+        vector_mean = np.mean(mag_waveform_reconstruct_all[vector])
+    
+        # subtract the mean of each vector from each value in that vector
+        mag_waveform_mean_removed = []
+        for j in range(len(mag_waveform_reconstruct_all[vector])):
+            mag_waveform_mean_removed = mag_waveform_reconstruct_all[vector] - vector_mean
+        mag_waveform_mean_removed_all.append(mag_waveform_mean_removed)
+    
+    # calculate/ display the mean of each vector AFTER removing the mean
+    mag_x_mean_removed = mag_waveform_mean_removed_all[0]
+    mag_y_mean_removed = mag_waveform_mean_removed_all[1]
+    mag_z_mean_removed = mag_waveform_mean_removed_all[2]
+    
+    # calculate the max of all the components for use in the plot limits later on.
+    mag_x_max_of_mean = np.max(mag_x_mean_removed)
+    mag_y_max_of_mean = np.max(mag_y_mean_removed)
+    mag_z_max_of_mean = np.max(mag_z_mean_removed)
+    max_all_components = [mag_x_max_of_mean, mag_y_max_of_mean, mag_z_max_of_mean]
+    max_final = np.round(np.max(max_all_components))
+    min_final = -max_final
+
+    # plot setup for displaying the mean removed signal from each component
+    df = pd.DataFrame({&#39;x&#39;: mag_epoch_diff, &#39;x-component&#39;: mag_x_mean_removed, &#39;y-component&#39;: mag_y_mean_removed,
+                       &#39;z-component&#39;: mag_z_mean_removed})
+
+    # Calculate mag intensity from all three components
+    mag_intensity_all = []
+    for j in range(len(mag_x_mean_removed)):
+        mag_intensity = np.sqrt(((mag_x_mean_removed[j]) ** 2) + ((mag_y_mean_removed[j]) ** 2) +
+                                ((mag_z_mean_removed[j]) ** 2))
+        mag_intensity_all.append(mag_intensity)
+    
+    # plot setup for mag intensity plot
+    df2 = pd.DataFrame({&#39;x&#39;: mag_epoch_diff, &#39;y&#39;: mag_intensity_all})
+
+    # # calculate the fft
+    # mag_sample_rate = [mag_sample_rate]
+    # mag_intensity_array = [np.array(mag_intensity_all)]
+    # time_fft, frequency_fft, energy_fft, snr_fft = spectra.spectra_fft(mag_intensity_array, mag_sample_rate,
+    #                                                                    redvox_id, minimum_frequency=0.1)
+    #
+    # # calculate fft limits for plotting
+    # max_energy = (np.amax(energy_fft))
+    # min_energy = (np.amin(energy_fft))</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="libquantum.uneven_sensors.bandpass_butter_uneven"><code class="name flex">
+<span>def <span class="ident">bandpass_butter_uneven</span></span>(<span>sensor_wf, filter_order, frequency_cut_low_hz, sample_rate_hz)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bandpass_butter_uneven(sensor_wf, filter_order, frequency_cut_low_hz, sample_rate_hz):
+    # Frequencies are scaled by Nyquist, with 1 = Nyquist
+    # filter_order = 4,
+    nyquist = 0.5 * sample_rate_hz
+    edge_low = frequency_cut_low_hz / nyquist
+    edge_high = 0.5
+    b, a = signal.butter(N=filter_order, Wn=[edge_low, edge_high], btype=&#39;bandpass&#39;)
+    sensor_bandpass = signal.filtfilt(b, a, sensor_wf)
+    return sensor_bandpass</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.height_asl_from_pressure_below10km"><code class="name flex">
+<span>def <span class="ident">height_asl_from_pressure_below10km</span></span>(<span>bar_waveform: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Simple model for troposphere
+:param bar_waveform: barometric pressure in kPa
+:return: height ASL in m</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def height_asl_from_pressure_below10km(bar_waveform: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Simple model for troposphere
+    :param bar_waveform: barometric pressure in kPa
+    :return: height ASL in m
+    &#34;&#34;&#34;
+    mg_rt = 0.00012  # Molar mass of air x gravity / (gas constant x standard temperature)
+    elevation_m = -np.log(bar_waveform/scales.Slice.PREF_KPA)/mg_rt
+    return elevation_m</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.highpass_from_diff"><code class="name flex">
+<span>def <span class="ident">highpass_from_diff</span></span>(<span>sensor_waveform: numpy.ndarray, sensor_epoch_s: numpy.ndarray, sample_rate: int, highpass_type: str = 'obspy4z', frequency_filter_low: float = 0.01) ‑> (<class 'numpy.ndarray'>, <class 'numpy.ndarray'>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Preprocess barometer data:
+- remove nans and DC offset by getting the differential pressure in kPa
+- apply highpass filter at 100 second periods
+- reconstruct Pressure in kPa from differential pressure: P(i) = dP(i) + P(i-1), P(0) = 0
+:param sensor_waveform:
+:param sensor_epoch_s:
+:param sample_rate:
+:param highpass_type: 'obspy4', 'butter', 'rc'
+:param frequency_filter_low: 100s default
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def highpass_from_diff(sensor_waveform: np.ndarray,
+                       sensor_epoch_s: np.ndarray,
+                       sample_rate: int or float,
+                       highpass_type: str = &#39;obspy4z&#39;,
+                       frequency_filter_low: float = 1./scales.Slice.T100S) \
+        -&gt; (np.ndarray, np.ndarray):
+    &#34;&#34;&#34;
+    Preprocess barometer data:
+    - remove nans and DC offset by getting the differential pressure in kPa
+    - apply highpass filter at 100 second periods
+    - reconstruct Pressure in kPa from differential pressure: P(i) = dP(i) + P(i-1), P(0) = 0
+    :param sensor_waveform:
+    :param sensor_epoch_s:
+    :param sample_rate:
+    :param highpass_type: &#39;obspy4&#39;, &#39;butter&#39;, &#39;rc&#39;
+    :param frequency_filter_low: 100s default
+    :return:
+    &#34;&#34;&#34;
+
+    # Apply diff to remove DC offset; difference of nans is a nan
+    # Replace nans with zeros, otherwise most things don&#39;t run
+    sensor_waveform_diff = utils.demean_nan(np.diff(sensor_waveform))
+
+    # Override default high pass at 100 seconds if signal is too short
+    # May be able to zero pad ... with ringing. Or fold as needed.
+    if sensor_epoch_s[-1] - sensor_epoch_s[0] &lt; 2/frequency_filter_low:
+        frequency_filter_low = 2/(sensor_epoch_s[-1] - sensor_epoch_s[0])
+        print(&#39;Default 100s highpass override. New highpass period = &#39;, 1/frequency_filter_low)
+
+    # Taper test:
+    # bar_waveform_diff_taper = bar_waveform_diff*utils.taper_tukey(bar_waveform_diff, 0.2)
+    # Apply highpass filter
+    # Watch out for edge ringing
+    if highpass_type == &#34;obspy4z&#34;:
+        sensor_waveform_dp_filtered = \
+            obspy.signal.filter.highpass(sensor_waveform_diff,
+                                         frequency_filter_low,
+                                         sample_rate, corners=4,
+                                         zerophase=True)
+    # bar_waveform_dp_filtered = bandpass_butter_uneven(bar_waveform_diff, filter_order=4,
+    #                                                     frequency_low_Hz=frequency_filter_low,
+    #                                                     sample_rate_Hz=sample_rate)
+
+    # TODO: Construct Reconstruct Function
+    # reconstruct from dP: P(0) = 0, P(i) = dP(i) + P(i-1)
+    sensor_waveform_reconstruct = np.zeros((len(sensor_waveform)))
+
+    # Initialize
+    # sensor_waveform_reconstruct[0] = sensor_waveform_dp_filtered[0]
+
+    # TODO: make sure this works if sensor_waveform_dp_filtered[i] is not set
+    for i in range(1, len(sensor_waveform) - 1):
+        sensor_waveform_reconstruct[i] = sensor_waveform_dp_filtered[i] + sensor_waveform_reconstruct[i-1]
+
+    return sensor_waveform_reconstruct, frequency_filter_low</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.highpass_obspy"><code class="name flex">
+<span>def <span class="ident">highpass_obspy</span></span>(<span>sensor_wf, frequency_low_Hz, sample_rate_Hz, filter_order=4)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def highpass_obspy(sensor_wf, frequency_low_Hz, sample_rate_Hz, filter_order=4):
+    sensor_highpass = obspy.signal.filter.highpass(sensor_wf,
+                                                   frequency_low_Hz,
+                                                   sample_rate_Hz, corners=filter_order,
+                                                   zerophase=True)
+    return sensor_highpass</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.model_height_from_pressure_skyfall"><code class="name flex">
+<span>def <span class="ident">model_height_from_pressure_skyfall</span></span>(<span>pressure_kPa)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns empirical height in m from input pressure
+:param pressure_kPa: barometric pressure in kPa
+:return: height in m</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def model_height_from_pressure_skyfall(pressure_kPa):
+    &#34;&#34;&#34;
+    Returns empirical height in m from input pressure
+    :param pressure_kPa: barometric pressure in kPa
+    :return: height in m
+    &#34;&#34;&#34;
+    pressure_ref_kPa = 101.325
+    scaled_pressure = -np.log(pressure_kPa/pressure_ref_kPa)
+    # Empirical model constructed from
+    # c, stats = np.polynomial.polynomial.polyfit(poly_x, bounder_loc[&#39;Alt_m&#39;], 8, full=True)
+    c = [1.52981286e+02, 7.39552295e+03, 2.44663285e+03, -3.57402081e+03, 2.02653051e+03,
+         -6.26581722e+02, 1.11758211e+02, -1.08674469e+01, 4.46784010e-01]
+    elevation_m = np.polynomial.polynomial.polyval(scaled_pressure, c, tensor=False)
+    return elevation_m</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.rc_high_pass"><code class="name flex">
+<span>def <span class="ident">rc_high_pass</span></span>(<span>x_new, x_old, y_old, sample_rate_hz, frequency_cut_low_hz)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rc_high_pass(x_new, x_old, y_old, sample_rate_hz, frequency_cut_low_hz):
+    sample_interval_s = 1/sample_rate_hz
+    rc = 1/(2 * np.pi * frequency_cut_low_hz)
+    alpha = rc/(rc + sample_interval_s)
+    y_new = alpha * (y_old + x_new - x_old)
+    return y_new</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.rc_iterator_highlow"><code class="name flex">
+<span>def <span class="ident">rc_iterator_highlow</span></span>(<span>sensor_wf, sample_rate_hz, frequency_cut_low_hz, frequency_cut_high_hz)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rc_iterator_highlow(sensor_wf, sample_rate_hz,
+                        frequency_cut_low_hz,
+                        frequency_cut_high_hz):
+    # Initialize. This can be improved to match wikipedia.
+    x_prev = 0
+    y_prev_high = 0
+    y_prev_low = 0
+
+    for x in sensor_wf:
+        y_prev_high = rc_high_pass(x, x_prev, y_prev_high, sample_rate_hz,
+                                   frequency_cut_low_hz)
+        y_prev_low = rc_low_pass(x, y_prev_low, sample_rate_hz,
+                                 frequency_cut_high_hz)
+        x_prev = x
+        yield y_prev_high, y_prev_low</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.rc_iterator_highpass"><code class="name flex">
+<span>def <span class="ident">rc_iterator_highpass</span></span>(<span>sensor_wf, sample_rate_hz, frequency_cut_low_hz)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rc_iterator_highpass(sensor_wf, sample_rate_hz, frequency_cut_low_hz):
+    # Initialize. This can be improved to match wikipedia.
+    x_prev = 0
+    y_prev_high = 0
+
+    for x in sensor_wf:
+        y_prev_high = rc_high_pass(x, x_prev, y_prev_high, sample_rate_hz,
+                                   frequency_cut_low_hz)
+        x_prev = x
+        yield y_prev_high</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.rc_iterator_lowpass"><code class="name flex">
+<span>def <span class="ident">rc_iterator_lowpass</span></span>(<span>sensor_wf, sample_rate_hz, frequency_cut_high_hz)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rc_iterator_lowpass(sensor_wf, sample_rate_hz,
+                        frequency_cut_high_hz):
+    # Initialize. This can be improved to match wikipedia.
+    y_prev_low = 0
+
+    for x in sensor_wf:
+        y_prev_low = rc_low_pass(x, y_prev_low, sample_rate_hz,
+                                 frequency_cut_high_hz)
+        yield y_prev_low</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.rc_low_pass"><code class="name flex">
+<span>def <span class="ident">rc_low_pass</span></span>(<span>x_new, y_old, sample_rate_hz, frequency_cut_high_hz)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rc_low_pass(x_new, y_old, sample_rate_hz, frequency_cut_high_hz):
+    sample_interval_s = 1/sample_rate_hz
+    rc = 1/(2 * np.pi * frequency_cut_high_hz)
+    alpha = sample_interval_s/(rc + sample_interval_s)
+    y_new = x_new * alpha + (1 - alpha) * y_old
+    return y_new</code></pre>
+</details>
+</dd>
+<dt id="libquantum.uneven_sensors.sensor_uneven_3c"><code class="name flex">
+<span>def <span class="ident">sensor_uneven_3c</span></span>(<span>sensor_x, sensor_y, sensor_z, sensor_epoch, sensor_sample_rate)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sensor_uneven_3c(sensor_x, sensor_y, sensor_z, sensor_epoch, sensor_sample_rate):
+    mag_waveform = [sensor_x, sensor_y, sensor_z]
+    
+    mag_epoch_diff = sensor_epoch[:-1]
+    
+    mag_diff = np.diff(mag_waveform)
+    
+    mag_waveform_dp_filtered_all = []
+    mag_waveform_reconstruct_all = []
+    
+    for vector in range(len(mag_waveform)):
+    
+        # condition for when the record is too short for high pass at 100 seconds.
+        # Needs to be at least 200 seconds
+        if sensor_epoch[-1] - sensor_epoch[0] &lt; 200:
+            raise ValueError(&#39;Sensor record is too short for performing scalogram computations.&#39; +
+                             &#39;Please provide a record longer than 200 seconds (3 minutes and 20 seconds).&#39;)
+    
+        # apply high pass filter at 100 seconds for sample rate calculated from the mag sensor.
+        mag_waveform_dp_filtered = obspy.signal.filter.highpass(mag_diff[vector], 0.01, sensor_sample_rate, corners=4,
+                                                                zerophase=True)
+        mag_waveform_dp_filtered_all.append(mag_waveform_dp_filtered)
+    
+        # mag data reconstruct reconstruct mag from dP: P(0) = 0, P(i) = dP(i) + P(i-1)
+        mag_waveform_reconstruct = np.zeros(len(mag_epoch_diff))
+        mag_waveform_reconstruct[0] = 0
+    
+        # loop over the time series and reconstruct each data point
+        for j in range(1, len(mag_waveform_reconstruct)):
+            mag_waveform_reconstruct[j] = mag_waveform_dp_filtered[j] + mag_waveform_reconstruct[j - 1]
+    
+        mag_waveform_reconstruct_all.append(mag_waveform_reconstruct)
+    
+    # calculate and subtract the mean of each vector from each vector to remove the &#34;DC offset&#34;.
+    # Loop through each vector.
+    mag_waveform_mean_removed_all = []
+    
+    for vector in range(len(mag_waveform_reconstruct_all)):
+        vector_mean = np.mean(mag_waveform_reconstruct_all[vector])
+    
+        # subtract the mean of each vector from each value in that vector
+        mag_waveform_mean_removed = []
+        for j in range(len(mag_waveform_reconstruct_all[vector])):
+            mag_waveform_mean_removed = mag_waveform_reconstruct_all[vector] - vector_mean
+        mag_waveform_mean_removed_all.append(mag_waveform_mean_removed)
+    
+    # calculate/ display the mean of each vector AFTER removing the mean
+    mag_x_mean_removed = mag_waveform_mean_removed_all[0]
+    mag_y_mean_removed = mag_waveform_mean_removed_all[1]
+    mag_z_mean_removed = mag_waveform_mean_removed_all[2]
+    
+    # calculate the max of all the components for use in the plot limits later on.
+    mag_x_max_of_mean = np.max(mag_x_mean_removed)
+    mag_y_max_of_mean = np.max(mag_y_mean_removed)
+    mag_z_max_of_mean = np.max(mag_z_mean_removed)
+    max_all_components = [mag_x_max_of_mean, mag_y_max_of_mean, mag_z_max_of_mean]
+    max_final = np.round(np.max(max_all_components))
+    min_final = -max_final
+
+    # plot setup for displaying the mean removed signal from each component
+    df = pd.DataFrame({&#39;x&#39;: mag_epoch_diff, &#39;x-component&#39;: mag_x_mean_removed, &#39;y-component&#39;: mag_y_mean_removed,
+                       &#39;z-component&#39;: mag_z_mean_removed})
+
+    # Calculate mag intensity from all three components
+    mag_intensity_all = []
+    for j in range(len(mag_x_mean_removed)):
+        mag_intensity = np.sqrt(((mag_x_mean_removed[j]) ** 2) + ((mag_y_mean_removed[j]) ** 2) +
+                                ((mag_z_mean_removed[j]) ** 2))
+        mag_intensity_all.append(mag_intensity)
+    
+    # plot setup for mag intensity plot
+    df2 = pd.DataFrame({&#39;x&#39;: mag_epoch_diff, &#39;y&#39;: mag_intensity_all})
+
+    # # calculate the fft
+    # mag_sample_rate = [mag_sample_rate]
+    # mag_intensity_array = [np.array(mag_intensity_all)]
+    # time_fft, frequency_fft, energy_fft, snr_fft = spectra.spectra_fft(mag_intensity_array, mag_sample_rate,
+    #                                                                    redvox_id, minimum_frequency=0.1)
+    #
+    # # calculate fft limits for plotting
+    # max_energy = (np.amax(energy_fft))
+    # min_energy = (np.amin(energy_fft))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="libquantum" href="index.html">libquantum</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="libquantum.uneven_sensors.bandpass_butter_uneven" href="#libquantum.uneven_sensors.bandpass_butter_uneven">bandpass_butter_uneven</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.height_asl_from_pressure_below10km" href="#libquantum.uneven_sensors.height_asl_from_pressure_below10km">height_asl_from_pressure_below10km</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.highpass_from_diff" href="#libquantum.uneven_sensors.highpass_from_diff">highpass_from_diff</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.highpass_obspy" href="#libquantum.uneven_sensors.highpass_obspy">highpass_obspy</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.model_height_from_pressure_skyfall" href="#libquantum.uneven_sensors.model_height_from_pressure_skyfall">model_height_from_pressure_skyfall</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.rc_high_pass" href="#libquantum.uneven_sensors.rc_high_pass">rc_high_pass</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.rc_iterator_highlow" href="#libquantum.uneven_sensors.rc_iterator_highlow">rc_iterator_highlow</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.rc_iterator_highpass" href="#libquantum.uneven_sensors.rc_iterator_highpass">rc_iterator_highpass</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.rc_iterator_lowpass" href="#libquantum.uneven_sensors.rc_iterator_lowpass">rc_iterator_lowpass</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.rc_low_pass" href="#libquantum.uneven_sensors.rc_low_pass">rc_low_pass</a></code></li>
+<li><code><a title="libquantum.uneven_sensors.sensor_uneven_3c" href="#libquantum.uneven_sensors.sensor_uneven_3c">sensor_uneven_3c</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

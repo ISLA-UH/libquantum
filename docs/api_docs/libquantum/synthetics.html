@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>libquantum.synthetics API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>libquantum.synthetics</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import numpy as np
+import scipy.signal as signal
+from typing import Optional
+
+
+# Synthetics for rdvxm testing
+def gt_rdvxm_center_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
+                                noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
+    &#34;&#34;&#34;
+    Construct the GT explosion pulse of Garces (2019) in Gaussion noise with SNR in bits re signal STD
+    :param duration_points:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :param frequency_center_hz:
+    :return:
+    &#34;&#34;&#34;
+
+    if frequency_center_hz:
+        pseudo_period_s = 1/frequency_center_hz
+    else:
+        pseudo_period_s = duration_points/sample_rate_hz/4.
+
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    gt_white_aa.astype(np.float16)
+
+    return gt_white_aa
+
+
+def gt_rdvxm_center_noise_uneven(sensor_epoch_micros: np.array, start_epoch_micros: float,
+                                 duration_points: int = 2**12, sample_rate_hz: float = 80,
+                                 noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
+    &#34;&#34;&#34;
+    Construct the GT explosion pulse of Garces (2019) for uneven sensor time
+    in Gaussion noise with SNR in bits re signal STD
+    :param sensor_epoch_micros:
+    :param start_epoch_micros:
+    :param duration_points:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :param frequency_center_hz:
+    :return:
+    &#34;&#34;&#34;
+
+    if frequency_center_hz:
+        pseudo_period_s = 1/frequency_center_hz
+    else:
+        pseudo_period_s = duration_points/sample_rate_hz/4.
+
+    # Convert to seconds
+    time_duration_s = duration_points/sample_rate_hz
+    time_center_s = (sensor_epoch_micros - start_epoch_micros)/1E6 - time_duration_s/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+
+    return gt_white_aa
+
+
+def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
+                            noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+
+    duration_s = duration_points/sample_rate_hz
+    if frequency_center_hz:
+        frequency_start_hz = 0.5*frequency_center_hz
+        frequency_end_hz = sample_rate_hz/4.
+    else:
+        frequency_center_hz = 8./duration_s
+        frequency_start_hz = 0.5*frequency_center_hz
+        frequency_end_hz = sample_rate_hz/4.
+
+    sig_time_s = np.arange(int(duration_points))/sample_rate_hz
+    chirp_wf = signal.chirp(sig_time_s, frequency_start_hz, sig_time_s[-1],
+                            frequency_end_hz, method=&#39;linear&#39;, phi=0, vertex_zero=True)
+    chirp_wf *= taper_tukey(chirp_wf, 0.25)
+    noise_wf = white_noise_fbits(sig=chirp_wf, std_bit_loss=noise_std_loss_bits)
+    chirp_white = chirp_wf + noise_wf
+    chirp_white_aa = antialias_halfNyquist(chirp_white)
+    chirp_white_aa.astype(np.float16)
+
+    return chirp_white_aa
+
+
+def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
+                               noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+
+    duration_s = duration_points/sample_rate_hz
+    if frequency_center_hz:
+        frequency_center_angular = 2*np.pi*frequency_center_hz
+    else:
+        frequency_center_hz = 8./duration_s
+        frequency_center_angular = 2*np.pi*frequency_center_hz
+
+    sig_time_s = np.arange(int(duration_points))/sample_rate_hz
+    saw_wf = signal.sawtooth(frequency_center_angular*sig_time_s, width=0)
+    saw_wf *= taper_tukey(saw_wf, 0.25)
+    noise_wf = white_noise_fbits(sig=saw_wf, std_bit_loss=noise_std_loss_bits)
+    saw_white = saw_wf + noise_wf
+    saw_white_aa = antialias_halfNyquist(saw_white)
+    saw_white_aa.astype(np.float16)
+
+    return saw_white_aa
+
+
+# GT Test Pulse
+def gt_blast_center_fast(frequency_peak_hz, sample_rate_hz):
+    &#34;&#34;&#34;
+    TODO: Set default of 16 bits for std_loss_bits
+    :param duration_s:
+    :param frequency_peak_hz:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :return:
+    &#34;&#34;&#34;
+
+    duration_s = 16/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
+    noise_std_loss_bits = 16                # 16 bit record, system noise
+    pseudo_period_s = 1/frequency_peak_hz
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    return time_center_s, gt_white_aa
+
+
+def gt_blast_center_noise(duration_s, frequency_peak_hz, sample_rate_hz, noise_std_loss_bits):
+    &#34;&#34;&#34;
+    TODO: Set default of 16 bits for std_loss_bits
+    :param duration_s:
+    :param frequency_peak_hz:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :return:
+    &#34;&#34;&#34;
+    pseudo_period_s = 1/frequency_peak_hz
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    return time_center_s, gt_white_aa
+
+
+def gt_blast_period_center(time_center_s, pseudo_period_s):
+    # Garces (2019) ground truth GT blast pulse
+    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    # time_start = time_zero - time_pos
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GT = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GT[sigint1] = (1. - tau[sigint1])
+    p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
+    return p_GT
+
+
+def gt_blast_ft(frequency_peak_hz, frequency_hz):
+    w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
+    ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
+    ft_G17_negative = np.exp(-1j*w_scaled*(1+np.sqrt(6.)))/(3.*w_scaled**4.) * \
+                      (1j*w_scaled*np.sqrt(6.) + 3. +
+                       np.exp(1j*w_scaled*np.sqrt(6.))*(3.*w_scaled**2. + 1j*w_scaled*2.*np.sqrt(6.)-3.))
+    ft_G17 = (ft_G17_positive + ft_G17_negative)*np.pi/(2*np.pi*frequency_peak_hz)
+    return ft_G17
+
+
+def gt_blast_spectral_density(frequency_peak_hz, frequency_hz):
+    fourier_tx = gt_blast_ft(frequency_peak_hz, frequency_hz)
+    spectral_density = 2*np.abs(fourier_tx*np.conj(fourier_tx))
+    spectral_density_peak = np.max(spectral_density)
+    # spectral_density_peak = np.pi/(2*np.pi*frequency_center_hz)
+    return spectral_density, spectral_density_peak
+
+
+def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
+                          frequency_start_hz, frequency_end_hz,
+                          intro_s, outro_s,):
+
+    sig_time_s = np.arange(int(sample_rate_hz*duration_s))/sample_rate_hz
+    chirp_wf = signal.chirp(sig_time_s, frequency_start_hz, sig_time_s[-1],
+                            frequency_end_hz, method=&#39;linear&#39;, phi=0, vertex_zero=True)
+    chirp_wf *= taper_tukey(chirp_wf, 0.25)
+    sig_wf = np.concatenate((np.zeros(int(intro_s*sample_rate_hz)),
+                             chirp_wf,
+                             np.zeros(int(outro_s*sample_rate_hz))))
+    noise_wf = white_noise_fbits(sig=sig_wf, std_bit_loss=snr_bits)
+    synth_wf = sig_wf+noise_wf
+    synth_time_s = np.arange(len(synth_wf))/sample_rate_hz
+    return synth_wf, synth_time_s
+
+
+def white_noise_fbits(sig: np.ndarray, std_bit_loss: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute white noise with zero mean and standard deviation that is snr_bits below the input signal
+    :param sig: input signal, detrended
+    :param std_bit_loss: number of bits below signal standard deviation
+    :return: gaussian noise with zero mean
+    &#34;&#34;&#34;
+    sig_std = np.std(sig)
+    # This is in power, or variance
+    noise_loss = 2.**std_bit_loss
+    std_from_fbits = sig_std/noise_loss
+    # White noise, zero mean
+    sig_noise = np.random.normal(0, std_from_fbits, size=sig.size)
+    return sig_noise
+
+
+def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
+    fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+    :param sig_or_time: input signal or time
+    :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
+    :return: tukey taper window amplitude
+    &#34;&#34;&#34;
+    number_points = np.size(sig_or_time)
+    amplitude = signal.tukey(M=number_points, alpha=fraction_cosine, sym=True)
+    return amplitude
+
+
+def antialias_halfNyquist(synth):
+    # Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
+    # Signal frequencies are scaled by Nyquist
+    filter_order = 2
+    edge_high = 0.5
+    b, a = signal.butter(filter_order, edge_high, btype=&#39;lowpass&#39;)
+    synth_anti_aliased = signal.filtfilt(b, a, synth)
+    return synth_anti_aliased
+
+
+def frequency_algebraic_Nth(frequency_geometric, band_order_Nth):
+    frequency_algebra = frequency_geometric*(np.sqrt(1+1/(8*band_order_Nth**2)))
+    return frequency_algebra</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="libquantum.synthetics.antialias_halfNyquist"><code class="name flex">
+<span>def <span class="ident">antialias_halfNyquist</span></span>(<span>synth)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def antialias_halfNyquist(synth):
+    # Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
+    # Signal frequencies are scaled by Nyquist
+    filter_order = 2
+    edge_high = 0.5
+    b, a = signal.butter(filter_order, edge_high, btype=&#39;lowpass&#39;)
+    synth_anti_aliased = signal.filtfilt(b, a, synth)
+    return synth_anti_aliased</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.chirp_linear_in_noise"><code class="name flex">
+<span>def <span class="ident">chirp_linear_in_noise</span></span>(<span>snr_bits, sample_rate_hz, duration_s, frequency_start_hz, frequency_end_hz, intro_s, outro_s)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
+                          frequency_start_hz, frequency_end_hz,
+                          intro_s, outro_s,):
+
+    sig_time_s = np.arange(int(sample_rate_hz*duration_s))/sample_rate_hz
+    chirp_wf = signal.chirp(sig_time_s, frequency_start_hz, sig_time_s[-1],
+                            frequency_end_hz, method=&#39;linear&#39;, phi=0, vertex_zero=True)
+    chirp_wf *= taper_tukey(chirp_wf, 0.25)
+    sig_wf = np.concatenate((np.zeros(int(intro_s*sample_rate_hz)),
+                             chirp_wf,
+                             np.zeros(int(outro_s*sample_rate_hz))))
+    noise_wf = white_noise_fbits(sig=sig_wf, std_bit_loss=snr_bits)
+    synth_wf = sig_wf+noise_wf
+    synth_time_s = np.arange(len(synth_wf))/sample_rate_hz
+    return synth_wf, synth_time_s</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.chirp_rdvxm_noise_16bit"><code class="name flex">
+<span>def <span class="ident">chirp_rdvxm_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80, noise_std_loss_bits: float = 4, frequency_center_hz: typing.Union[float, NoneType] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
+                            noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+
+    duration_s = duration_points/sample_rate_hz
+    if frequency_center_hz:
+        frequency_start_hz = 0.5*frequency_center_hz
+        frequency_end_hz = sample_rate_hz/4.
+    else:
+        frequency_center_hz = 8./duration_s
+        frequency_start_hz = 0.5*frequency_center_hz
+        frequency_end_hz = sample_rate_hz/4.
+
+    sig_time_s = np.arange(int(duration_points))/sample_rate_hz
+    chirp_wf = signal.chirp(sig_time_s, frequency_start_hz, sig_time_s[-1],
+                            frequency_end_hz, method=&#39;linear&#39;, phi=0, vertex_zero=True)
+    chirp_wf *= taper_tukey(chirp_wf, 0.25)
+    noise_wf = white_noise_fbits(sig=chirp_wf, std_bit_loss=noise_std_loss_bits)
+    chirp_white = chirp_wf + noise_wf
+    chirp_white_aa = antialias_halfNyquist(chirp_white)
+    chirp_white_aa.astype(np.float16)
+
+    return chirp_white_aa</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.frequency_algebraic_Nth"><code class="name flex">
+<span>def <span class="ident">frequency_algebraic_Nth</span></span>(<span>frequency_geometric, band_order_Nth)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def frequency_algebraic_Nth(frequency_geometric, band_order_Nth):
+    frequency_algebra = frequency_geometric*(np.sqrt(1+1/(8*band_order_Nth**2)))
+    return frequency_algebra</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.gt_blast_center_fast"><code class="name flex">
+<span>def <span class="ident">gt_blast_center_fast</span></span>(<span>frequency_peak_hz, sample_rate_hz)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TODO: Set default of 16 bits for std_loss_bits
+:param duration_s:
+:param frequency_peak_hz:
+:param sample_rate_hz:
+:param noise_std_loss_bits:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_center_fast(frequency_peak_hz, sample_rate_hz):
+    &#34;&#34;&#34;
+    TODO: Set default of 16 bits for std_loss_bits
+    :param duration_s:
+    :param frequency_peak_hz:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :return:
+    &#34;&#34;&#34;
+
+    duration_s = 16/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
+    noise_std_loss_bits = 16                # 16 bit record, system noise
+    pseudo_period_s = 1/frequency_peak_hz
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    return time_center_s, gt_white_aa</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.gt_blast_center_noise"><code class="name flex">
+<span>def <span class="ident">gt_blast_center_noise</span></span>(<span>duration_s, frequency_peak_hz, sample_rate_hz, noise_std_loss_bits)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TODO: Set default of 16 bits for std_loss_bits
+:param duration_s:
+:param frequency_peak_hz:
+:param sample_rate_hz:
+:param noise_std_loss_bits:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_center_noise(duration_s, frequency_peak_hz, sample_rate_hz, noise_std_loss_bits):
+    &#34;&#34;&#34;
+    TODO: Set default of 16 bits for std_loss_bits
+    :param duration_s:
+    :param frequency_peak_hz:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :return:
+    &#34;&#34;&#34;
+    pseudo_period_s = 1/frequency_peak_hz
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    return time_center_s, gt_white_aa</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.gt_blast_ft"><code class="name flex">
+<span>def <span class="ident">gt_blast_ft</span></span>(<span>frequency_peak_hz, frequency_hz)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_ft(frequency_peak_hz, frequency_hz):
+    w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
+    ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
+    ft_G17_negative = np.exp(-1j*w_scaled*(1+np.sqrt(6.)))/(3.*w_scaled**4.) * \
+                      (1j*w_scaled*np.sqrt(6.) + 3. +
+                       np.exp(1j*w_scaled*np.sqrt(6.))*(3.*w_scaled**2. + 1j*w_scaled*2.*np.sqrt(6.)-3.))
+    ft_G17 = (ft_G17_positive + ft_G17_negative)*np.pi/(2*np.pi*frequency_peak_hz)
+    return ft_G17</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.gt_blast_period_center"><code class="name flex">
+<span>def <span class="ident">gt_blast_period_center</span></span>(<span>time_center_s, pseudo_period_s)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_period_center(time_center_s, pseudo_period_s):
+    # Garces (2019) ground truth GT blast pulse
+    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    # time_start = time_zero - time_pos
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GT = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GT[sigint1] = (1. - tau[sigint1])
+    p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
+    return p_GT</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.gt_blast_spectral_density"><code class="name flex">
+<span>def <span class="ident">gt_blast_spectral_density</span></span>(<span>frequency_peak_hz, frequency_hz)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_spectral_density(frequency_peak_hz, frequency_hz):
+    fourier_tx = gt_blast_ft(frequency_peak_hz, frequency_hz)
+    spectral_density = 2*np.abs(fourier_tx*np.conj(fourier_tx))
+    spectral_density_peak = np.max(spectral_density)
+    # spectral_density_peak = np.pi/(2*np.pi*frequency_center_hz)
+    return spectral_density, spectral_density_peak</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.gt_rdvxm_center_noise_16bit"><code class="name flex">
+<span>def <span class="ident">gt_rdvxm_center_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80, noise_std_loss_bits: float = 2, frequency_center_hz: typing.Union[float, NoneType] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Construct the GT explosion pulse of Garces (2019) in Gaussion noise with SNR in bits re signal STD
+:param duration_points:
+:param sample_rate_hz:
+:param noise_std_loss_bits:
+:param frequency_center_hz:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_rdvxm_center_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
+                                noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
+    &#34;&#34;&#34;
+    Construct the GT explosion pulse of Garces (2019) in Gaussion noise with SNR in bits re signal STD
+    :param duration_points:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :param frequency_center_hz:
+    :return:
+    &#34;&#34;&#34;
+
+    if frequency_center_hz:
+        pseudo_period_s = 1/frequency_center_hz
+    else:
+        pseudo_period_s = duration_points/sample_rate_hz/4.
+
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    gt_white_aa.astype(np.float16)
+
+    return gt_white_aa</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.gt_rdvxm_center_noise_uneven"><code class="name flex">
+<span>def <span class="ident">gt_rdvxm_center_noise_uneven</span></span>(<span>sensor_epoch_micros: <built-in function array>, start_epoch_micros: float, duration_points: int = 4096, sample_rate_hz: float = 80, noise_std_loss_bits: float = 2, frequency_center_hz: typing.Union[float, NoneType] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Construct the GT explosion pulse of Garces (2019) for uneven sensor time
+in Gaussion noise with SNR in bits re signal STD
+:param sensor_epoch_micros:
+:param start_epoch_micros:
+:param duration_points:
+:param sample_rate_hz:
+:param noise_std_loss_bits:
+:param frequency_center_hz:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_rdvxm_center_noise_uneven(sensor_epoch_micros: np.array, start_epoch_micros: float,
+                                 duration_points: int = 2**12, sample_rate_hz: float = 80,
+                                 noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
+    &#34;&#34;&#34;
+    Construct the GT explosion pulse of Garces (2019) for uneven sensor time
+    in Gaussion noise with SNR in bits re signal STD
+    :param sensor_epoch_micros:
+    :param start_epoch_micros:
+    :param duration_points:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :param frequency_center_hz:
+    :return:
+    &#34;&#34;&#34;
+
+    if frequency_center_hz:
+        pseudo_period_s = 1/frequency_center_hz
+    else:
+        pseudo_period_s = duration_points/sample_rate_hz/4.
+
+    # Convert to seconds
+    time_duration_s = duration_points/sample_rate_hz
+    time_center_s = (sensor_epoch_micros - start_epoch_micros)/1E6 - time_duration_s/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+
+    return gt_white_aa</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.sawtooth_rdvxm_noise_16bit"><code class="name flex">
+<span>def <span class="ident">sawtooth_rdvxm_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80, noise_std_loss_bits: float = 4, frequency_center_hz: typing.Union[float, NoneType] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
+                               noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+
+    duration_s = duration_points/sample_rate_hz
+    if frequency_center_hz:
+        frequency_center_angular = 2*np.pi*frequency_center_hz
+    else:
+        frequency_center_hz = 8./duration_s
+        frequency_center_angular = 2*np.pi*frequency_center_hz
+
+    sig_time_s = np.arange(int(duration_points))/sample_rate_hz
+    saw_wf = signal.sawtooth(frequency_center_angular*sig_time_s, width=0)
+    saw_wf *= taper_tukey(saw_wf, 0.25)
+    noise_wf = white_noise_fbits(sig=saw_wf, std_bit_loss=noise_std_loss_bits)
+    saw_white = saw_wf + noise_wf
+    saw_white_aa = antialias_halfNyquist(saw_white)
+    saw_white_aa.astype(np.float16)
+
+    return saw_white_aa</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.taper_tukey"><code class="name flex">
+<span>def <span class="ident">taper_tukey</span></span>(<span>sig_or_time: numpy.ndarray, fraction_cosine: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
+fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+:param sig_or_time: input signal or time
+:param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
+:return: tukey taper window amplitude</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
+    fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+    :param sig_or_time: input signal or time
+    :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
+    :return: tukey taper window amplitude
+    &#34;&#34;&#34;
+    number_points = np.size(sig_or_time)
+    amplitude = signal.tukey(M=number_points, alpha=fraction_cosine, sym=True)
+    return amplitude</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.white_noise_fbits"><code class="name flex">
+<span>def <span class="ident">white_noise_fbits</span></span>(<span>sig: numpy.ndarray, std_bit_loss: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute white noise with zero mean and standard deviation that is snr_bits below the input signal
+:param sig: input signal, detrended
+:param std_bit_loss: number of bits below signal standard deviation
+:return: gaussian noise with zero mean</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def white_noise_fbits(sig: np.ndarray, std_bit_loss: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute white noise with zero mean and standard deviation that is snr_bits below the input signal
+    :param sig: input signal, detrended
+    :param std_bit_loss: number of bits below signal standard deviation
+    :return: gaussian noise with zero mean
+    &#34;&#34;&#34;
+    sig_std = np.std(sig)
+    # This is in power, or variance
+    noise_loss = 2.**std_bit_loss
+    std_from_fbits = sig_std/noise_loss
+    # White noise, zero mean
+    sig_noise = np.random.normal(0, std_from_fbits, size=sig.size)
+    return sig_noise</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="libquantum" href="index.html">libquantum</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="libquantum.synthetics.antialias_halfNyquist" href="#libquantum.synthetics.antialias_halfNyquist">antialias_halfNyquist</a></code></li>
+<li><code><a title="libquantum.synthetics.chirp_linear_in_noise" href="#libquantum.synthetics.chirp_linear_in_noise">chirp_linear_in_noise</a></code></li>
+<li><code><a title="libquantum.synthetics.chirp_rdvxm_noise_16bit" href="#libquantum.synthetics.chirp_rdvxm_noise_16bit">chirp_rdvxm_noise_16bit</a></code></li>
+<li><code><a title="libquantum.synthetics.frequency_algebraic_Nth" href="#libquantum.synthetics.frequency_algebraic_Nth">frequency_algebraic_Nth</a></code></li>
+<li><code><a title="libquantum.synthetics.gt_blast_center_fast" href="#libquantum.synthetics.gt_blast_center_fast">gt_blast_center_fast</a></code></li>
+<li><code><a title="libquantum.synthetics.gt_blast_center_noise" href="#libquantum.synthetics.gt_blast_center_noise">gt_blast_center_noise</a></code></li>
+<li><code><a title="libquantum.synthetics.gt_blast_ft" href="#libquantum.synthetics.gt_blast_ft">gt_blast_ft</a></code></li>
+<li><code><a title="libquantum.synthetics.gt_blast_period_center" href="#libquantum.synthetics.gt_blast_period_center">gt_blast_period_center</a></code></li>
+<li><code><a title="libquantum.synthetics.gt_blast_spectral_density" href="#libquantum.synthetics.gt_blast_spectral_density">gt_blast_spectral_density</a></code></li>
+<li><code><a title="libquantum.synthetics.gt_rdvxm_center_noise_16bit" href="#libquantum.synthetics.gt_rdvxm_center_noise_16bit">gt_rdvxm_center_noise_16bit</a></code></li>
+<li><code><a title="libquantum.synthetics.gt_rdvxm_center_noise_uneven" href="#libquantum.synthetics.gt_rdvxm_center_noise_uneven">gt_rdvxm_center_noise_uneven</a></code></li>
+<li><code><a title="libquantum.synthetics.sawtooth_rdvxm_noise_16bit" href="#libquantum.synthetics.sawtooth_rdvxm_noise_16bit">sawtooth_rdvxm_noise_16bit</a></code></li>
+<li><code><a title="libquantum.synthetics.taper_tukey" href="#libquantum.synthetics.taper_tukey">taper_tukey</a></code></li>
+<li><code><a title="libquantum.synthetics.white_noise_fbits" href="#libquantum.synthetics.white_noise_fbits">white_noise_fbits</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

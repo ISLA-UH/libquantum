@@ -1,0 +1,1356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>libquantum.scales API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>libquantum.scales</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import numpy as np
+
+&#34;&#34;&#34;
+CREATED: 20200901
+Construct standardized scales
+MAG LAST UPDATED:
+&#34;&#34;&#34;
+
+&#34;&#34;&#34; Smallest number for 64-bit floats. Deploy to avoid division by zero or log zero singularities&#34;&#34;&#34;
+EPSILON = np.finfo(np.float64).eps
+MICROS_TO_S = 1E-6
+MICROS_TO_MILLIS = 1E-3
+KPA_TO_PA = 1E3
+DEGREES_TO_M = 111.
+&#34;&#34;&#34;
+Standardized scales
+&#34;&#34;&#34;
+
+
+class Slice:
+    &#34;&#34;&#34;
+    Constants for slice calculations, supersedes inferno/slice
+    &#34;&#34;&#34;
+    # Constant Q Base
+    G2 = 2.  # Octaves
+    G3 = 10. ** 0.3  # Reconciles base2 and base10
+    # Time
+    T_PLANCK = 5.4E-44  # 2.**(-144)   Planck time in seconds
+    T0S = 1E-42  # Universal Scale
+    T1S = 1.    # 1 second
+    T100S = 100.  # 1 hectosecond, IMS low band edge
+    T1000S = 1000.  # 1 kiloseconds = 1 mHz
+    T1M = 60.  # 1 minute in seconds
+    T1H = T1M*60.  # 1 hour in seconds
+    T1D = T1H*24.   # 1 day in seconds
+    TU = 2.**58  # Estimated age of the known universe in seconds
+    # Frequency
+    F1 = 1.  # 1 Hz
+    F1000 = 1000.  # 1 kHz
+    F0 = 1.E42  # 1/Universal Scale
+    FU = 2.**-58  # Estimated age of the universe in Hz
+    # Pressure
+    PREF_KPA = 101.325  # sea level pressure, kPa
+    PREF_PA = 10132500.  # sea level pressure, kPa
+
+
+def planck_scale_s(scale_order):
+    # Assumes base 2, Slice.G2
+    cycles_M, quality_factor_Q = wavelet_MQ_from_N(scale_order)
+    scale_edge = Slice.G2 ** (1.0 / (2.0 * scale_order))
+    # # Q = center/bandwidth
+    # planck_scale_zero_s = planck_scale_bandwidth_s*quality_factor_Q
+    # Must be greater than Planck scale
+    planck_scale_center_s = Slice.T0S
+    # Smallest scale
+    planck_scale_min_s = planck_scale_center_s/scale_edge
+    planck_scale_max_s = planck_scale_center_s*scale_edge
+    return planck_scale_center_s, planck_scale_min_s, planck_scale_max_s, quality_factor_Q
+
+
+def musical_scale_hz():
+    &#34;&#34;&#34;
+    Returns frequencies for equal tempered scale
+    base2, ref = 440 Hz, 12th octaves
+    &#34;&#34;&#34;
+    return band_frequencies_nyquist(frequency_order_input=12,
+                                    frequency_base_input=2,
+                                    frequency_ref_input=440,
+                                    frequency_low_input=16.35,
+                                    frequency_sample_rate_input=16000)
+
+
+def band_periods_nyquist(scale_order_input: float, scale_base_input: float,
+                         scale_ref_input: float,
+                         scale_sample_interval_input: float, scale_high_input: float) -&gt; \
+        (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE SECONDS
+    scale = pseudo-period
+    scale_sample_interval_input: float
+        Sample interval in seconds, sets lowest frequency
+    scale_high_input: float
+        Highest center scale of interest
+    &#34;&#34;&#34;
+    scale_nyquist_input = 2*scale_sample_interval_input
+    return band_intervals_periods(scale_order_input, scale_base_input,
+                                  scale_ref_input,
+                                  scale_nyquist_input, scale_high_input)
+
+
+def band_frequencies_nyquist(frequency_order_input: float, frequency_base_input: float,
+                             frequency_ref_input: float,
+                             frequency_low_input: float, frequency_sample_rate_input: float) -&gt; \
+        (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
+    &#34;&#34;&#34;
+
+    scale_ref_input = 1/frequency_ref_input
+    scale_nyquist_input = 2/frequency_sample_rate_input
+    scale_high_input = 1/frequency_low_input
+
+    scale_order, scale_base, scale_band_number, \
+    scale_ref, scale_center_algebraic, scale_center_geometric, \
+    scale_start, scale_end = \
+        band_intervals_periods(frequency_order_input, frequency_base_input,
+                               scale_ref_input,
+                               scale_nyquist_input, scale_high_input)
+    frequency_ref = 1/scale_ref
+    frequency_center_geometric = 1/scale_center_geometric
+    frequency_end = 1/scale_start
+    frequency_start = 1/scale_end
+    frequency_center_algebraic = (frequency_end + frequency_start)/2.
+    
+    # Inherit the order, base, and band number
+    return scale_order, scale_base, -scale_band_number, \
+           frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
+           frequency_start, frequency_end
+
+
+def band_frequencies_low_high(frequency_order_input: float, frequency_base_input: float,
+                              frequency_ref_input: float,
+                              frequency_low_input: float,
+                              frequency_high_input: float,
+                              frequency_sample_rate_input: float) -&gt; \
+        (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
+    &#34;&#34;&#34;
+
+    scale_ref_input = 1/frequency_ref_input
+    scale_nyquist_input = 2/frequency_sample_rate_input
+    scale_low_input = 1/frequency_high_input
+    if scale_low_input &lt; scale_nyquist_input:
+        scale_low_input = scale_nyquist_input
+    scale_high_input = 1/frequency_low_input
+
+    scale_order, scale_base, scale_band_number, \
+    scale_ref, scale_center_algebraic, scale_center_geometric, \
+    scale_start, scale_end = \
+        band_intervals_periods(frequency_order_input, frequency_base_input,
+                               scale_ref_input,
+                               scale_low_input,
+                               scale_high_input)
+    frequency_ref = 1/scale_ref
+    frequency_center_geometric = 1/scale_center_geometric
+    frequency_end = 1/scale_start
+    frequency_start = 1/scale_end
+    frequency_center_algebraic = (frequency_end + frequency_start)/2.
+
+    # Inherit the order, base, and band number
+    return scale_order, scale_base, -scale_band_number, \
+           frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
+           frequency_start, frequency_end
+
+
+def band_intervals_periods(scale_order_input: float, scale_base_input: float,
+                           scale_ref_input: float,
+                           scale_low_input: float,
+                           scale_high_input: float) -&gt; \
+        (float, float, np.ndarray, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;Evaluate Standard Logarithmic Interval Scale Parameters using time scales in seconds
+    If scales are provided as frequency, previous computations convert to time.
+    Designed to take bappsband to just below Nyquist, within a band edge.
+    ALWAYS CONVERT TO SECONDS
+    Last updated: 20200905
+
+    Parameters
+    ----------
+    scale_order_input: float
+        Band order N, for ISO3 use N = 1.0 or 3.0 or 6.0 or 12.0 or 24.0
+    scale_base_input: float
+        reference base G; i.e. G3 = 10.**0.3 or G2 = 2.0
+    scale_ref_input: float
+        time reference: in seconds
+    scale_low_input: float
+        Lowest scale. If Nyquist scale, 2 * sample interval in seconds.
+    scale_high_input: float
+        Highest scale of interest in seconds
+
+    Returns
+    -------
+    scale_order: float
+        Band order N &gt; 1, defaults to 1.
+    scale_base: float
+        positive reference Base G &gt; 1, defaults to G3
+    scale_ref: float
+        positive reference scale
+    scale_band_number: numpy ndarray
+        Band number n
+    scale_center: numpy ndarray
+        Center band scale
+    scale_start: numpy ndarray
+        Lower band edge scale
+    scale_end: numpy ndarray
+        Upper band edge scale
+    &#34;&#34;&#34;
+    # Initiate error handling, all inputs should be numeric, positive, and real
+    # Need error check for string inputs
+    # If not real and positive, make them so
+    [scale_ref, scale_low, scale_high, scale_base, scale_order] = np.absolute(
+        [scale_ref_input, scale_low_input, scale_high_input, scale_base_input, scale_order_input])
+
+    # print(&#39;\nConstructing standard band intervals&#39;)
+    # Check for compliance with ISO3 and/or ANSI S1.11 and for scale_order = 1, 3, 6, 12, and 24
+    if scale_base == Slice.G3:
+        pass
+        # print(&#39;Specified Base G3 = 10.**(3./10.) Meets ISO3 Preferred Series&#39;)
+    elif scale_base == Slice.G2:
+        pass
+    elif scale_base &lt; 1.:
+        print(&#39;\nWARNING: Base must be greater than unity. Overriding to G = 2&#39;)
+        scale_base = Slice.G2
+    else:
+        print(&#39;\nWARNING: Base is not ISO3 or ANSI S1.11 compliant&#39;)
+        print((&#39;Continuing With Non-standard base = &#39; + repr(scale_base) + &#39; ...&#39;))
+
+    # Check for compliance with ISO3 for scale_order = 1, 3, 6, 12, and 24
+    # and the two &#39;special&#39; orders 0.75 and 1.5
+    valid_scale_orders = (0.75, 1, 1.5, 3, 6, 12, 24, 48)
+    if scale_order in valid_scale_orders:
+        pass
+        # print(&#39;Specified Order = &#39; + repr(scale_order) + &#39; Meets ISO3 Preferred Series&#39;)
+    elif scale_order &lt; 0.75:
+        print(&#39;Order must be greater than 0.75. Overriding to Order 1&#39;)
+        scale_order = 1
+    else:
+        print((&#39;\nWARNING: Recommend Orders &#39; + str(valid_scale_orders)))
+        print((&#39;Continuing With Non-standard Order = &#39; + repr(scale_order) + &#39; ...&#39;))
+
+    # Compute scale edge and width parameters
+    scale_edge = scale_base ** (1.0 / (2.0 * scale_order))
+    scale_width = scale_edge - 1.0 / scale_edge
+
+    if scale_low &lt; Slice.T0S:
+        scale_low = Slice.T0S/scale_edge
+    if scale_high &lt; scale_low:
+        print(&#39;\nWARNING: Upper scale must be larger than the lowest scale&#39;)
+        print(&#39;Overriding to min = max/G  \n&#39;)
+        scale_low = scale_high / scale_base
+    if scale_high == scale_low:
+        print(&#39;\nWARNING: Upper scale = lowest scale, returning closest band edges&#39;)
+        scale_high *= scale_edge
+        scale_low /= scale_edge
+
+    # Max and min bands are computed relative to the center scale
+    n_max = np.round(scale_order * np.log(scale_high / scale_ref) / np.log(scale_base))
+    n_min = np.floor(scale_order * np.log(scale_low / scale_ref) / np.log(scale_base))
+
+    # Evaluate min, ensure it stays below Nyquist period
+    scale_center_n_min = scale_ref * np.power(scale_base, n_min/scale_order)
+    if (scale_center_n_min &lt; scale_low) or (scale_center_n_min/scale_edge &lt; scale_low-EPSILON):
+        n_min += 1
+
+    # Check for band number anomalies
+    if n_max &lt; n_min:
+        print(&#39;\nSPECMOD: Insufficient bandwidth for Nth band specification&#39;)
+        print((&#39;Minimum scaled bandwidth (scale_high - scale_low)/scale_center = &#39; + repr(scale_width) + &#39;\n&#39;))
+        print(&#39;Correct scale High/Low input parameters \n&#39;)
+        print(&#39;Apply one order  \n&#39;)
+        n_max = np.floor(np.log10(scale_high) / np.log10(scale_base))
+        n_min = n_max - scale_order
+
+    # Band number array for Nth octave
+    scale_band_number = np.arange(n_min, n_max + 1)
+
+    # Compute exact, evenly (log) distributed, constant Q,
+    # Nth octave center and band edge frequencies
+    scale_band_exponent = scale_band_number / scale_order
+
+    scale_center_geometric = scale_ref * np.power(scale_base * np.ones(scale_band_number.shape), scale_band_exponent)
+    scale_start = scale_center_geometric / scale_edge
+    scale_end = scale_center_geometric * scale_edge
+    # The spectrum is centered on the algebraic center scale
+    scale_center_algebraic = (scale_start+scale_end)/2.
+
+    return scale_order, scale_base, scale_band_number, \
+           scale_ref, scale_center_algebraic, scale_center_geometric, \
+           scale_start, scale_end
+
+
+&#34;&#34;&#34;
+Quantum wavelet specifications
+&#34;&#34;&#34;
+
+
+def wavelet_MQ_from_N(band_order_Nth: float):
+    &#34;&#34;&#34;
+    Compute the quality factor Q and multiplier M for a specified band order N
+    N is THE quantization parameter for the binary constant Q wavelet filters
+    :param band_order_Nth: Band order, must be &gt; 0.75 or reverts to N=3
+    :return: float, float
+    &#34;&#34;&#34;
+    if band_order_Nth &lt; 0.7:
+        # raise TypeError(&#39;N&lt;0.7 specified, using N = {}.&#39;.format(str(3)))
+        print(&#39;N&lt;0.7 specified, using N = &#39;, 3)
+        band_order_Nth = 3.
+    order_bandedge = 2 ** (1. / 2. / band_order_Nth)  # kN in Garces 2013
+    order_scaled_bandwidth = order_bandedge - 1. / order_bandedge
+    quality_factor_Q = 1./order_scaled_bandwidth  # Exact for Nth octave bands
+    cycles_M = quality_factor_Q*2*np.sqrt(np.log(2))  # Exact, from -3dB points
+    return cycles_M, quality_factor_Q
+
+
+def wavelet_NMQ_from_Q(quality_factor_Q: float):
+    &#34;&#34;&#34;
+    For a specified Q, estimate order N and recompute exact Q and number of cycles M from N
+    :param quality_factor_Q: number of oscillations with significant amplitude in the frame
+    :return: float, float, float
+    &#34;&#34;&#34;
+    band_order_Nth = quality_factor_Q/np.sqrt(2)  # Approximate
+    cycles_M, quality_factor_Q = wavelet_MQ_from_N(band_order_Nth)
+    return band_order_Nth, cycles_M, quality_factor_Q
+
+
+def wavelet_NMQ_from_M(cycles_M: float):
+    &#34;&#34;&#34;
+    For a specified M, estimate order N and recompute exact Q and number of cycles M from N
+    :param quality_factor_Q: number of oscillations with significant amplitude in the frame
+    :return: float, float, float
+    &#34;&#34;&#34;
+    quality_factor_Q = cycles_M/(2*np.sqrt(np.log(2)))  # Exact, from -3dB/half bit points
+    band_order_Nth, cycles_M, quality_factor_Q = wavelet_NMQ_from_Q(quality_factor_Q)
+    return band_order_Nth, cycles_M, quality_factor_Q
+
+
+def wavelet_support(band_order_Nth : float,
+                    scale_frequency_center_hz: float,
+                    frequency_sample_rate_hz: float,
+                    is_power_2: bool=True):
+    &#34;&#34;&#34;
+    Compact support for Gabor wavelet
+    :param band_order_Nth: band order
+    :param scale_frequency_center_hz: scale frequency in hz
+    :param is_power_2: power of two approximation
+    :return: int, float, float
+    &#34;&#34;&#34;
+    cycles_M, _ = wavelet_MQ_from_N(band_order_Nth)
+    scale_frame_T_s = cycles_M / scale_frequency_center_hz   # Lifetime Tn, in seconds, M/fc
+    # scale_lifetime_T_horn_s = scale_frame_T_s / (2. * np.pi)  # Lifetime per cycle, M/omega
+    scale_atom = frequency_sample_rate_hz*scale_frame_T_s / (2. * np.pi)  # Canonical Gabor atom scale
+    nominal_points = np.floor(scale_frame_T_s*frequency_sample_rate_hz)
+
+    floor_switch = 0.8  # Theoretical foundation, empirical implementation
+    # TODO: Will this work with vector inputs?
+    if is_power_2:
+        duration_points_floor = 2**(np.floor(np.log2(nominal_points)))
+        duration_points_ceil = 2**(np.ceil(np.log2(nominal_points)))
+        if duration_points_floor &lt; floor_switch*nominal_points:
+            duration_points = int(duration_points_ceil)
+        else:
+            duration_points = int(duration_points_floor)
+    else:
+        duration_points = int(nominal_points)
+    return duration_points, scale_frame_T_s, scale_atom
+
+
+def from_duration(band_order_Nth : float,
+                  sig_duration_s: float):
+    cycles_M, _ = wavelet_MQ_from_N(band_order_Nth)
+    scale_time_s = sig_duration_s/cycles_M
+    scale_frequency_hz = 1/scale_time_s
+    return scale_time_s, scale_frequency_hz
+
+
+def frequency_bands_g2f1(scale_order_input: float,
+                         frequency_low_input: float,
+                         frequency_sample_rate_input: float) -&gt; \
+        (float, float, float, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;
+    As with band intervals, takes it all the way to Nyquist
+    :param scale_order_input:
+    :param frequency_low_input:
+    :param frequency_sample_rate_input:
+    :return:
+    &#34;&#34;&#34;
+
+    order_Nth, scale_base, scale_band_number, \
+    frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
+    frequency_start, frequency_end = \
+        band_frequencies_nyquist(frequency_order_input=scale_order_input,
+                                 frequency_base_input=Slice.G2,
+                                 frequency_ref_input=Slice.F1,
+                                 frequency_low_input=frequency_low_input,
+                                 frequency_sample_rate_input=frequency_sample_rate_input)
+    cycles_M, quality_Q = wavelet_MQ_from_N(order_Nth)
+
+    return order_Nth, cycles_M, quality_Q, frequency_center_geometric, frequency_start, frequency_end
+
+
+def cqt_frequency_bands_g2f1(scale_order_input: float,
+                             frequency_low_input: float,
+                             frequency_sample_rate_input: float,
+                             is_power_2: bool = True) -&gt; \
+        (float, float, float, float, float):
+
+    order_Nth, cycles_M, quality_Q, frequency_hz_center, frequency_hz_start, frequency_hz_end = \
+        frequency_bands_g2f1(scale_order_input, frequency_low_input, frequency_sample_rate_input)
+
+    scale_number_bins_0 = int(len(frequency_hz_center))
+
+    # TODO: Document resolution of bandwidth discrepancy
+    hann_bandwidth = 1.50018310546875
+    _, q_gabor = wavelet_MQ_from_N(order_Nth)
+    # From Librosa/filters: threshold =  freq[-1] * (1 + 0.5 * window_bandwidth(window) / Q)
+    # &gt; frequency_sample_rate_hz / 2.0:
+    threshold = frequency_hz_center * (1 + 0.5 * hann_bandwidth / q_gabor)  # &gt; frequency_sample_rate_hz / 2.0:
+    # print(&#39;threshold:&#39;, threshold)
+    # print(scale_number_bins_0)
+    # Remember frequency order is inverted because solution is in periods.
+    idn = np.argmax(threshold &lt; 0.9*frequency_sample_rate_input/2.0)
+    scale_number_bins = int(len(frequency_hz_center[idn:]))
+
+    frequency_hz_center_min = np.min(frequency_hz_center)
+    cqt_points_hop_min = int(2**(np.floor(scale_number_bins/order_Nth)-1.))
+    # cqt_points_hop_min = int(2**(np.ceil(scale_number_bins/order_Nth)))
+    cqt_points_per_seg_max, _, _ = wavelet_support(order_Nth,
+                                                   frequency_hz_center_min,
+                                                   frequency_sample_rate_input,
+                                                   is_power_2)
+    return cqt_points_hop_min, frequency_hz_center_min, scale_number_bins, order_Nth, cqt_points_per_seg_max
+
+
+# def spect_scale(sample_rate_hz, order_base, order_Nth, scale_ref_input,
+#                 soi_fundamental_frequency_hz, soi_fundamental_cycles_per_window):
+#     # TODO: Where does this fit?
+#     frequency_hz_minimum = soi_fundamental_frequency_hz/4.   # Octave below fundamental
+#
+#     time_window_duration = soi_fundamental_cycles_per_window/soi_fundamental_frequency_hz  # 1/spectral resolution for FFT
+#
+#     scale_ref, scale_base, scale_order, scale_band_number, scale_band_exponent, \
+#     scale_center, scale_start, scale_end = band_intervals(scale_ref_input, order_base, order_Nth,
+#                                                           frequency_hz_minimum, sample_rate_hz/2.)
+#     scale_number_bins = int(len(scale_band_number))
+#     scale_nth_octave = int(scale_order)
+#
+#     print(&#39;Scale number octaves:&#39;, np.floor(scale_number_bins/order_Nth))
+#     print(&#39;Scale number bins:&#39;, scale_number_bins)
+#     # print(&#39;Scale band:&#39;, scale_band_number)
+#     # print(&#39;Scale center:&#39;, scale_center)
+#
+#     points_per_seg = time_window_duration*sample_rate_hz
+#     points_per_seg_base2 = int(2**np.ceil(np.log2(points_per_seg)))  # 2**n points
+#     time_per_seg_s_base2 = points_per_seg_base2/sample_rate_hz
+#
+#     print(&#39;NFFT segment, base2:&#39;, points_per_seg_base2)
+#     print(&#39;NFFT segment base2 time, s:&#39;, time_per_seg_s_base2)
+#     # TODO: find code where I fixed this
+#     points_hop = int(points_per_seg_base2/8)
+#     # TODO: Here it is
+#     cqt_points_hop = int(2**(np.floor(scale_number_bins/order_Nth)-1.))
+#     points_overlap = points_per_seg_base2 - points_hop
+#     return scale_nth_octave, scale_number_bins, points_hop, points_overlap, points_per_seg_base2, frequency_hz_minimum
+
+
+def wavelet_scale_morlet2(band_order_Nth: float,
+                          scale_frequency_center_hz: float,
+                          frequency_sample_rate_hz: float):
+    &#34;&#34;&#34;
+    Nondimensional scale for canonical Morlet wavelet
+    :param band_order_Nth: band order
+    :param scale_frequency_center_hz: scale frequency in hz
+    :param frequency_sample_rate_hz: sample rate in hz
+    :return: floats or np.ndarray
+    &#34;&#34;&#34;
+    cycles_M, _ = wavelet_MQ_from_N(band_order_Nth)
+    scale_atom = cycles_M*frequency_sample_rate_hz/scale_frequency_center_hz/(2. * np.pi)
+    return scale_atom, cycles_M
+
+
+def wavelet_inputs_morlet2(band_order_Nth: float, time_s: np.ndarray, offset_time_s: float,
+                           scale_frequency_center_hz: float, frequency_sample_rate_hz: float):
+    &#34;&#34;&#34;
+    Adds scaled time-shifted time
+    :param band_order_Nth:
+    :param time_s:
+    :param offset_time_s:
+    :param scale_frequency_center_hz:
+    :param frequency_sample_rate_hz:
+    :return: floats or np.ndarrays
+    &#34;&#34;&#34;
+
+    xtime_shifted = frequency_sample_rate_hz*(time_s-offset_time_s)
+    scale_morlet2, cycles_M = wavelet_scale_morlet2(band_order_Nth, scale_frequency_center_hz, frequency_sample_rate_hz)
+
+    return xtime_shifted, scale_morlet2, cycles_M
+
+
+# if __name__ == &#34;__main__&#34;:
+#
+#     print(&#39;First Planck band, with minimum pseudo-period bandwidth = &#39;, Slice.T0S)
+#     for scale_order in [0.75, 1, 1.5, 3, 6, 12]:
+#         planck_center, planck_low, planck_high, quality_Q = planck_scale_s(scale_order)
+#         print(&#39;\nOrder_N:&#39;, scale_order)
+#         print(&#39;Number of Oscillations, Q:&#39;, quality_Q)
+#         # print(&#39;%1s%12s%12s&#39; % (&#39;Scaled Center&#39;, &#39;Lower&#39;, &#39;Upper&#39;))
+#         # print(&#39;%12.4e%12.4e%12.4e&#39; % (planck_center/Slice.T0S, planck_low/Slice.T0S, planck_high/Slice.T0S))
+#         print(&#39;%1s%12s%12s&#39; % (&#39;Time_s Center&#39;, &#39;Lower&#39;, &#39;Upper&#39;))
+#         print(&#39;%12.4e%12.4e%12.4e&#39; % (planck_center, planck_low, planck_high))
+#         print(&#39;Scaled bandwidth:&#39;, (planck_high-planck_low)/Slice.T0S)
+#
+#
+#     print(&#39;\n Scale Period up to Nyquist&#39;)
+#     export.print_scales_to_screen(scale_order_input=1,
+#                                   scale_base_input=Slice.G3,
+#                                   scale_ref_input=Slice.T0S,
+#                                   scale_sample_interval_input=1E-43,
+#                                   scale_high_input=1E-41)
+#
+#     print(&#39;\n Scale Frequency up to Nyquist, G3&#39;)
+#     export.print_frequencies_to_screen(frequency_order_input=1,
+#                                        frequency_base_input=Slice.G3,
+#                                        frequency_ref_input=Slice.F1,
+#                                        frequency_low_input=1/1E-41,
+#                                        frequency_sample_rate_input=1/1E-43)
+#
+#     print(&#39;\n Scale Frequency up to Nyquist, G2&#39;)
+#     export.print_frequencies_to_screen(frequency_order_input=1,
+#                                        frequency_base_input=Slice.G2,
+#                                        frequency_ref_input=Slice.F1,
+#                                        frequency_low_input=1/1E-41,
+#                                        frequency_sample_rate_input=1/1E-43)
+#
+#     print(&#39;\n *** Equal tempered scale re A4 = 440 Hz&#39;)
+#     export.print_frequencies_to_screen(frequency_order_input=12,
+#                                        frequency_base_input=Slice.G2,
+#                                        frequency_ref_input=440,
+#                                        frequency_low_input=16.35,
+#                                        frequency_sample_rate_input=16000)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="libquantum.scales.DEGREES_TO_M"><code class="name">var <span class="ident">DEGREES_TO_M</span></code></dt>
+<dd>
+<div class="desc"><p>Standardized scales</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="libquantum.scales.band_frequencies_low_high"><code class="name flex">
+<span>def <span class="ident">band_frequencies_low_high</span></span>(<span>frequency_order_input: float, frequency_base_input: float, frequency_ref_input: float, frequency_low_input: float, frequency_high_input: float, frequency_sample_rate_input: float) ‑> (<class 'float'>, <class 'float'>, <class 'float'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def band_frequencies_low_high(frequency_order_input: float, frequency_base_input: float,
+                              frequency_ref_input: float,
+                              frequency_low_input: float,
+                              frequency_high_input: float,
+                              frequency_sample_rate_input: float) -&gt; \
+        (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
+    &#34;&#34;&#34;
+
+    scale_ref_input = 1/frequency_ref_input
+    scale_nyquist_input = 2/frequency_sample_rate_input
+    scale_low_input = 1/frequency_high_input
+    if scale_low_input &lt; scale_nyquist_input:
+        scale_low_input = scale_nyquist_input
+    scale_high_input = 1/frequency_low_input
+
+    scale_order, scale_base, scale_band_number, \
+    scale_ref, scale_center_algebraic, scale_center_geometric, \
+    scale_start, scale_end = \
+        band_intervals_periods(frequency_order_input, frequency_base_input,
+                               scale_ref_input,
+                               scale_low_input,
+                               scale_high_input)
+    frequency_ref = 1/scale_ref
+    frequency_center_geometric = 1/scale_center_geometric
+    frequency_end = 1/scale_start
+    frequency_start = 1/scale_end
+    frequency_center_algebraic = (frequency_end + frequency_start)/2.
+
+    # Inherit the order, base, and band number
+    return scale_order, scale_base, -scale_band_number, \
+           frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
+           frequency_start, frequency_end</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.band_frequencies_nyquist"><code class="name flex">
+<span>def <span class="ident">band_frequencies_nyquist</span></span>(<span>frequency_order_input: float, frequency_base_input: float, frequency_ref_input: float, frequency_low_input: float, frequency_sample_rate_input: float) ‑> (<class 'float'>, <class 'float'>, <class 'float'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def band_frequencies_nyquist(frequency_order_input: float, frequency_base_input: float,
+                             frequency_ref_input: float,
+                             frequency_low_input: float, frequency_sample_rate_input: float) -&gt; \
+        (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
+    &#34;&#34;&#34;
+
+    scale_ref_input = 1/frequency_ref_input
+    scale_nyquist_input = 2/frequency_sample_rate_input
+    scale_high_input = 1/frequency_low_input
+
+    scale_order, scale_base, scale_band_number, \
+    scale_ref, scale_center_algebraic, scale_center_geometric, \
+    scale_start, scale_end = \
+        band_intervals_periods(frequency_order_input, frequency_base_input,
+                               scale_ref_input,
+                               scale_nyquist_input, scale_high_input)
+    frequency_ref = 1/scale_ref
+    frequency_center_geometric = 1/scale_center_geometric
+    frequency_end = 1/scale_start
+    frequency_start = 1/scale_end
+    frequency_center_algebraic = (frequency_end + frequency_start)/2.
+    
+    # Inherit the order, base, and band number
+    return scale_order, scale_base, -scale_band_number, \
+           frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
+           frequency_start, frequency_end</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.band_intervals_periods"><code class="name flex">
+<span>def <span class="ident">band_intervals_periods</span></span>(<span>scale_order_input: float, scale_base_input: float, scale_ref_input: float, scale_low_input: float, scale_high_input: float) ‑> (<class 'float'>, <class 'float'>, <class 'numpy.ndarray'>, <class 'float'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate Standard Logarithmic Interval Scale Parameters using time scales in seconds
+If scales are provided as frequency, previous computations convert to time.
+Designed to take bappsband to just below Nyquist, within a band edge.
+ALWAYS CONVERT TO SECONDS
+Last updated: 20200905</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>scale_order_input</code></strong> :&ensp;<code>float</code></dt>
+<dd>Band order N, for ISO3 use N = 1.0 or 3.0 or 6.0 or 12.0 or 24.0</dd>
+<dt><strong><code>scale_base_input</code></strong> :&ensp;<code>float</code></dt>
+<dd>reference base G; i.e. G3 = 10.**0.3 or G2 = 2.0</dd>
+<dt><strong><code>scale_ref_input</code></strong> :&ensp;<code>float</code></dt>
+<dd>time reference: in seconds</dd>
+<dt><strong><code>scale_low_input</code></strong> :&ensp;<code>float</code></dt>
+<dd>Lowest scale. If Nyquist scale, 2 * sample interval in seconds.</dd>
+<dt><strong><code>scale_high_input</code></strong> :&ensp;<code>float</code></dt>
+<dd>Highest scale of interest in seconds</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>scale_order</code></strong> :&ensp;<code>float</code></dt>
+<dd>Band order N &gt; 1, defaults to 1.</dd>
+<dt><strong><code>scale_base</code></strong> :&ensp;<code>float</code></dt>
+<dd>positive reference Base G &gt; 1, defaults to G3</dd>
+<dt><strong><code>scale_ref</code></strong> :&ensp;<code>float</code></dt>
+<dd>positive reference scale</dd>
+<dt><strong><code>scale_band_number</code></strong> :&ensp;<code>numpy ndarray</code></dt>
+<dd>Band number n</dd>
+<dt><strong><code>scale_center</code></strong> :&ensp;<code>numpy ndarray</code></dt>
+<dd>Center band scale</dd>
+<dt><strong><code>scale_start</code></strong> :&ensp;<code>numpy ndarray</code></dt>
+<dd>Lower band edge scale</dd>
+<dt><strong><code>scale_end</code></strong> :&ensp;<code>numpy ndarray</code></dt>
+<dd>Upper band edge scale</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def band_intervals_periods(scale_order_input: float, scale_base_input: float,
+                           scale_ref_input: float,
+                           scale_low_input: float,
+                           scale_high_input: float) -&gt; \
+        (float, float, np.ndarray, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;Evaluate Standard Logarithmic Interval Scale Parameters using time scales in seconds
+    If scales are provided as frequency, previous computations convert to time.
+    Designed to take bappsband to just below Nyquist, within a band edge.
+    ALWAYS CONVERT TO SECONDS
+    Last updated: 20200905
+
+    Parameters
+    ----------
+    scale_order_input: float
+        Band order N, for ISO3 use N = 1.0 or 3.0 or 6.0 or 12.0 or 24.0
+    scale_base_input: float
+        reference base G; i.e. G3 = 10.**0.3 or G2 = 2.0
+    scale_ref_input: float
+        time reference: in seconds
+    scale_low_input: float
+        Lowest scale. If Nyquist scale, 2 * sample interval in seconds.
+    scale_high_input: float
+        Highest scale of interest in seconds
+
+    Returns
+    -------
+    scale_order: float
+        Band order N &gt; 1, defaults to 1.
+    scale_base: float
+        positive reference Base G &gt; 1, defaults to G3
+    scale_ref: float
+        positive reference scale
+    scale_band_number: numpy ndarray
+        Band number n
+    scale_center: numpy ndarray
+        Center band scale
+    scale_start: numpy ndarray
+        Lower band edge scale
+    scale_end: numpy ndarray
+        Upper band edge scale
+    &#34;&#34;&#34;
+    # Initiate error handling, all inputs should be numeric, positive, and real
+    # Need error check for string inputs
+    # If not real and positive, make them so
+    [scale_ref, scale_low, scale_high, scale_base, scale_order] = np.absolute(
+        [scale_ref_input, scale_low_input, scale_high_input, scale_base_input, scale_order_input])
+
+    # print(&#39;\nConstructing standard band intervals&#39;)
+    # Check for compliance with ISO3 and/or ANSI S1.11 and for scale_order = 1, 3, 6, 12, and 24
+    if scale_base == Slice.G3:
+        pass
+        # print(&#39;Specified Base G3 = 10.**(3./10.) Meets ISO3 Preferred Series&#39;)
+    elif scale_base == Slice.G2:
+        pass
+    elif scale_base &lt; 1.:
+        print(&#39;\nWARNING: Base must be greater than unity. Overriding to G = 2&#39;)
+        scale_base = Slice.G2
+    else:
+        print(&#39;\nWARNING: Base is not ISO3 or ANSI S1.11 compliant&#39;)
+        print((&#39;Continuing With Non-standard base = &#39; + repr(scale_base) + &#39; ...&#39;))
+
+    # Check for compliance with ISO3 for scale_order = 1, 3, 6, 12, and 24
+    # and the two &#39;special&#39; orders 0.75 and 1.5
+    valid_scale_orders = (0.75, 1, 1.5, 3, 6, 12, 24, 48)
+    if scale_order in valid_scale_orders:
+        pass
+        # print(&#39;Specified Order = &#39; + repr(scale_order) + &#39; Meets ISO3 Preferred Series&#39;)
+    elif scale_order &lt; 0.75:
+        print(&#39;Order must be greater than 0.75. Overriding to Order 1&#39;)
+        scale_order = 1
+    else:
+        print((&#39;\nWARNING: Recommend Orders &#39; + str(valid_scale_orders)))
+        print((&#39;Continuing With Non-standard Order = &#39; + repr(scale_order) + &#39; ...&#39;))
+
+    # Compute scale edge and width parameters
+    scale_edge = scale_base ** (1.0 / (2.0 * scale_order))
+    scale_width = scale_edge - 1.0 / scale_edge
+
+    if scale_low &lt; Slice.T0S:
+        scale_low = Slice.T0S/scale_edge
+    if scale_high &lt; scale_low:
+        print(&#39;\nWARNING: Upper scale must be larger than the lowest scale&#39;)
+        print(&#39;Overriding to min = max/G  \n&#39;)
+        scale_low = scale_high / scale_base
+    if scale_high == scale_low:
+        print(&#39;\nWARNING: Upper scale = lowest scale, returning closest band edges&#39;)
+        scale_high *= scale_edge
+        scale_low /= scale_edge
+
+    # Max and min bands are computed relative to the center scale
+    n_max = np.round(scale_order * np.log(scale_high / scale_ref) / np.log(scale_base))
+    n_min = np.floor(scale_order * np.log(scale_low / scale_ref) / np.log(scale_base))
+
+    # Evaluate min, ensure it stays below Nyquist period
+    scale_center_n_min = scale_ref * np.power(scale_base, n_min/scale_order)
+    if (scale_center_n_min &lt; scale_low) or (scale_center_n_min/scale_edge &lt; scale_low-EPSILON):
+        n_min += 1
+
+    # Check for band number anomalies
+    if n_max &lt; n_min:
+        print(&#39;\nSPECMOD: Insufficient bandwidth for Nth band specification&#39;)
+        print((&#39;Minimum scaled bandwidth (scale_high - scale_low)/scale_center = &#39; + repr(scale_width) + &#39;\n&#39;))
+        print(&#39;Correct scale High/Low input parameters \n&#39;)
+        print(&#39;Apply one order  \n&#39;)
+        n_max = np.floor(np.log10(scale_high) / np.log10(scale_base))
+        n_min = n_max - scale_order
+
+    # Band number array for Nth octave
+    scale_band_number = np.arange(n_min, n_max + 1)
+
+    # Compute exact, evenly (log) distributed, constant Q,
+    # Nth octave center and band edge frequencies
+    scale_band_exponent = scale_band_number / scale_order
+
+    scale_center_geometric = scale_ref * np.power(scale_base * np.ones(scale_band_number.shape), scale_band_exponent)
+    scale_start = scale_center_geometric / scale_edge
+    scale_end = scale_center_geometric * scale_edge
+    # The spectrum is centered on the algebraic center scale
+    scale_center_algebraic = (scale_start+scale_end)/2.
+
+    return scale_order, scale_base, scale_band_number, \
+           scale_ref, scale_center_algebraic, scale_center_geometric, \
+           scale_start, scale_end</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.band_periods_nyquist"><code class="name flex">
+<span>def <span class="ident">band_periods_nyquist</span></span>(<span>scale_order_input: float, scale_base_input: float, scale_ref_input: float, scale_sample_interval_input: float, scale_high_input: float) ‑> (<class 'float'>, <class 'float'>, <class 'float'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE SECONDS
+scale = pseudo-period
+scale_sample_interval_input: float
+Sample interval in seconds, sets lowest frequency
+scale_high_input: float
+Highest center scale of interest</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def band_periods_nyquist(scale_order_input: float, scale_base_input: float,
+                         scale_ref_input: float,
+                         scale_sample_interval_input: float, scale_high_input: float) -&gt; \
+        (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE SECONDS
+    scale = pseudo-period
+    scale_sample_interval_input: float
+        Sample interval in seconds, sets lowest frequency
+    scale_high_input: float
+        Highest center scale of interest
+    &#34;&#34;&#34;
+    scale_nyquist_input = 2*scale_sample_interval_input
+    return band_intervals_periods(scale_order_input, scale_base_input,
+                                  scale_ref_input,
+                                  scale_nyquist_input, scale_high_input)</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.cqt_frequency_bands_g2f1"><code class="name flex">
+<span>def <span class="ident">cqt_frequency_bands_g2f1</span></span>(<span>scale_order_input: float, frequency_low_input: float, frequency_sample_rate_input: float, is_power_2: bool = True) ‑> (<class 'float'>, <class 'float'>, <class 'float'>, <class 'float'>, <class 'float'>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cqt_frequency_bands_g2f1(scale_order_input: float,
+                             frequency_low_input: float,
+                             frequency_sample_rate_input: float,
+                             is_power_2: bool = True) -&gt; \
+        (float, float, float, float, float):
+
+    order_Nth, cycles_M, quality_Q, frequency_hz_center, frequency_hz_start, frequency_hz_end = \
+        frequency_bands_g2f1(scale_order_input, frequency_low_input, frequency_sample_rate_input)
+
+    scale_number_bins_0 = int(len(frequency_hz_center))
+
+    # TODO: Document resolution of bandwidth discrepancy
+    hann_bandwidth = 1.50018310546875
+    _, q_gabor = wavelet_MQ_from_N(order_Nth)
+    # From Librosa/filters: threshold =  freq[-1] * (1 + 0.5 * window_bandwidth(window) / Q)
+    # &gt; frequency_sample_rate_hz / 2.0:
+    threshold = frequency_hz_center * (1 + 0.5 * hann_bandwidth / q_gabor)  # &gt; frequency_sample_rate_hz / 2.0:
+    # print(&#39;threshold:&#39;, threshold)
+    # print(scale_number_bins_0)
+    # Remember frequency order is inverted because solution is in periods.
+    idn = np.argmax(threshold &lt; 0.9*frequency_sample_rate_input/2.0)
+    scale_number_bins = int(len(frequency_hz_center[idn:]))
+
+    frequency_hz_center_min = np.min(frequency_hz_center)
+    cqt_points_hop_min = int(2**(np.floor(scale_number_bins/order_Nth)-1.))
+    # cqt_points_hop_min = int(2**(np.ceil(scale_number_bins/order_Nth)))
+    cqt_points_per_seg_max, _, _ = wavelet_support(order_Nth,
+                                                   frequency_hz_center_min,
+                                                   frequency_sample_rate_input,
+                                                   is_power_2)
+    return cqt_points_hop_min, frequency_hz_center_min, scale_number_bins, order_Nth, cqt_points_per_seg_max</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.frequency_bands_g2f1"><code class="name flex">
+<span>def <span class="ident">frequency_bands_g2f1</span></span>(<span>scale_order_input: float, frequency_low_input: float, frequency_sample_rate_input: float) ‑> (<class 'float'>, <class 'float'>, <class 'float'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>, <class 'numpy.ndarray'>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>As with band intervals, takes it all the way to Nyquist
+:param scale_order_input:
+:param frequency_low_input:
+:param frequency_sample_rate_input:
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def frequency_bands_g2f1(scale_order_input: float,
+                         frequency_low_input: float,
+                         frequency_sample_rate_input: float) -&gt; \
+        (float, float, float, np.ndarray, np.ndarray, np.ndarray):
+    &#34;&#34;&#34;
+    As with band intervals, takes it all the way to Nyquist
+    :param scale_order_input:
+    :param frequency_low_input:
+    :param frequency_sample_rate_input:
+    :return:
+    &#34;&#34;&#34;
+
+    order_Nth, scale_base, scale_band_number, \
+    frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
+    frequency_start, frequency_end = \
+        band_frequencies_nyquist(frequency_order_input=scale_order_input,
+                                 frequency_base_input=Slice.G2,
+                                 frequency_ref_input=Slice.F1,
+                                 frequency_low_input=frequency_low_input,
+                                 frequency_sample_rate_input=frequency_sample_rate_input)
+    cycles_M, quality_Q = wavelet_MQ_from_N(order_Nth)
+
+    return order_Nth, cycles_M, quality_Q, frequency_center_geometric, frequency_start, frequency_end</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.from_duration"><code class="name flex">
+<span>def <span class="ident">from_duration</span></span>(<span>band_order_Nth: float, sig_duration_s: float)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def from_duration(band_order_Nth : float,
+                  sig_duration_s: float):
+    cycles_M, _ = wavelet_MQ_from_N(band_order_Nth)
+    scale_time_s = sig_duration_s/cycles_M
+    scale_frequency_hz = 1/scale_time_s
+    return scale_time_s, scale_frequency_hz</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.musical_scale_hz"><code class="name flex">
+<span>def <span class="ident">musical_scale_hz</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns frequencies for equal tempered scale
+base2, ref = 440 Hz, 12th octaves</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def musical_scale_hz():
+    &#34;&#34;&#34;
+    Returns frequencies for equal tempered scale
+    base2, ref = 440 Hz, 12th octaves
+    &#34;&#34;&#34;
+    return band_frequencies_nyquist(frequency_order_input=12,
+                                    frequency_base_input=2,
+                                    frequency_ref_input=440,
+                                    frequency_low_input=16.35,
+                                    frequency_sample_rate_input=16000)</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.planck_scale_s"><code class="name flex">
+<span>def <span class="ident">planck_scale_s</span></span>(<span>scale_order)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def planck_scale_s(scale_order):
+    # Assumes base 2, Slice.G2
+    cycles_M, quality_factor_Q = wavelet_MQ_from_N(scale_order)
+    scale_edge = Slice.G2 ** (1.0 / (2.0 * scale_order))
+    # # Q = center/bandwidth
+    # planck_scale_zero_s = planck_scale_bandwidth_s*quality_factor_Q
+    # Must be greater than Planck scale
+    planck_scale_center_s = Slice.T0S
+    # Smallest scale
+    planck_scale_min_s = planck_scale_center_s/scale_edge
+    planck_scale_max_s = planck_scale_center_s*scale_edge
+    return planck_scale_center_s, planck_scale_min_s, planck_scale_max_s, quality_factor_Q</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.wavelet_MQ_from_N"><code class="name flex">
+<span>def <span class="ident">wavelet_MQ_from_N</span></span>(<span>band_order_Nth: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the quality factor Q and multiplier M for a specified band order N
+N is THE quantization parameter for the binary constant Q wavelet filters
+:param band_order_Nth: Band order, must be &gt; 0.75 or reverts to N=3
+:return: float, float</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wavelet_MQ_from_N(band_order_Nth: float):
+    &#34;&#34;&#34;
+    Compute the quality factor Q and multiplier M for a specified band order N
+    N is THE quantization parameter for the binary constant Q wavelet filters
+    :param band_order_Nth: Band order, must be &gt; 0.75 or reverts to N=3
+    :return: float, float
+    &#34;&#34;&#34;
+    if band_order_Nth &lt; 0.7:
+        # raise TypeError(&#39;N&lt;0.7 specified, using N = {}.&#39;.format(str(3)))
+        print(&#39;N&lt;0.7 specified, using N = &#39;, 3)
+        band_order_Nth = 3.
+    order_bandedge = 2 ** (1. / 2. / band_order_Nth)  # kN in Garces 2013
+    order_scaled_bandwidth = order_bandedge - 1. / order_bandedge
+    quality_factor_Q = 1./order_scaled_bandwidth  # Exact for Nth octave bands
+    cycles_M = quality_factor_Q*2*np.sqrt(np.log(2))  # Exact, from -3dB points
+    return cycles_M, quality_factor_Q</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.wavelet_NMQ_from_M"><code class="name flex">
+<span>def <span class="ident">wavelet_NMQ_from_M</span></span>(<span>cycles_M: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>For a specified M, estimate order N and recompute exact Q and number of cycles M from N
+:param quality_factor_Q: number of oscillations with significant amplitude in the frame
+:return: float, float, float</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wavelet_NMQ_from_M(cycles_M: float):
+    &#34;&#34;&#34;
+    For a specified M, estimate order N and recompute exact Q and number of cycles M from N
+    :param quality_factor_Q: number of oscillations with significant amplitude in the frame
+    :return: float, float, float
+    &#34;&#34;&#34;
+    quality_factor_Q = cycles_M/(2*np.sqrt(np.log(2)))  # Exact, from -3dB/half bit points
+    band_order_Nth, cycles_M, quality_factor_Q = wavelet_NMQ_from_Q(quality_factor_Q)
+    return band_order_Nth, cycles_M, quality_factor_Q</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.wavelet_NMQ_from_Q"><code class="name flex">
+<span>def <span class="ident">wavelet_NMQ_from_Q</span></span>(<span>quality_factor_Q: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>For a specified Q, estimate order N and recompute exact Q and number of cycles M from N
+:param quality_factor_Q: number of oscillations with significant amplitude in the frame
+:return: float, float, float</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wavelet_NMQ_from_Q(quality_factor_Q: float):
+    &#34;&#34;&#34;
+    For a specified Q, estimate order N and recompute exact Q and number of cycles M from N
+    :param quality_factor_Q: number of oscillations with significant amplitude in the frame
+    :return: float, float, float
+    &#34;&#34;&#34;
+    band_order_Nth = quality_factor_Q/np.sqrt(2)  # Approximate
+    cycles_M, quality_factor_Q = wavelet_MQ_from_N(band_order_Nth)
+    return band_order_Nth, cycles_M, quality_factor_Q</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.wavelet_inputs_morlet2"><code class="name flex">
+<span>def <span class="ident">wavelet_inputs_morlet2</span></span>(<span>band_order_Nth: float, time_s: numpy.ndarray, offset_time_s: float, scale_frequency_center_hz: float, frequency_sample_rate_hz: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds scaled time-shifted time
+:param band_order_Nth:
+:param time_s:
+:param offset_time_s:
+:param scale_frequency_center_hz:
+:param frequency_sample_rate_hz:
+:return: floats or np.ndarrays</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wavelet_inputs_morlet2(band_order_Nth: float, time_s: np.ndarray, offset_time_s: float,
+                           scale_frequency_center_hz: float, frequency_sample_rate_hz: float):
+    &#34;&#34;&#34;
+    Adds scaled time-shifted time
+    :param band_order_Nth:
+    :param time_s:
+    :param offset_time_s:
+    :param scale_frequency_center_hz:
+    :param frequency_sample_rate_hz:
+    :return: floats or np.ndarrays
+    &#34;&#34;&#34;
+
+    xtime_shifted = frequency_sample_rate_hz*(time_s-offset_time_s)
+    scale_morlet2, cycles_M = wavelet_scale_morlet2(band_order_Nth, scale_frequency_center_hz, frequency_sample_rate_hz)
+
+    return xtime_shifted, scale_morlet2, cycles_M</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.wavelet_scale_morlet2"><code class="name flex">
+<span>def <span class="ident">wavelet_scale_morlet2</span></span>(<span>band_order_Nth: float, scale_frequency_center_hz: float, frequency_sample_rate_hz: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Nondimensional scale for canonical Morlet wavelet
+:param band_order_Nth: band order
+:param scale_frequency_center_hz: scale frequency in hz
+:param frequency_sample_rate_hz: sample rate in hz
+:return: floats or np.ndarray</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wavelet_scale_morlet2(band_order_Nth: float,
+                          scale_frequency_center_hz: float,
+                          frequency_sample_rate_hz: float):
+    &#34;&#34;&#34;
+    Nondimensional scale for canonical Morlet wavelet
+    :param band_order_Nth: band order
+    :param scale_frequency_center_hz: scale frequency in hz
+    :param frequency_sample_rate_hz: sample rate in hz
+    :return: floats or np.ndarray
+    &#34;&#34;&#34;
+    cycles_M, _ = wavelet_MQ_from_N(band_order_Nth)
+    scale_atom = cycles_M*frequency_sample_rate_hz/scale_frequency_center_hz/(2. * np.pi)
+    return scale_atom, cycles_M</code></pre>
+</details>
+</dd>
+<dt id="libquantum.scales.wavelet_support"><code class="name flex">
+<span>def <span class="ident">wavelet_support</span></span>(<span>band_order_Nth: float, scale_frequency_center_hz: float, frequency_sample_rate_hz: float, is_power_2: bool = True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compact support for Gabor wavelet
+:param band_order_Nth: band order
+:param scale_frequency_center_hz: scale frequency in hz
+:param is_power_2: power of two approximation
+:return: int, float, float</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wavelet_support(band_order_Nth : float,
+                    scale_frequency_center_hz: float,
+                    frequency_sample_rate_hz: float,
+                    is_power_2: bool=True):
+    &#34;&#34;&#34;
+    Compact support for Gabor wavelet
+    :param band_order_Nth: band order
+    :param scale_frequency_center_hz: scale frequency in hz
+    :param is_power_2: power of two approximation
+    :return: int, float, float
+    &#34;&#34;&#34;
+    cycles_M, _ = wavelet_MQ_from_N(band_order_Nth)
+    scale_frame_T_s = cycles_M / scale_frequency_center_hz   # Lifetime Tn, in seconds, M/fc
+    # scale_lifetime_T_horn_s = scale_frame_T_s / (2. * np.pi)  # Lifetime per cycle, M/omega
+    scale_atom = frequency_sample_rate_hz*scale_frame_T_s / (2. * np.pi)  # Canonical Gabor atom scale
+    nominal_points = np.floor(scale_frame_T_s*frequency_sample_rate_hz)
+
+    floor_switch = 0.8  # Theoretical foundation, empirical implementation
+    # TODO: Will this work with vector inputs?
+    if is_power_2:
+        duration_points_floor = 2**(np.floor(np.log2(nominal_points)))
+        duration_points_ceil = 2**(np.ceil(np.log2(nominal_points)))
+        if duration_points_floor &lt; floor_switch*nominal_points:
+            duration_points = int(duration_points_ceil)
+        else:
+            duration_points = int(duration_points_floor)
+    else:
+        duration_points = int(nominal_points)
+    return duration_points, scale_frame_T_s, scale_atom</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="libquantum.scales.Slice"><code class="flex name class">
+<span>class <span class="ident">Slice</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constants for slice calculations, supersedes inferno/slice</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Slice:
+    &#34;&#34;&#34;
+    Constants for slice calculations, supersedes inferno/slice
+    &#34;&#34;&#34;
+    # Constant Q Base
+    G2 = 2.  # Octaves
+    G3 = 10. ** 0.3  # Reconciles base2 and base10
+    # Time
+    T_PLANCK = 5.4E-44  # 2.**(-144)   Planck time in seconds
+    T0S = 1E-42  # Universal Scale
+    T1S = 1.    # 1 second
+    T100S = 100.  # 1 hectosecond, IMS low band edge
+    T1000S = 1000.  # 1 kiloseconds = 1 mHz
+    T1M = 60.  # 1 minute in seconds
+    T1H = T1M*60.  # 1 hour in seconds
+    T1D = T1H*24.   # 1 day in seconds
+    TU = 2.**58  # Estimated age of the known universe in seconds
+    # Frequency
+    F1 = 1.  # 1 Hz
+    F1000 = 1000.  # 1 kHz
+    F0 = 1.E42  # 1/Universal Scale
+    FU = 2.**-58  # Estimated age of the universe in Hz
+    # Pressure
+    PREF_KPA = 101.325  # sea level pressure, kPa
+    PREF_PA = 10132500.  # sea level pressure, kPa</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="libquantum.scales.Slice.F0"><code class="name">var <span class="ident">F0</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.F1"><code class="name">var <span class="ident">F1</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.F1000"><code class="name">var <span class="ident">F1000</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.FU"><code class="name">var <span class="ident">FU</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.G2"><code class="name">var <span class="ident">G2</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.G3"><code class="name">var <span class="ident">G3</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.PREF_KPA"><code class="name">var <span class="ident">PREF_KPA</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.PREF_PA"><code class="name">var <span class="ident">PREF_PA</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.T0S"><code class="name">var <span class="ident">T0S</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.T1000S"><code class="name">var <span class="ident">T1000S</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.T100S"><code class="name">var <span class="ident">T100S</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.T1D"><code class="name">var <span class="ident">T1D</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.T1H"><code class="name">var <span class="ident">T1H</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.T1M"><code class="name">var <span class="ident">T1M</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.T1S"><code class="name">var <span class="ident">T1S</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.TU"><code class="name">var <span class="ident">TU</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.scales.Slice.T_PLANCK"><code class="name">var <span class="ident">T_PLANCK</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="libquantum" href="index.html">libquantum</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="libquantum.scales.DEGREES_TO_M" href="#libquantum.scales.DEGREES_TO_M">DEGREES_TO_M</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="libquantum.scales.band_frequencies_low_high" href="#libquantum.scales.band_frequencies_low_high">band_frequencies_low_high</a></code></li>
+<li><code><a title="libquantum.scales.band_frequencies_nyquist" href="#libquantum.scales.band_frequencies_nyquist">band_frequencies_nyquist</a></code></li>
+<li><code><a title="libquantum.scales.band_intervals_periods" href="#libquantum.scales.band_intervals_periods">band_intervals_periods</a></code></li>
+<li><code><a title="libquantum.scales.band_periods_nyquist" href="#libquantum.scales.band_periods_nyquist">band_periods_nyquist</a></code></li>
+<li><code><a title="libquantum.scales.cqt_frequency_bands_g2f1" href="#libquantum.scales.cqt_frequency_bands_g2f1">cqt_frequency_bands_g2f1</a></code></li>
+<li><code><a title="libquantum.scales.frequency_bands_g2f1" href="#libquantum.scales.frequency_bands_g2f1">frequency_bands_g2f1</a></code></li>
+<li><code><a title="libquantum.scales.from_duration" href="#libquantum.scales.from_duration">from_duration</a></code></li>
+<li><code><a title="libquantum.scales.musical_scale_hz" href="#libquantum.scales.musical_scale_hz">musical_scale_hz</a></code></li>
+<li><code><a title="libquantum.scales.planck_scale_s" href="#libquantum.scales.planck_scale_s">planck_scale_s</a></code></li>
+<li><code><a title="libquantum.scales.wavelet_MQ_from_N" href="#libquantum.scales.wavelet_MQ_from_N">wavelet_MQ_from_N</a></code></li>
+<li><code><a title="libquantum.scales.wavelet_NMQ_from_M" href="#libquantum.scales.wavelet_NMQ_from_M">wavelet_NMQ_from_M</a></code></li>
+<li><code><a title="libquantum.scales.wavelet_NMQ_from_Q" href="#libquantum.scales.wavelet_NMQ_from_Q">wavelet_NMQ_from_Q</a></code></li>
+<li><code><a title="libquantum.scales.wavelet_inputs_morlet2" href="#libquantum.scales.wavelet_inputs_morlet2">wavelet_inputs_morlet2</a></code></li>
+<li><code><a title="libquantum.scales.wavelet_scale_morlet2" href="#libquantum.scales.wavelet_scale_morlet2">wavelet_scale_morlet2</a></code></li>
+<li><code><a title="libquantum.scales.wavelet_support" href="#libquantum.scales.wavelet_support">wavelet_support</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="libquantum.scales.Slice" href="#libquantum.scales.Slice">Slice</a></code></h4>
+<ul class="two-column">
+<li><code><a title="libquantum.scales.Slice.F0" href="#libquantum.scales.Slice.F0">F0</a></code></li>
+<li><code><a title="libquantum.scales.Slice.F1" href="#libquantum.scales.Slice.F1">F1</a></code></li>
+<li><code><a title="libquantum.scales.Slice.F1000" href="#libquantum.scales.Slice.F1000">F1000</a></code></li>
+<li><code><a title="libquantum.scales.Slice.FU" href="#libquantum.scales.Slice.FU">FU</a></code></li>
+<li><code><a title="libquantum.scales.Slice.G2" href="#libquantum.scales.Slice.G2">G2</a></code></li>
+<li><code><a title="libquantum.scales.Slice.G3" href="#libquantum.scales.Slice.G3">G3</a></code></li>
+<li><code><a title="libquantum.scales.Slice.PREF_KPA" href="#libquantum.scales.Slice.PREF_KPA">PREF_KPA</a></code></li>
+<li><code><a title="libquantum.scales.Slice.PREF_PA" href="#libquantum.scales.Slice.PREF_PA">PREF_PA</a></code></li>
+<li><code><a title="libquantum.scales.Slice.T0S" href="#libquantum.scales.Slice.T0S">T0S</a></code></li>
+<li><code><a title="libquantum.scales.Slice.T1000S" href="#libquantum.scales.Slice.T1000S">T1000S</a></code></li>
+<li><code><a title="libquantum.scales.Slice.T100S" href="#libquantum.scales.Slice.T100S">T100S</a></code></li>
+<li><code><a title="libquantum.scales.Slice.T1D" href="#libquantum.scales.Slice.T1D">T1D</a></code></li>
+<li><code><a title="libquantum.scales.Slice.T1H" href="#libquantum.scales.Slice.T1H">T1H</a></code></li>
+<li><code><a title="libquantum.scales.Slice.T1M" href="#libquantum.scales.Slice.T1M">T1M</a></code></li>
+<li><code><a title="libquantum.scales.Slice.T1S" href="#libquantum.scales.Slice.T1S">T1S</a></code></li>
+<li><code><a title="libquantum.scales.Slice.TU" href="#libquantum.scales.Slice.TU">TU</a></code></li>
+<li><code><a title="libquantum.scales.Slice.T_PLANCK" href="#libquantum.scales.Slice.T_PLANCK">T_PLANCK</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

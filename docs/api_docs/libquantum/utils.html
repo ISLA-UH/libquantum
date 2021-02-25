@@ -1,0 +1,1662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>libquantum.utils API documentation</title>
+<meta name="description" content="This module contains general utilities that can work with values containing nans." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>libquantum.utils</code></h1>
+</header>
+<section id="section-intro">
+<p>This module contains general utilities that can work with values containing nans.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+This module contains general utilities that can work with values containing nans.
+&#34;&#34;&#34;
+
+from enum import Enum
+from typing import Tuple
+
+import numpy as np
+from scipy import signal
+
+from libquantum.scales import EPSILON, MICROS_TO_S, KPA_TO_PA
+from redvox.common import date_time_utils as dt
+from redvox.common.station import Station
+
+
+def datetime_now_epoch_s() -&gt; float:
+    &#34;&#34;&#34;
+    Returns the invocation Unix time in seconds
+    :return: The current epoch timestamp as seconds since the epoch UTC
+    &#34;&#34;&#34;
+    return dt.datetime_to_epoch_seconds_utc(dt.now())
+
+
+def datetime_now_epoch_micros() -&gt; float:
+    &#34;&#34;&#34;
+    Returns the invocation Unix time in microseconds
+    :return: The current epoch timestamp as microseconds since the epoch UTC
+    &#34;&#34;&#34;
+    return dt.datetime_to_epoch_microseconds_utc(dt.now())
+
+
+class NormType(Enum):
+    &#34;&#34;&#34;
+    Enumeration of normalization types.
+    &#34;&#34;&#34;
+    MAX: str = &#34;max&#34;
+    L1: str = &#34;l1&#34;
+    L2: str = &#34;l2&#34;
+    OTHER: str = &#34;other&#34;
+
+
+def normalize(sig: np.ndarray, scaling: float = 1., norm_type: NormType = NormType.MAX) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Scale a 1D time series
+    :param sig: time series signature
+    :param scaling: scaling parameter, division
+    :param norm_type: {&#39;max&#39;, l1, l2}, optional
+    :return: The scaled series
+    &#34;&#34;&#34;
+    if norm_type == NormType.MAX:
+        return sig / np.nanmax(np.abs(sig))
+    elif norm_type == NormType.L1:
+        return sig / np.nansum(sig)
+    elif norm_type == NormType.L2:
+        return sig / np.sqrt(np.nansum(sig * sig))
+    else:  # Must be NormType.Other
+        return sig / scaling
+
+
+def demean_nan(sig: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Detrend and normalize a 1D time series
+    :param sig: time series with (possibly) non-zero mean
+    :return: Detrended and normalized time series
+    &#34;&#34;&#34;&#34;&#34;
+    return np.nan_to_num(sig - np.nanmean(sig))
+
+
+def detrend_nan(sig: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Detrend and normalize a 1D time series
+    :param sig: time series with (possibly) non-zero mean
+    :return: Detrended and normalized time series
+    &#34;&#34;&#34;&#34;&#34;
+    return signal.detrend(demean_nan(sig))
+
+
+def demean_nan_norm(sig: np.ndarray, scaling: float = 1., norm_type: NormType = NormType.MAX) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Detrend and normalize a 1D time series
+    :param sig: time series with (possibly) non-zero mean
+    :param scaling: scaling parameter, division
+    :param norm_type: {&#39;max&#39;, l1, l2}, overrides scikit default of &#39;l2&#39; by &#39;max&#39;
+    :return: The detrended and denormalized series.
+    &#34;&#34;&#34;&#34;&#34;
+    sig_detrend = demean_nan(sig)
+    return normalize(sig_detrend, scaling=scaling, norm_type=norm_type)
+
+
+def demean_nan_matrix(sig: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Detrend and normalize a matrix of time series
+    :param sig: time series with (possibly) non-zero mean
+    :return: The detrended and normalized signature
+    &#34;&#34;&#34;&#34;&#34;
+    return np.nan_to_num(np.subtract(sig.transpose(), np.nanmean(sig, axis=1))).transpose()
+
+
+def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
+    fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+    :param sig_or_time: input signal or time
+    :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
+    :return: tukey taper window amplitude
+    &#34;&#34;&#34;
+    number_points = np.size(sig_or_time)
+    amplitude = signal.tukey(M=number_points, alpha=fraction_cosine, sym=True)
+    return amplitude
+
+
+def mic_wf_time_build_station(station,
+                              mean_type: str = &#34;simple&#34;,
+                              raw: bool = False) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    Builds mic waveform and times
+    :param station: the station with data
+    :param mean_type: under development
+    :param raw: if false (default), boolean or nan mean removed
+    :return:
+    &#34;&#34;&#34;
+    mic_sample_rate_hz = station.audio_sensor().sample_rate
+    mic_wf_raw = station.audio_sensor().get_data_channel(&#34;microphone&#34;)
+    mic_epoch_s = station.audio_sensor().data_timestamps() * MICROS_TO_S
+
+    if raw:
+        mic_wf = np.array(mic_wf_raw)
+    else:
+        if mean_type == &#34;simple&#34;:
+            # Simple demean and replace nans with zeros. OK for mic, not OK for all other DC-biased sensors
+            mic_wf = demean_nan(mic_wf_raw)
+        else:
+            # Remove linear trend
+            mic_wf = detrend_nan(mic_wf_raw)
+
+    return mic_wf, mic_epoch_s, mic_sample_rate_hz
+
+
+def barometer_build_station(station: Station, raw: bool = True) -&gt; Tuple[np.ndarray, np.ndarray, float, np.ndarray]:
+    &#34;&#34;&#34;
+    gets barometer data from a station. Returns raw data
+    :param station: the station with data
+    :param raw: if false (default), boolean or nan mean removed
+    :return: the barometer data, the timestamps, the estimated sample rate, and the indexes of the nans
+    The nan indexes should be preserved throughout the computation and used in all the plots.
+    &#34;&#34;&#34;
+    barometer_sample_rate_hz = station.barometer_sensor().sample_rate
+    barometer_raw = station.barometer_sensor().get_data_channel(&#34;pressure&#34;)
+    barometer_epoch_s = station.barometer_sensor().data_timestamps() * MICROS_TO_S
+    barometer_nans = np.argwhere(np.isnan(barometer_raw))
+    if raw:
+        barometer_wf = np.array(barometer_raw)
+    else:
+        # Detrend
+        barometer_wf = detrend_nan(np.array(barometer_raw))
+
+    return barometer_wf, barometer_epoch_s, barometer_sample_rate_hz, barometer_nans
+
+
+def accelerometer_build_station(station: Station,
+                                mean_type: str = &#34;simple&#34;,
+                                raw: bool = False) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    gets accelerometer data from a station
+    :param station: the station with data
+    :param mean_type: under development
+    :param raw: if false (default), boolean or nan mean removed
+    :return: the accelerometer data, the timestamps, and the estimated sample rate
+    &#34;&#34;&#34;
+    accelerometer_sample_rate_hz = station.accelerometer_sensor().sample_rate
+    accelerometer_raw = station.accelerometer_sensor().samples()
+    accelerometer_epoch_s = station.accelerometer_sensor().data_timestamps() * MICROS_TO_S
+
+    if raw:
+        accelerometer_wf = np.array(accelerometer_raw)
+    else:
+        if mean_type == &#34;simple&#34;:
+            # Demeans and replaces nans with zeros for 3C sensors
+            # TODO: Write function
+            accelerometer_wf = np.nan_to_num(np.subtract(accelerometer_raw.transpose(), np.nanmean(accelerometer_raw, axis=1))).transpose()
+        else:
+            # Placeholder for diff solution with nans
+            accelerometer_wf = np.nan_to_num(np.subtract(accelerometer_raw.transpose(), np.nanmean(accelerometer_raw, axis=1))).transpose()
+
+    return accelerometer_wf, accelerometer_epoch_s, accelerometer_sample_rate_hz
+
+
+def gyroscope_build_station(station: Station,
+                            mean_type: str = &#34;simple&#34;,
+                            raw: bool = False) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    gets gyroscope data from a station
+    :param station: the station with data
+    :param mean_type: under development
+    :param raw: if false (default), boolean or nan mean removed
+    :return: the gyroscope data, the timestamps, and the estimated sample rate
+    &#34;&#34;&#34;
+    gyroscope_sample_rate_hz = station.gyroscope_sensor().sample_rate
+    gyroscope_raw = station.gyroscope_sensor().samples()
+    gyroscope_epoch_s = station.gyroscope_sensor().data_timestamps() * MICROS_TO_S
+
+    if raw:
+        gyroscope_wf = np.array(gyroscope_raw)
+    else:
+        if mean_type == &#34;simple&#34;:
+            # Demeans and replaces nans with zeros for 3C sensors
+            # TODO: Write function
+            gyroscope_wf = np.nan_to_num(np.subtract(gyroscope_raw.transpose(), np.nanmean(gyroscope_raw, axis=1))).transpose()
+        else:
+            # Placeholder for diff solution with nans
+            gyroscope_wf = np.nan_to_num(np.subtract(gyroscope_raw.transpose(), np.nanmean(gyroscope_raw, axis=1))).transpose()
+
+    return gyroscope_wf, gyroscope_epoch_s, gyroscope_sample_rate_hz
+
+
+def magnetometer_build_station(station: Station,
+                               mean_type: str = &#34;simple&#34;,
+                               raw: bool = False) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    gets magnetometer data from a station
+    :param station: the station with data
+    :param mean_type: under development
+    :param raw: if false (default), boolean or nan mean removed
+    :return: the magnetometer data, the timestamps, and the estimated sample rate
+    &#34;&#34;&#34;
+    magnetometer_sample_rate_hz = station.magnetometer_sensor().sample_rate
+    magnetometer_raw = station.magnetometer_sensor().samples()
+    magnetometer_epoch_s = station.magnetometer_sensor().data_timestamps() * MICROS_TO_S
+
+    if raw:
+        magnetometer_wf = np.array(magnetometer_raw)
+    else:
+        if mean_type == &#34;simple&#34;:
+            # Demeans and replaces nans with zeros for 3C sensors
+            # TODO: Write function
+            magnetometer_wf = np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
+        else:
+            # Placeholder for diff solution with nans
+            magnetometer_wf = np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
+
+    return magnetometer_wf, magnetometer_epoch_s, magnetometer_sample_rate_hz
+
+
+class ExtractionType(Enum):
+    &#34;&#34;&#34;
+    Enumeration of valid extraction types.
+    ARGMAX = max of the absolute value of the signal
+    SIGMAX = fancier signal picker, from POSITIVE max
+    BITMAX = fancier signal picker, from ABSOLUTE max
+    &#34;&#34;&#34;
+    ARGMAX: str = &#34;argmax&#34;
+    SIGMAX: str = &#34;sigmax&#34;
+    BITMAX: str = &#34;bitmax&#34;
+
+
+def sig_extract(sig: np.ndarray, time_epoch_s: np.ndarray,
+                intro_s: float, outro_s: float,
+                pick_bits_below_max: float = 1.,
+                pick_time_interval_s: float = 1.,
+                extract_type: ExtractionType = ExtractionType.ARGMAX) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    Extract signal and time relative to reference index
+    :param sig: input signal
+    :param time_epoch_s: signal epoch time
+    :param intro_s: time before pick
+    :param outro_s: time after pick
+    :param pick_bits_below_max: pick treshold in bits below max
+    :param pick_time_interval_s: pick time interval between adjacent max point
+    :param extract_type: Type of extraction, see ExtractionType class
+    :return:
+    &#34;&#34;&#34;
+
+    sig_sample_interval_s = np.mean(np.diff(time_epoch_s))
+
+    if extract_type == ExtractionType.ARGMAX:
+        index_max = np.argmax(np.abs(sig))
+        # Max pick
+        pick_time_epoch_s = time_epoch_s[index_max]
+    elif extract_type == ExtractionType.SIGMAX:
+        time_index_pick_all = \
+            picker_signal_max_index(sig=sig, sig_sample_rate_hz=1./sig_sample_interval_s,
+                                    bits_pick=pick_bits_below_max, time_interval_s=pick_time_interval_s)
+        # First pick
+        pick_time_epoch_s = time_epoch_s[time_index_pick_all[0]]
+    elif extract_type == ExtractionType.BITMAX:
+        time_index_pick_all = \
+            picker_signal_bit_index(sig=sig, sig_sample_rate_hz=1./sig_sample_interval_s,
+                                    bits_pick=pick_bits_below_max, time_interval_s=pick_time_interval_s)
+        # First pick
+        pick_time_epoch_s = time_epoch_s[time_index_pick_all[0]]
+    else:
+        print(&#39;Unexpected extraction type to sig_extract, return max&#39;)
+        index_max = np.argmax(np.abs(sig))
+        # Max pick
+        pick_time_epoch_s = time_epoch_s[index_max]
+
+    epoch_s_start = pick_time_epoch_s - intro_s
+    epoch_s_stop = pick_time_epoch_s + outro_s
+
+    intro_index = np.argmin(np.abs(time_epoch_s - epoch_s_start))
+    outro_index = np.argmin(np.abs(time_epoch_s - epoch_s_stop))
+    sig_wf = sig[intro_index: outro_index]
+    sig_epoch_s = time_epoch_s[intro_index: outro_index]
+
+    return sig_wf, sig_epoch_s, pick_time_epoch_s
+
+
+def sig_frame(sig: np.ndarray, time_epoch_s: np.ndarray,
+              epoch_s_start: float, epoch_s_stop: float) -&gt; Tuple[np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Frame one-component signal within start and stop epoch times
+    :param sig: input signal
+    :param time_epoch_s: input epoch time in seconds
+    :param epoch_s_start: start epoch time
+    :param epoch_s_stop: stop epoch time
+    :return: truncated time series and time
+    &#34;&#34;&#34;
+    intro_index = np.argmin(np.abs(time_epoch_s - epoch_s_start))
+    outro_index = np.argmin(np.abs(time_epoch_s - epoch_s_stop))
+    sig_wf = sig[intro_index: outro_index]
+    sig_epoch_s = time_epoch_s[intro_index: outro_index]
+
+    return sig_wf, sig_epoch_s
+
+
+def sig3c_frame(sig3c: np.ndarray, time_epoch_s: np.ndarray,
+                epoch_s_start: float, epoch_s_stop: float):
+    &#34;&#34;&#34;
+    Frame three-component signal within start and stop epoch times
+    :param sig3c: input signal with three components
+    :param time_epoch_s: input epoch time in seconds
+    :param epoch_s_start: start epoch time
+    :param epoch_s_stop: stop epoch time
+    :return: truncated time series and time
+    &#34;&#34;&#34;
+    intro_index = np.argmin(np.abs(time_epoch_s - epoch_s_start))
+    outro_index = np.argmin(np.abs(time_epoch_s - epoch_s_stop))
+    sig_wf = sig3c[:, intro_index: outro_index]
+    sig_epoch_s = time_epoch_s[intro_index: outro_index]
+
+    return sig_wf, sig_epoch_s
+
+
+def dbepsilon(x: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Converts the absolute value of a time series to dB
+    :param x: time series
+    :return: ndarray
+    &#34;&#34;&#34;
+    y = 10 * np.log10(np.abs(x ** 2) + EPSILON)
+    return y
+
+
+def dbepsilon_max(x: np.ndarray) -&gt; float:
+    &#34;&#34;&#34;
+    Returns the max of the absolute value of a time series to dB
+    :param x: time series
+    :return: float
+    &#34;&#34;&#34;
+    y = 10 * np.log10(np.max(np.abs(x ** 2)) + EPSILON)
+    return y
+
+
+def log2epsilon(x: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    log 2 of the absolute value of linear amplitude, with EPSILON to avoid singularities
+    :param x: time series or fft - not power
+    :return: ndarray
+    &#34;&#34;&#34;
+    y = np.log2(np.abs(x) + EPSILON)
+    return y
+
+
+def log2epsilon_max(x: np.ndarray) -&gt; float:
+    &#34;&#34;&#34;
+    max of the log 2 of absolute value of linear amplitude, with EPSILON to avoid singularities
+    :param x: time series or fft - not power
+    :return: float
+    &#34;&#34;&#34;
+    y = np.max(np.log2(np.abs(x) + EPSILON))
+    return y
+
+
+&#34;&#34;&#34;
+Picker modules
+&#34;&#34;&#34;
+
+
+# TODO: Migrate to their own modules
+def picker_signal_max_index(sig: np.array,
+                            sig_sample_rate_hz: float,
+                            bits_pick: float,
+                            time_interval_s: float) -&gt; np.array:
+    &#34;&#34;&#34;
+    Finds the picker index for the POSITIVE max of a signal
+    :param sig: array of waveform data
+    :param sig_sample_rate_hz: float sample rate of reference sensor
+    :param bits_pick: detection threshold in bits loss
+    :param time_interval_s: min time interval between events
+    :return: picker index
+    &#34;&#34;&#34;
+
+    # Compute the distance
+    distance_points = int(time_interval_s * sig_sample_rate_hz)
+    height_min = np.max(sig) - 2 ** bits_pick
+    time_index_pick, _ = signal.find_peaks(sig, height=height_min, distance=distance_points)
+
+    return time_index_pick
+
+
+def picker_signal_bit_index(sig: np.array, sig_sample_rate_hz: float,
+                            bits_pick: float, time_interval_s: float) -&gt; np.array:
+    &#34;&#34;&#34;
+    Finds the picker index from the ABSOLUTE max in bits
+    :param sig: array of waveform data
+    :param sig_sample_rate_hz: float sample rate of reference sensor
+    :param bits_pick: detection treshold in db loss
+    :param time_interval_s: min time interval between events
+    :return: picker index
+    &#34;&#34;&#34;
+
+    # Compute the distance
+    distance_points = int(time_interval_s * sig_sample_rate_hz)
+    sig_bit = log2epsilon(sig)
+    height_min = log2epsilon_max(sig) - bits_pick
+    index_pick, _ = signal.find_peaks(sig_bit, height=height_min, distance=distance_points)
+
+    return index_pick
+
+
+def picker_comb(sig_pick, index_pick):
+    &#34;&#34;&#34;
+    Constructs a comb function from the picks
+    :param sig_pick: 1D record corresponding to the picks
+    :param index_pick: indexes for the picks
+    :return: comb with unit amplitude
+    &#34;&#34;&#34;
+    comb = np.zeros(sig_pick.shape)
+    comb[index_pick] = np.ones(index_pick.shape)
+    return comb
+
+
+&#34;&#34;&#34;
+Matrix transformations
+&#34;&#34;&#34;
+
+
+def sum_columns(sxx: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Sum over all the columns in a 1D or 2D array
+    :param sxx: input vector or matrix
+    :return: ndarray
+    &#34;&#34;&#34;
+    if not isinstance(sxx, np.ndarray):
+        raise TypeError(&#39;Input must be array.&#39;)
+    elif len(sxx) == 0:
+        raise ValueError(&#39;Cannot compute on empty array.&#39;)
+
+    if np.isnan(sxx).any() or np.isinf(sxx).any():
+        sxx = np.nan_to_num(sxx)
+
+    if len(sxx.shape) == 1:
+        sum_c = np.sum(sxx, axis=0)
+    elif len(sxx.shape) == 2:
+        sum_c = np.sum(sxx, axis=1)
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(sxx.shape)))
+
+    return sum_c
+
+
+def mean_columns(sxx: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute the mean of the columns in a 1D or 2D array
+    :param sxx: input vector or matrix
+    :return: ndarray
+    &#34;&#34;&#34;
+    if not isinstance(sxx, np.ndarray):
+        raise TypeError(&#39;Input must be array.&#39;)
+    elif len(sxx) == 0:
+        raise ValueError(&#39;Cannot compute on empty array.&#39;)
+
+    if np.isnan(sxx).any() or np.isinf(sxx).any():
+        sxx = np.nan_to_num(sxx)
+
+    if len(sxx.shape) == 1:
+        sum_c = np.mean(sxx, axis=0)
+    elif len(sxx.shape) == 2:
+        sum_c = np.mean(sxx, axis=1)
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(sxx.shape)))
+
+    return sum_c
+
+
+def just_tile(array1d_in: np.ndarray, shape_out: tuple) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Constructs tiled array from 1D array to the shape specified by shape_out
+    :param array1d_in: 1D array or vector
+    :param shape_out: Tuple with output array shape.
+    :return: ndarray
+    &#34;&#34;&#34;
+    if len(shape_out) == 1:
+        tiled_matrix = np.tile(array1d_in, (shape_out[0]))
+    elif len(shape_out) == 2:
+        tiled_matrix = np.tile(array1d_in, (shape_out[1], 1)).T
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(array1d_in.shape)))
+
+    return tiled_matrix
+
+
+def sum_tile(sxx: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute the sum of the columns in a 1D or 2D array and then re-tile to the original size
+    :param sxx: input vector or matrix
+    :return: ndarray
+    &#34;&#34;&#34;
+    sum_c = sum_columns(sxx)
+
+    # create array of repeated values of PSD with dimensions that match those of energy array
+    if len(sxx.shape) == 1:
+        sum_c_matrix = np.tile(sum_c, (sxx.shape[0]))
+    elif len(sxx.shape) == 2:
+        sum_c_matrix = np.tile(sum_c, (sxx.shape[1], 1)).T
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(sxx.shape)))
+
+    return sum_c_matrix
+
+
+def mean_tile(sxx: np.ndarray, shape_out) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute the mean of the columns in a 1D or 2D array and then re-tile to the original size
+    :param sxx: input vector or matrix
+    :param shape_out: shape of output vector or matrix
+    :return: ndarray
+    &#34;&#34;&#34;
+    sum_c = mean_columns(sxx)
+
+    # create array of repeated values of PSD with dimensions that match those of energy array
+    if len(shape_out) == 1:
+        sum_c_matrix = np.tile(sum_c, (shape_out[0]))
+    elif len(shape_out) == 2:
+        sum_c_matrix = np.tile(sum_c, (shape_out[1], 1)).T
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(sxx.shape)))
+
+    return sum_c_matrix
+
+
+def d1tile_x_d2(d1: np.ndarray, d2: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Create array of repeated values with dimensions that match those of energy array
+    Useful to multiply frequency-dependent values to frequency-time matrices
+    :param d1: 1D input vector, nominally frequency/scale multipliers
+    :param d2: 2D array, first dimension should be that same as d1
+    :return:
+    &#34;&#34;&#34;
+    shape_out = d2.shape
+
+    if len(shape_out) == 1:
+        d1_matrix = np.tile(d1, (shape_out[0]))
+    elif len(shape_out) == 2:
+        d1_matrix = np.tile(d1, (shape_out[1], 1)).T
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(d1.shape)))
+
+    if d1_matrix.shape == d2.shape:
+        d1_x_d2 = d1_matrix * d2
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(d1.shape)))
+    return d1_x_d2</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="libquantum.utils.accelerometer_build_station"><code class="name flex">
+<span>def <span class="ident">accelerometer_build_station</span></span>(<span>station: redvox.common.station.Station, mean_type: str = 'simple', raw: bool = False) ‑> typing.Tuple[numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>gets accelerometer data from a station
+:param station: the station with data
+:param mean_type: under development
+:param raw: if false (default), boolean or nan mean removed
+:return: the accelerometer data, the timestamps, and the estimated sample rate</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def accelerometer_build_station(station: Station,
+                                mean_type: str = &#34;simple&#34;,
+                                raw: bool = False) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    gets accelerometer data from a station
+    :param station: the station with data
+    :param mean_type: under development
+    :param raw: if false (default), boolean or nan mean removed
+    :return: the accelerometer data, the timestamps, and the estimated sample rate
+    &#34;&#34;&#34;
+    accelerometer_sample_rate_hz = station.accelerometer_sensor().sample_rate
+    accelerometer_raw = station.accelerometer_sensor().samples()
+    accelerometer_epoch_s = station.accelerometer_sensor().data_timestamps() * MICROS_TO_S
+
+    if raw:
+        accelerometer_wf = np.array(accelerometer_raw)
+    else:
+        if mean_type == &#34;simple&#34;:
+            # Demeans and replaces nans with zeros for 3C sensors
+            # TODO: Write function
+            accelerometer_wf = np.nan_to_num(np.subtract(accelerometer_raw.transpose(), np.nanmean(accelerometer_raw, axis=1))).transpose()
+        else:
+            # Placeholder for diff solution with nans
+            accelerometer_wf = np.nan_to_num(np.subtract(accelerometer_raw.transpose(), np.nanmean(accelerometer_raw, axis=1))).transpose()
+
+    return accelerometer_wf, accelerometer_epoch_s, accelerometer_sample_rate_hz</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.barometer_build_station"><code class="name flex">
+<span>def <span class="ident">barometer_build_station</span></span>(<span>station: redvox.common.station.Station, raw: bool = True) ‑> typing.Tuple[numpy.ndarray, numpy.ndarray, float, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>gets barometer data from a station. Returns raw data
+:param station: the station with data
+:param raw: if false (default), boolean or nan mean removed
+:return: the barometer data, the timestamps, the estimated sample rate, and the indexes of the nans
+The nan indexes should be preserved throughout the computation and used in all the plots.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def barometer_build_station(station: Station, raw: bool = True) -&gt; Tuple[np.ndarray, np.ndarray, float, np.ndarray]:
+    &#34;&#34;&#34;
+    gets barometer data from a station. Returns raw data
+    :param station: the station with data
+    :param raw: if false (default), boolean or nan mean removed
+    :return: the barometer data, the timestamps, the estimated sample rate, and the indexes of the nans
+    The nan indexes should be preserved throughout the computation and used in all the plots.
+    &#34;&#34;&#34;
+    barometer_sample_rate_hz = station.barometer_sensor().sample_rate
+    barometer_raw = station.barometer_sensor().get_data_channel(&#34;pressure&#34;)
+    barometer_epoch_s = station.barometer_sensor().data_timestamps() * MICROS_TO_S
+    barometer_nans = np.argwhere(np.isnan(barometer_raw))
+    if raw:
+        barometer_wf = np.array(barometer_raw)
+    else:
+        # Detrend
+        barometer_wf = detrend_nan(np.array(barometer_raw))
+
+    return barometer_wf, barometer_epoch_s, barometer_sample_rate_hz, barometer_nans</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.d1tile_x_d2"><code class="name flex">
+<span>def <span class="ident">d1tile_x_d2</span></span>(<span>d1: numpy.ndarray, d2: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create array of repeated values with dimensions that match those of energy array
+Useful to multiply frequency-dependent values to frequency-time matrices
+:param d1: 1D input vector, nominally frequency/scale multipliers
+:param d2: 2D array, first dimension should be that same as d1
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def d1tile_x_d2(d1: np.ndarray, d2: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Create array of repeated values with dimensions that match those of energy array
+    Useful to multiply frequency-dependent values to frequency-time matrices
+    :param d1: 1D input vector, nominally frequency/scale multipliers
+    :param d2: 2D array, first dimension should be that same as d1
+    :return:
+    &#34;&#34;&#34;
+    shape_out = d2.shape
+
+    if len(shape_out) == 1:
+        d1_matrix = np.tile(d1, (shape_out[0]))
+    elif len(shape_out) == 2:
+        d1_matrix = np.tile(d1, (shape_out[1], 1)).T
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(d1.shape)))
+
+    if d1_matrix.shape == d2.shape:
+        d1_x_d2 = d1_matrix * d2
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(d1.shape)))
+    return d1_x_d2</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.datetime_now_epoch_micros"><code class="name flex">
+<span>def <span class="ident">datetime_now_epoch_micros</span></span>(<span>) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the invocation Unix time in microseconds
+:return: The current epoch timestamp as microseconds since the epoch UTC</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def datetime_now_epoch_micros() -&gt; float:
+    &#34;&#34;&#34;
+    Returns the invocation Unix time in microseconds
+    :return: The current epoch timestamp as microseconds since the epoch UTC
+    &#34;&#34;&#34;
+    return dt.datetime_to_epoch_microseconds_utc(dt.now())</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.datetime_now_epoch_s"><code class="name flex">
+<span>def <span class="ident">datetime_now_epoch_s</span></span>(<span>) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the invocation Unix time in seconds
+:return: The current epoch timestamp as seconds since the epoch UTC</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def datetime_now_epoch_s() -&gt; float:
+    &#34;&#34;&#34;
+    Returns the invocation Unix time in seconds
+    :return: The current epoch timestamp as seconds since the epoch UTC
+    &#34;&#34;&#34;
+    return dt.datetime_to_epoch_seconds_utc(dt.now())</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.dbepsilon"><code class="name flex">
+<span>def <span class="ident">dbepsilon</span></span>(<span>x: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts the absolute value of a time series to dB
+:param x: time series
+:return: ndarray</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dbepsilon(x: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Converts the absolute value of a time series to dB
+    :param x: time series
+    :return: ndarray
+    &#34;&#34;&#34;
+    y = 10 * np.log10(np.abs(x ** 2) + EPSILON)
+    return y</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.dbepsilon_max"><code class="name flex">
+<span>def <span class="ident">dbepsilon_max</span></span>(<span>x: numpy.ndarray) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the max of the absolute value of a time series to dB
+:param x: time series
+:return: float</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dbepsilon_max(x: np.ndarray) -&gt; float:
+    &#34;&#34;&#34;
+    Returns the max of the absolute value of a time series to dB
+    :param x: time series
+    :return: float
+    &#34;&#34;&#34;
+    y = 10 * np.log10(np.max(np.abs(x ** 2)) + EPSILON)
+    return y</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.demean_nan"><code class="name flex">
+<span>def <span class="ident">demean_nan</span></span>(<span>sig: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Detrend and normalize a 1D time series
+:param sig: time series with (possibly) non-zero mean
+:return: Detrended and normalized time series</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def demean_nan(sig: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Detrend and normalize a 1D time series
+    :param sig: time series with (possibly) non-zero mean
+    :return: Detrended and normalized time series
+    &#34;&#34;&#34;&#34;&#34;
+    return np.nan_to_num(sig - np.nanmean(sig))</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.demean_nan_matrix"><code class="name flex">
+<span>def <span class="ident">demean_nan_matrix</span></span>(<span>sig: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Detrend and normalize a matrix of time series
+:param sig: time series with (possibly) non-zero mean
+:return: The detrended and normalized signature</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def demean_nan_matrix(sig: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Detrend and normalize a matrix of time series
+    :param sig: time series with (possibly) non-zero mean
+    :return: The detrended and normalized signature
+    &#34;&#34;&#34;&#34;&#34;
+    return np.nan_to_num(np.subtract(sig.transpose(), np.nanmean(sig, axis=1))).transpose()</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.demean_nan_norm"><code class="name flex">
+<span>def <span class="ident">demean_nan_norm</span></span>(<span>sig: numpy.ndarray, scaling: float = 1.0, norm_type: <a title="libquantum.utils.NormType" href="#libquantum.utils.NormType">NormType</a> = NormType.MAX) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Detrend and normalize a 1D time series
+:param sig: time series with (possibly) non-zero mean
+:param scaling: scaling parameter, division
+:param norm_type: {'max', l1, l2}, overrides scikit default of 'l2' by 'max'
+:return: The detrended and denormalized series.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def demean_nan_norm(sig: np.ndarray, scaling: float = 1., norm_type: NormType = NormType.MAX) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Detrend and normalize a 1D time series
+    :param sig: time series with (possibly) non-zero mean
+    :param scaling: scaling parameter, division
+    :param norm_type: {&#39;max&#39;, l1, l2}, overrides scikit default of &#39;l2&#39; by &#39;max&#39;
+    :return: The detrended and denormalized series.
+    &#34;&#34;&#34;&#34;&#34;
+    sig_detrend = demean_nan(sig)
+    return normalize(sig_detrend, scaling=scaling, norm_type=norm_type)</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.detrend_nan"><code class="name flex">
+<span>def <span class="ident">detrend_nan</span></span>(<span>sig: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Detrend and normalize a 1D time series
+:param sig: time series with (possibly) non-zero mean
+:return: Detrended and normalized time series</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def detrend_nan(sig: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Detrend and normalize a 1D time series
+    :param sig: time series with (possibly) non-zero mean
+    :return: Detrended and normalized time series
+    &#34;&#34;&#34;&#34;&#34;
+    return signal.detrend(demean_nan(sig))</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.gyroscope_build_station"><code class="name flex">
+<span>def <span class="ident">gyroscope_build_station</span></span>(<span>station: redvox.common.station.Station, mean_type: str = 'simple', raw: bool = False) ‑> typing.Tuple[numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>gets gyroscope data from a station
+:param station: the station with data
+:param mean_type: under development
+:param raw: if false (default), boolean or nan mean removed
+:return: the gyroscope data, the timestamps, and the estimated sample rate</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gyroscope_build_station(station: Station,
+                            mean_type: str = &#34;simple&#34;,
+                            raw: bool = False) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    gets gyroscope data from a station
+    :param station: the station with data
+    :param mean_type: under development
+    :param raw: if false (default), boolean or nan mean removed
+    :return: the gyroscope data, the timestamps, and the estimated sample rate
+    &#34;&#34;&#34;
+    gyroscope_sample_rate_hz = station.gyroscope_sensor().sample_rate
+    gyroscope_raw = station.gyroscope_sensor().samples()
+    gyroscope_epoch_s = station.gyroscope_sensor().data_timestamps() * MICROS_TO_S
+
+    if raw:
+        gyroscope_wf = np.array(gyroscope_raw)
+    else:
+        if mean_type == &#34;simple&#34;:
+            # Demeans and replaces nans with zeros for 3C sensors
+            # TODO: Write function
+            gyroscope_wf = np.nan_to_num(np.subtract(gyroscope_raw.transpose(), np.nanmean(gyroscope_raw, axis=1))).transpose()
+        else:
+            # Placeholder for diff solution with nans
+            gyroscope_wf = np.nan_to_num(np.subtract(gyroscope_raw.transpose(), np.nanmean(gyroscope_raw, axis=1))).transpose()
+
+    return gyroscope_wf, gyroscope_epoch_s, gyroscope_sample_rate_hz</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.just_tile"><code class="name flex">
+<span>def <span class="ident">just_tile</span></span>(<span>array1d_in: numpy.ndarray, shape_out: tuple) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constructs tiled array from 1D array to the shape specified by shape_out
+:param array1d_in: 1D array or vector
+:param shape_out: Tuple with output array shape.
+:return: ndarray</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def just_tile(array1d_in: np.ndarray, shape_out: tuple) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Constructs tiled array from 1D array to the shape specified by shape_out
+    :param array1d_in: 1D array or vector
+    :param shape_out: Tuple with output array shape.
+    :return: ndarray
+    &#34;&#34;&#34;
+    if len(shape_out) == 1:
+        tiled_matrix = np.tile(array1d_in, (shape_out[0]))
+    elif len(shape_out) == 2:
+        tiled_matrix = np.tile(array1d_in, (shape_out[1], 1)).T
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(array1d_in.shape)))
+
+    return tiled_matrix</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.log2epsilon"><code class="name flex">
+<span>def <span class="ident">log2epsilon</span></span>(<span>x: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>log 2 of the absolute value of linear amplitude, with EPSILON to avoid singularities
+:param x: time series or fft - not power
+:return: ndarray</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def log2epsilon(x: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    log 2 of the absolute value of linear amplitude, with EPSILON to avoid singularities
+    :param x: time series or fft - not power
+    :return: ndarray
+    &#34;&#34;&#34;
+    y = np.log2(np.abs(x) + EPSILON)
+    return y</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.log2epsilon_max"><code class="name flex">
+<span>def <span class="ident">log2epsilon_max</span></span>(<span>x: numpy.ndarray) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>max of the log 2 of absolute value of linear amplitude, with EPSILON to avoid singularities
+:param x: time series or fft - not power
+:return: float</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def log2epsilon_max(x: np.ndarray) -&gt; float:
+    &#34;&#34;&#34;
+    max of the log 2 of absolute value of linear amplitude, with EPSILON to avoid singularities
+    :param x: time series or fft - not power
+    :return: float
+    &#34;&#34;&#34;
+    y = np.max(np.log2(np.abs(x) + EPSILON))
+    return y</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.magnetometer_build_station"><code class="name flex">
+<span>def <span class="ident">magnetometer_build_station</span></span>(<span>station: redvox.common.station.Station, mean_type: str = 'simple', raw: bool = False) ‑> typing.Tuple[numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>gets magnetometer data from a station
+:param station: the station with data
+:param mean_type: under development
+:param raw: if false (default), boolean or nan mean removed
+:return: the magnetometer data, the timestamps, and the estimated sample rate</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def magnetometer_build_station(station: Station,
+                               mean_type: str = &#34;simple&#34;,
+                               raw: bool = False) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    gets magnetometer data from a station
+    :param station: the station with data
+    :param mean_type: under development
+    :param raw: if false (default), boolean or nan mean removed
+    :return: the magnetometer data, the timestamps, and the estimated sample rate
+    &#34;&#34;&#34;
+    magnetometer_sample_rate_hz = station.magnetometer_sensor().sample_rate
+    magnetometer_raw = station.magnetometer_sensor().samples()
+    magnetometer_epoch_s = station.magnetometer_sensor().data_timestamps() * MICROS_TO_S
+
+    if raw:
+        magnetometer_wf = np.array(magnetometer_raw)
+    else:
+        if mean_type == &#34;simple&#34;:
+            # Demeans and replaces nans with zeros for 3C sensors
+            # TODO: Write function
+            magnetometer_wf = np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
+        else:
+            # Placeholder for diff solution with nans
+            magnetometer_wf = np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
+
+    return magnetometer_wf, magnetometer_epoch_s, magnetometer_sample_rate_hz</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.mean_columns"><code class="name flex">
+<span>def <span class="ident">mean_columns</span></span>(<span>sxx: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the mean of the columns in a 1D or 2D array
+:param sxx: input vector or matrix
+:return: ndarray</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mean_columns(sxx: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute the mean of the columns in a 1D or 2D array
+    :param sxx: input vector or matrix
+    :return: ndarray
+    &#34;&#34;&#34;
+    if not isinstance(sxx, np.ndarray):
+        raise TypeError(&#39;Input must be array.&#39;)
+    elif len(sxx) == 0:
+        raise ValueError(&#39;Cannot compute on empty array.&#39;)
+
+    if np.isnan(sxx).any() or np.isinf(sxx).any():
+        sxx = np.nan_to_num(sxx)
+
+    if len(sxx.shape) == 1:
+        sum_c = np.mean(sxx, axis=0)
+    elif len(sxx.shape) == 2:
+        sum_c = np.mean(sxx, axis=1)
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(sxx.shape)))
+
+    return sum_c</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.mean_tile"><code class="name flex">
+<span>def <span class="ident">mean_tile</span></span>(<span>sxx: numpy.ndarray, shape_out) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the mean of the columns in a 1D or 2D array and then re-tile to the original size
+:param sxx: input vector or matrix
+:param shape_out: shape of output vector or matrix
+:return: ndarray</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mean_tile(sxx: np.ndarray, shape_out) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute the mean of the columns in a 1D or 2D array and then re-tile to the original size
+    :param sxx: input vector or matrix
+    :param shape_out: shape of output vector or matrix
+    :return: ndarray
+    &#34;&#34;&#34;
+    sum_c = mean_columns(sxx)
+
+    # create array of repeated values of PSD with dimensions that match those of energy array
+    if len(shape_out) == 1:
+        sum_c_matrix = np.tile(sum_c, (shape_out[0]))
+    elif len(shape_out) == 2:
+        sum_c_matrix = np.tile(sum_c, (shape_out[1], 1)).T
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(sxx.shape)))
+
+    return sum_c_matrix</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.mic_wf_time_build_station"><code class="name flex">
+<span>def <span class="ident">mic_wf_time_build_station</span></span>(<span>station, mean_type: str = 'simple', raw: bool = False) ‑> typing.Tuple[numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Builds mic waveform and times
+:param station: the station with data
+:param mean_type: under development
+:param raw: if false (default), boolean or nan mean removed
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mic_wf_time_build_station(station,
+                              mean_type: str = &#34;simple&#34;,
+                              raw: bool = False) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    Builds mic waveform and times
+    :param station: the station with data
+    :param mean_type: under development
+    :param raw: if false (default), boolean or nan mean removed
+    :return:
+    &#34;&#34;&#34;
+    mic_sample_rate_hz = station.audio_sensor().sample_rate
+    mic_wf_raw = station.audio_sensor().get_data_channel(&#34;microphone&#34;)
+    mic_epoch_s = station.audio_sensor().data_timestamps() * MICROS_TO_S
+
+    if raw:
+        mic_wf = np.array(mic_wf_raw)
+    else:
+        if mean_type == &#34;simple&#34;:
+            # Simple demean and replace nans with zeros. OK for mic, not OK for all other DC-biased sensors
+            mic_wf = demean_nan(mic_wf_raw)
+        else:
+            # Remove linear trend
+            mic_wf = detrend_nan(mic_wf_raw)
+
+    return mic_wf, mic_epoch_s, mic_sample_rate_hz</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.normalize"><code class="name flex">
+<span>def <span class="ident">normalize</span></span>(<span>sig: numpy.ndarray, scaling: float = 1.0, norm_type: <a title="libquantum.utils.NormType" href="#libquantum.utils.NormType">NormType</a> = NormType.MAX) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Scale a 1D time series
+:param sig: time series signature
+:param scaling: scaling parameter, division
+:param norm_type: {'max', l1, l2}, optional
+:return: The scaled series</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def normalize(sig: np.ndarray, scaling: float = 1., norm_type: NormType = NormType.MAX) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Scale a 1D time series
+    :param sig: time series signature
+    :param scaling: scaling parameter, division
+    :param norm_type: {&#39;max&#39;, l1, l2}, optional
+    :return: The scaled series
+    &#34;&#34;&#34;
+    if norm_type == NormType.MAX:
+        return sig / np.nanmax(np.abs(sig))
+    elif norm_type == NormType.L1:
+        return sig / np.nansum(sig)
+    elif norm_type == NormType.L2:
+        return sig / np.sqrt(np.nansum(sig * sig))
+    else:  # Must be NormType.Other
+        return sig / scaling</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.picker_comb"><code class="name flex">
+<span>def <span class="ident">picker_comb</span></span>(<span>sig_pick, index_pick)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constructs a comb function from the picks
+:param sig_pick: 1D record corresponding to the picks
+:param index_pick: indexes for the picks
+:return: comb with unit amplitude</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def picker_comb(sig_pick, index_pick):
+    &#34;&#34;&#34;
+    Constructs a comb function from the picks
+    :param sig_pick: 1D record corresponding to the picks
+    :param index_pick: indexes for the picks
+    :return: comb with unit amplitude
+    &#34;&#34;&#34;
+    comb = np.zeros(sig_pick.shape)
+    comb[index_pick] = np.ones(index_pick.shape)
+    return comb</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.picker_signal_bit_index"><code class="name flex">
+<span>def <span class="ident">picker_signal_bit_index</span></span>(<span>sig: <built-in function array>, sig_sample_rate_hz: float, bits_pick: float, time_interval_s: float) ‑> <built-in function array></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds the picker index from the ABSOLUTE max in bits
+:param sig: array of waveform data
+:param sig_sample_rate_hz: float sample rate of reference sensor
+:param bits_pick: detection treshold in db loss
+:param time_interval_s: min time interval between events
+:return: picker index</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def picker_signal_bit_index(sig: np.array, sig_sample_rate_hz: float,
+                            bits_pick: float, time_interval_s: float) -&gt; np.array:
+    &#34;&#34;&#34;
+    Finds the picker index from the ABSOLUTE max in bits
+    :param sig: array of waveform data
+    :param sig_sample_rate_hz: float sample rate of reference sensor
+    :param bits_pick: detection treshold in db loss
+    :param time_interval_s: min time interval between events
+    :return: picker index
+    &#34;&#34;&#34;
+
+    # Compute the distance
+    distance_points = int(time_interval_s * sig_sample_rate_hz)
+    sig_bit = log2epsilon(sig)
+    height_min = log2epsilon_max(sig) - bits_pick
+    index_pick, _ = signal.find_peaks(sig_bit, height=height_min, distance=distance_points)
+
+    return index_pick</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.picker_signal_max_index"><code class="name flex">
+<span>def <span class="ident">picker_signal_max_index</span></span>(<span>sig: <built-in function array>, sig_sample_rate_hz: float, bits_pick: float, time_interval_s: float) ‑> <built-in function array></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds the picker index for the POSITIVE max of a signal
+:param sig: array of waveform data
+:param sig_sample_rate_hz: float sample rate of reference sensor
+:param bits_pick: detection threshold in bits loss
+:param time_interval_s: min time interval between events
+:return: picker index</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def picker_signal_max_index(sig: np.array,
+                            sig_sample_rate_hz: float,
+                            bits_pick: float,
+                            time_interval_s: float) -&gt; np.array:
+    &#34;&#34;&#34;
+    Finds the picker index for the POSITIVE max of a signal
+    :param sig: array of waveform data
+    :param sig_sample_rate_hz: float sample rate of reference sensor
+    :param bits_pick: detection threshold in bits loss
+    :param time_interval_s: min time interval between events
+    :return: picker index
+    &#34;&#34;&#34;
+
+    # Compute the distance
+    distance_points = int(time_interval_s * sig_sample_rate_hz)
+    height_min = np.max(sig) - 2 ** bits_pick
+    time_index_pick, _ = signal.find_peaks(sig, height=height_min, distance=distance_points)
+
+    return time_index_pick</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.sig3c_frame"><code class="name flex">
+<span>def <span class="ident">sig3c_frame</span></span>(<span>sig3c: numpy.ndarray, time_epoch_s: numpy.ndarray, epoch_s_start: float, epoch_s_stop: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Frame three-component signal within start and stop epoch times
+:param sig3c: input signal with three components
+:param time_epoch_s: input epoch time in seconds
+:param epoch_s_start: start epoch time
+:param epoch_s_stop: stop epoch time
+:return: truncated time series and time</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sig3c_frame(sig3c: np.ndarray, time_epoch_s: np.ndarray,
+                epoch_s_start: float, epoch_s_stop: float):
+    &#34;&#34;&#34;
+    Frame three-component signal within start and stop epoch times
+    :param sig3c: input signal with three components
+    :param time_epoch_s: input epoch time in seconds
+    :param epoch_s_start: start epoch time
+    :param epoch_s_stop: stop epoch time
+    :return: truncated time series and time
+    &#34;&#34;&#34;
+    intro_index = np.argmin(np.abs(time_epoch_s - epoch_s_start))
+    outro_index = np.argmin(np.abs(time_epoch_s - epoch_s_stop))
+    sig_wf = sig3c[:, intro_index: outro_index]
+    sig_epoch_s = time_epoch_s[intro_index: outro_index]
+
+    return sig_wf, sig_epoch_s</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.sig_extract"><code class="name flex">
+<span>def <span class="ident">sig_extract</span></span>(<span>sig: numpy.ndarray, time_epoch_s: numpy.ndarray, intro_s: float, outro_s: float, pick_bits_below_max: float = 1.0, pick_time_interval_s: float = 1.0, extract_type: <a title="libquantum.utils.ExtractionType" href="#libquantum.utils.ExtractionType">ExtractionType</a> = ExtractionType.ARGMAX) ‑> typing.Tuple[numpy.ndarray, numpy.ndarray, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extract signal and time relative to reference index
+:param sig: input signal
+:param time_epoch_s: signal epoch time
+:param intro_s: time before pick
+:param outro_s: time after pick
+:param pick_bits_below_max: pick treshold in bits below max
+:param pick_time_interval_s: pick time interval between adjacent max point
+:param extract_type: Type of extraction, see ExtractionType class
+:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sig_extract(sig: np.ndarray, time_epoch_s: np.ndarray,
+                intro_s: float, outro_s: float,
+                pick_bits_below_max: float = 1.,
+                pick_time_interval_s: float = 1.,
+                extract_type: ExtractionType = ExtractionType.ARGMAX) -&gt; Tuple[np.ndarray, np.ndarray, float]:
+    &#34;&#34;&#34;
+    Extract signal and time relative to reference index
+    :param sig: input signal
+    :param time_epoch_s: signal epoch time
+    :param intro_s: time before pick
+    :param outro_s: time after pick
+    :param pick_bits_below_max: pick treshold in bits below max
+    :param pick_time_interval_s: pick time interval between adjacent max point
+    :param extract_type: Type of extraction, see ExtractionType class
+    :return:
+    &#34;&#34;&#34;
+
+    sig_sample_interval_s = np.mean(np.diff(time_epoch_s))
+
+    if extract_type == ExtractionType.ARGMAX:
+        index_max = np.argmax(np.abs(sig))
+        # Max pick
+        pick_time_epoch_s = time_epoch_s[index_max]
+    elif extract_type == ExtractionType.SIGMAX:
+        time_index_pick_all = \
+            picker_signal_max_index(sig=sig, sig_sample_rate_hz=1./sig_sample_interval_s,
+                                    bits_pick=pick_bits_below_max, time_interval_s=pick_time_interval_s)
+        # First pick
+        pick_time_epoch_s = time_epoch_s[time_index_pick_all[0]]
+    elif extract_type == ExtractionType.BITMAX:
+        time_index_pick_all = \
+            picker_signal_bit_index(sig=sig, sig_sample_rate_hz=1./sig_sample_interval_s,
+                                    bits_pick=pick_bits_below_max, time_interval_s=pick_time_interval_s)
+        # First pick
+        pick_time_epoch_s = time_epoch_s[time_index_pick_all[0]]
+    else:
+        print(&#39;Unexpected extraction type to sig_extract, return max&#39;)
+        index_max = np.argmax(np.abs(sig))
+        # Max pick
+        pick_time_epoch_s = time_epoch_s[index_max]
+
+    epoch_s_start = pick_time_epoch_s - intro_s
+    epoch_s_stop = pick_time_epoch_s + outro_s
+
+    intro_index = np.argmin(np.abs(time_epoch_s - epoch_s_start))
+    outro_index = np.argmin(np.abs(time_epoch_s - epoch_s_stop))
+    sig_wf = sig[intro_index: outro_index]
+    sig_epoch_s = time_epoch_s[intro_index: outro_index]
+
+    return sig_wf, sig_epoch_s, pick_time_epoch_s</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.sig_frame"><code class="name flex">
+<span>def <span class="ident">sig_frame</span></span>(<span>sig: numpy.ndarray, time_epoch_s: numpy.ndarray, epoch_s_start: float, epoch_s_stop: float) ‑> typing.Tuple[numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Frame one-component signal within start and stop epoch times
+:param sig: input signal
+:param time_epoch_s: input epoch time in seconds
+:param epoch_s_start: start epoch time
+:param epoch_s_stop: stop epoch time
+:return: truncated time series and time</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sig_frame(sig: np.ndarray, time_epoch_s: np.ndarray,
+              epoch_s_start: float, epoch_s_stop: float) -&gt; Tuple[np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Frame one-component signal within start and stop epoch times
+    :param sig: input signal
+    :param time_epoch_s: input epoch time in seconds
+    :param epoch_s_start: start epoch time
+    :param epoch_s_stop: stop epoch time
+    :return: truncated time series and time
+    &#34;&#34;&#34;
+    intro_index = np.argmin(np.abs(time_epoch_s - epoch_s_start))
+    outro_index = np.argmin(np.abs(time_epoch_s - epoch_s_stop))
+    sig_wf = sig[intro_index: outro_index]
+    sig_epoch_s = time_epoch_s[intro_index: outro_index]
+
+    return sig_wf, sig_epoch_s</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.sum_columns"><code class="name flex">
+<span>def <span class="ident">sum_columns</span></span>(<span>sxx: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sum over all the columns in a 1D or 2D array
+:param sxx: input vector or matrix
+:return: ndarray</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sum_columns(sxx: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Sum over all the columns in a 1D or 2D array
+    :param sxx: input vector or matrix
+    :return: ndarray
+    &#34;&#34;&#34;
+    if not isinstance(sxx, np.ndarray):
+        raise TypeError(&#39;Input must be array.&#39;)
+    elif len(sxx) == 0:
+        raise ValueError(&#39;Cannot compute on empty array.&#39;)
+
+    if np.isnan(sxx).any() or np.isinf(sxx).any():
+        sxx = np.nan_to_num(sxx)
+
+    if len(sxx.shape) == 1:
+        sum_c = np.sum(sxx, axis=0)
+    elif len(sxx.shape) == 2:
+        sum_c = np.sum(sxx, axis=1)
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(sxx.shape)))
+
+    return sum_c</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.sum_tile"><code class="name flex">
+<span>def <span class="ident">sum_tile</span></span>(<span>sxx: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the sum of the columns in a 1D or 2D array and then re-tile to the original size
+:param sxx: input vector or matrix
+:return: ndarray</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sum_tile(sxx: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute the sum of the columns in a 1D or 2D array and then re-tile to the original size
+    :param sxx: input vector or matrix
+    :return: ndarray
+    &#34;&#34;&#34;
+    sum_c = sum_columns(sxx)
+
+    # create array of repeated values of PSD with dimensions that match those of energy array
+    if len(sxx.shape) == 1:
+        sum_c_matrix = np.tile(sum_c, (sxx.shape[0]))
+    elif len(sxx.shape) == 2:
+        sum_c_matrix = np.tile(sum_c, (sxx.shape[1], 1)).T
+    else:
+        raise TypeError(&#39;Cannot handle an array of shape {}.&#39;.format(str(sxx.shape)))
+
+    return sum_c_matrix</code></pre>
+</details>
+</dd>
+<dt id="libquantum.utils.taper_tukey"><code class="name flex">
+<span>def <span class="ident">taper_tukey</span></span>(<span>sig_or_time: numpy.ndarray, fraction_cosine: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
+fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+:param sig_or_time: input signal or time
+:param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
+:return: tukey taper window amplitude</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
+    fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+    :param sig_or_time: input signal or time
+    :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
+    :return: tukey taper window amplitude
+    &#34;&#34;&#34;
+    number_points = np.size(sig_or_time)
+    amplitude = signal.tukey(M=number_points, alpha=fraction_cosine, sym=True)
+    return amplitude</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="libquantum.utils.ExtractionType"><code class="flex name class">
+<span>class <span class="ident">ExtractionType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enumeration of valid extraction types.
+ARGMAX = max of the absolute value of the signal
+SIGMAX = fancier signal picker, from POSITIVE max
+BITMAX = fancier signal picker, from ABSOLUTE max</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ExtractionType(Enum):
+    &#34;&#34;&#34;
+    Enumeration of valid extraction types.
+    ARGMAX = max of the absolute value of the signal
+    SIGMAX = fancier signal picker, from POSITIVE max
+    BITMAX = fancier signal picker, from ABSOLUTE max
+    &#34;&#34;&#34;
+    ARGMAX: str = &#34;argmax&#34;
+    SIGMAX: str = &#34;sigmax&#34;
+    BITMAX: str = &#34;bitmax&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="libquantum.utils.ExtractionType.ARGMAX"><code class="name">var <span class="ident">ARGMAX</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.utils.ExtractionType.BITMAX"><code class="name">var <span class="ident">BITMAX</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.utils.ExtractionType.SIGMAX"><code class="name">var <span class="ident">SIGMAX</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="libquantum.utils.NormType"><code class="flex name class">
+<span>class <span class="ident">NormType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enumeration of normalization types.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NormType(Enum):
+    &#34;&#34;&#34;
+    Enumeration of normalization types.
+    &#34;&#34;&#34;
+    MAX: str = &#34;max&#34;
+    L1: str = &#34;l1&#34;
+    L2: str = &#34;l2&#34;
+    OTHER: str = &#34;other&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="libquantum.utils.NormType.L1"><code class="name">var <span class="ident">L1</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.utils.NormType.L2"><code class="name">var <span class="ident">L2</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.utils.NormType.MAX"><code class="name">var <span class="ident">MAX</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="libquantum.utils.NormType.OTHER"><code class="name">var <span class="ident">OTHER</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="libquantum" href="index.html">libquantum</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="libquantum.utils.accelerometer_build_station" href="#libquantum.utils.accelerometer_build_station">accelerometer_build_station</a></code></li>
+<li><code><a title="libquantum.utils.barometer_build_station" href="#libquantum.utils.barometer_build_station">barometer_build_station</a></code></li>
+<li><code><a title="libquantum.utils.d1tile_x_d2" href="#libquantum.utils.d1tile_x_d2">d1tile_x_d2</a></code></li>
+<li><code><a title="libquantum.utils.datetime_now_epoch_micros" href="#libquantum.utils.datetime_now_epoch_micros">datetime_now_epoch_micros</a></code></li>
+<li><code><a title="libquantum.utils.datetime_now_epoch_s" href="#libquantum.utils.datetime_now_epoch_s">datetime_now_epoch_s</a></code></li>
+<li><code><a title="libquantum.utils.dbepsilon" href="#libquantum.utils.dbepsilon">dbepsilon</a></code></li>
+<li><code><a title="libquantum.utils.dbepsilon_max" href="#libquantum.utils.dbepsilon_max">dbepsilon_max</a></code></li>
+<li><code><a title="libquantum.utils.demean_nan" href="#libquantum.utils.demean_nan">demean_nan</a></code></li>
+<li><code><a title="libquantum.utils.demean_nan_matrix" href="#libquantum.utils.demean_nan_matrix">demean_nan_matrix</a></code></li>
+<li><code><a title="libquantum.utils.demean_nan_norm" href="#libquantum.utils.demean_nan_norm">demean_nan_norm</a></code></li>
+<li><code><a title="libquantum.utils.detrend_nan" href="#libquantum.utils.detrend_nan">detrend_nan</a></code></li>
+<li><code><a title="libquantum.utils.gyroscope_build_station" href="#libquantum.utils.gyroscope_build_station">gyroscope_build_station</a></code></li>
+<li><code><a title="libquantum.utils.just_tile" href="#libquantum.utils.just_tile">just_tile</a></code></li>
+<li><code><a title="libquantum.utils.log2epsilon" href="#libquantum.utils.log2epsilon">log2epsilon</a></code></li>
+<li><code><a title="libquantum.utils.log2epsilon_max" href="#libquantum.utils.log2epsilon_max">log2epsilon_max</a></code></li>
+<li><code><a title="libquantum.utils.magnetometer_build_station" href="#libquantum.utils.magnetometer_build_station">magnetometer_build_station</a></code></li>
+<li><code><a title="libquantum.utils.mean_columns" href="#libquantum.utils.mean_columns">mean_columns</a></code></li>
+<li><code><a title="libquantum.utils.mean_tile" href="#libquantum.utils.mean_tile">mean_tile</a></code></li>
+<li><code><a title="libquantum.utils.mic_wf_time_build_station" href="#libquantum.utils.mic_wf_time_build_station">mic_wf_time_build_station</a></code></li>
+<li><code><a title="libquantum.utils.normalize" href="#libquantum.utils.normalize">normalize</a></code></li>
+<li><code><a title="libquantum.utils.picker_comb" href="#libquantum.utils.picker_comb">picker_comb</a></code></li>
+<li><code><a title="libquantum.utils.picker_signal_bit_index" href="#libquantum.utils.picker_signal_bit_index">picker_signal_bit_index</a></code></li>
+<li><code><a title="libquantum.utils.picker_signal_max_index" href="#libquantum.utils.picker_signal_max_index">picker_signal_max_index</a></code></li>
+<li><code><a title="libquantum.utils.sig3c_frame" href="#libquantum.utils.sig3c_frame">sig3c_frame</a></code></li>
+<li><code><a title="libquantum.utils.sig_extract" href="#libquantum.utils.sig_extract">sig_extract</a></code></li>
+<li><code><a title="libquantum.utils.sig_frame" href="#libquantum.utils.sig_frame">sig_frame</a></code></li>
+<li><code><a title="libquantum.utils.sum_columns" href="#libquantum.utils.sum_columns">sum_columns</a></code></li>
+<li><code><a title="libquantum.utils.sum_tile" href="#libquantum.utils.sum_tile">sum_tile</a></code></li>
+<li><code><a title="libquantum.utils.taper_tukey" href="#libquantum.utils.taper_tukey">taper_tukey</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="libquantum.utils.ExtractionType" href="#libquantum.utils.ExtractionType">ExtractionType</a></code></h4>
+<ul class="">
+<li><code><a title="libquantum.utils.ExtractionType.ARGMAX" href="#libquantum.utils.ExtractionType.ARGMAX">ARGMAX</a></code></li>
+<li><code><a title="libquantum.utils.ExtractionType.BITMAX" href="#libquantum.utils.ExtractionType.BITMAX">BITMAX</a></code></li>
+<li><code><a title="libquantum.utils.ExtractionType.SIGMAX" href="#libquantum.utils.ExtractionType.SIGMAX">SIGMAX</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="libquantum.utils.NormType" href="#libquantum.utils.NormType">NormType</a></code></h4>
+<ul class="">
+<li><code><a title="libquantum.utils.NormType.L1" href="#libquantum.utils.NormType.L1">L1</a></code></li>
+<li><code><a title="libquantum.utils.NormType.L2" href="#libquantum.utils.NormType.L2">L2</a></code></li>
+<li><code><a title="libquantum.utils.NormType.MAX" href="#libquantum.utils.NormType.MAX">MAX</a></code></li>
+<li><code><a title="libquantum.utils.NormType.OTHER" href="#libquantum.utils.NormType.OTHER">OTHER</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
