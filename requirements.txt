@@ -2,7 +2,8 @@ librosa
 libwwz >= 1.0.0
 matplotlib >= 3.3.0
 numpy >= 1.19.1
-redvox >= 3.0.0b2  # If this shows up as an error in your IDE, you can likely ignore it. pip -r requirements.txt should handle this without issue.
+# If this shows up as an error in your IDE, you can likely ignore it. pip -r requirements.txt should handle this without issue.
+redvox >= 3.0.0b2
 scipy
 
 
