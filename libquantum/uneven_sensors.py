@@ -99,13 +99,13 @@ def bandpass_butter_uneven(sensor_wf, filter_order, frequency_cut_low_hz, sample
     nyquist = 0.5 * sample_rate_hz
     edge_low = frequency_cut_low_hz / nyquist
     edge_high = 0.5
-    b, a = signal.butter(N=filter_order, Wn=[edge_low, edge_high], btype='bandpass')
-    sensor_bandpass = signal.filtfilt(b, a, sensor_wf)
+    [b, a] = signal.butter(N=filter_order, Wn=[edge_low, edge_high], btype='bandpass')
+    sensor_bandpass = signal.filtfilt(b, a, np.copy(sensor_wf))
     return sensor_bandpass
 
 
 def highpass_obspy(sensor_wf, frequency_low_Hz, sample_rate_Hz, filter_order=4):
-    sensor_highpass = obspy.signal.filter.highpass(sensor_wf,
+    sensor_highpass = obspy.signal.filter.highpass(np.copy(sensor_wf),
                                                    frequency_low_Hz,
                                                    sample_rate_Hz, corners=filter_order,
                                                    zerophase=True)
