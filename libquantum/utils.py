@@ -105,11 +105,11 @@ def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -> np.ndarray:
     :return: tukey taper window amplitude
     """
     number_points = np.size(sig_or_time)
-    amplitude = signal.tukey(M=number_points, alpha=fraction_cosine, sym=True)
+    amplitude = signal.windows.tukey(M=number_points, alpha=fraction_cosine, sym=True)
     return amplitude
 
 
-def mic_wf_time_build_station(station,
+def mic_wf_time_build_station(station: Station,
                               mean_type: str = "simple",
                               raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float]:
     """
@@ -119,7 +119,7 @@ def mic_wf_time_build_station(station,
     :param raw: if false (default), boolean or nan mean removed
     :return:
     """
-    mic_sample_rate_hz = station.audio_sensor().sample_rate
+    mic_sample_rate_hz = station.audio_sensor().sample_rate_hz
     mic_wf_raw = station.audio_sensor().get_data_channel("microphone")
     mic_epoch_s = station.audio_sensor().data_timestamps() * MICROS_TO_S
 
@@ -144,7 +144,7 @@ def barometer_build_station(station: Station, raw: bool = True) -> Tuple[np.ndar
     :return: the barometer data, the timestamps, the estimated sample rate, and the indexes of the nans
     The nan indexes should be preserved throughout the computation and used in all the plots.
     """
-    barometer_sample_rate_hz = station.barometer_sensor().sample_rate
+    barometer_sample_rate_hz = station.barometer_sensor().sample_rate_hz
     barometer_raw = station.barometer_sensor().get_data_channel("pressure")
     barometer_epoch_s = station.barometer_sensor().data_timestamps() * MICROS_TO_S
     barometer_nans = np.argwhere(np.isnan(barometer_raw))
@@ -167,7 +167,7 @@ def accelerometer_build_station(station: Station,
     :param raw: if false (default), boolean or nan mean removed
     :return: the accelerometer data, the timestamps, and the estimated sample rate
     """
-    accelerometer_sample_rate_hz = station.accelerometer_sensor().sample_rate
+    accelerometer_sample_rate_hz = station.accelerometer_sensor().sample_rate_hz
     accelerometer_raw = station.accelerometer_sensor().samples()
     accelerometer_epoch_s = station.accelerometer_sensor().data_timestamps() * MICROS_TO_S
 
@@ -195,7 +195,7 @@ def gyroscope_build_station(station: Station,
     :param raw: if false (default), boolean or nan mean removed
     :return: the gyroscope data, the timestamps, and the estimated sample rate
     """
-    gyroscope_sample_rate_hz = station.gyroscope_sensor().sample_rate
+    gyroscope_sample_rate_hz = station.gyroscope_sensor().sample_rate_hz
     gyroscope_raw = station.gyroscope_sensor().samples()
     gyroscope_epoch_s = station.gyroscope_sensor().data_timestamps() * MICROS_TO_S
 
@@ -223,7 +223,7 @@ def magnetometer_build_station(station: Station,
     :param raw: if false (default), boolean or nan mean removed
     :return: the magnetometer data, the timestamps, and the estimated sample rate
     """
-    magnetometer_sample_rate_hz = station.magnetometer_sensor().sample_rate
+    magnetometer_sample_rate_hz = station.magnetometer_sensor().sample_rate_hz
     magnetometer_raw = station.magnetometer_sensor().samples()
     magnetometer_epoch_s = station.magnetometer_sensor().data_timestamps() * MICROS_TO_S
 
@@ -233,10 +233,12 @@ def magnetometer_build_station(station: Station,
         if mean_type == "simple":
             # Demeans and replaces nans with zeros for 3C sensors
             # TODO: Write function
-            magnetometer_wf = np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
+            magnetometer_wf = \
+                np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
         else:
             # Placeholder for diff solution with nans
-            magnetometer_wf = np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
+            magnetometer_wf = \
+                np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
 
     return magnetometer_wf, magnetometer_epoch_s, magnetometer_sample_rate_hz
 
