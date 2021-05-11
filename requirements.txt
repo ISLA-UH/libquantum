@@ -1,9 +1,15 @@
-librosa
+numpy == 1.19.5  # Tensorflow spec - it's very picky
+scipy >= 1.6.1
+pandas >= 1.2.3
+redvox >= 3.0.0rc31
 libwwz >= 1.0.0
-matplotlib >= 3.3.0
-numpy >= 1.19.1
-# If this shows up as an error in your IDE, you can likely ignore it. pip -r requirements.txt should handle this without issue.
-redvox >= 3.0.0rc14
-scipy
+
+# Plotting
+matplotlib >= 3.3.2
+
+# TFR
+librosa
+
+
 
 
