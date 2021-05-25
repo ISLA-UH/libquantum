@@ -190,7 +190,8 @@ def plot_wf_wf_wf_vert(redvox_id: str,
                        params_tfr=AudioParams(),
                        waveform_color: str = "midnightblue",
                        units_time: str = "s",
-                       figure_title: str = "Time Domain Representation"):
+                       figure_title: str = "Time Domain Representation",
+                       figure_title_show: bool = True):
     """
     Template for aligned time-series display
     :param redvox_id:
@@ -208,6 +209,7 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     :param waveform_color:
     :param units_time:
     :param figure_title:
+    :param figure_title_show: True to display, False for publications
     :return:
     """
 
@@ -255,7 +257,9 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     wf_panel_1: plt.Axes = axes[1]
     wf_panel_2: plt.Axes = axes[2]
 
-    wf_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
+    if figure_title_show:
+        wf_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
+
     wf_panel_0.plot(wf_panel_0_time_zero, wf_panel_0_sig, color=waveform_color)
     wf_panel_0.set_ylabel(wf_panel_0_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_0.set_xlim(time_xmin, time_xmax)
@@ -318,7 +322,8 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
                            wf_panel_2_units: str = "Norm",
                            mesh_panel_1_cbar_units: str = "bits",
                            mesh_panel_0_cbar_units: str = "bits",
-                           figure_title: str = "Time-Frequency Representation"):
+                           figure_title: str = "Time-Frequency Representation",
+                           figure_title_show: bool = True):
 
     # This is the template for the TFR workhorse. Creating a TFR class would be practical.
 
@@ -429,7 +434,8 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     #                                         format=cbar_tick_fmt)
     mesh_panel_0_cbar.set_label(mesh_panel_0_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
     mesh_panel_0_cax.tick_params(labelsize='large')
-    mesh_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
+    if figure_title_show:
+        mesh_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
     mesh_panel_0.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
     mesh_panel_0.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     mesh_panel_0.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
@@ -512,28 +518,29 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
 
 
 def plot_wf_mesh_vert(redvox_id: str,
-                           wf_panel_2_sig: np.ndarray,
-                           wf_panel_2_time: np.ndarray,
-                           mesh_time: np.ndarray,
-                           mesh_frequency: np.ndarray,
-                           mesh_panel_0_tfr: np.ndarray,
-                           params_tfr=AudioParams(),
-                           frequency_scaling: str = "log",
-                           mesh_shading: str = "auto",
-                           mesh_panel_0_colormap_scaling: str = "auto",
-                           mesh_panel_0_color_max: float = 15,
-                           mesh_panel_0_color_range: float = 15,
-                           mesh_panel_0_color_min: float = 0,
-                           start_time_epoch: float = 0,
-                           frequency_hz_ymin: float = scales.Slice.FU,
-                           frequency_hz_ymax: float = scales.Slice.F0,
-                           waveform_color: str = "midnightblue",
-                           mesh_colormap: str = "inferno",
-                           units_time: str = "s",
-                           units_frequency: str = "Hz",
-                           wf_panel_2_units: str = "Norm",
-                           mesh_panel_0_cbar_units: str = "bits",
-                           figure_title: str = "Time-Frequency Representation"):
+                      wf_panel_2_sig: np.ndarray,
+                      wf_panel_2_time: np.ndarray,
+                      mesh_time: np.ndarray,
+                      mesh_frequency: np.ndarray,
+                      mesh_panel_0_tfr: np.ndarray,
+                      params_tfr=AudioParams(),
+                      frequency_scaling: str = "log",
+                      mesh_shading: str = "auto",
+                      mesh_panel_0_colormap_scaling: str = "auto",
+                      mesh_panel_0_color_max: float = 15,
+                      mesh_panel_0_color_range: float = 15,
+                      mesh_panel_0_color_min: float = 0,
+                      start_time_epoch: float = 0,
+                      frequency_hz_ymin: float = scales.Slice.FU,
+                      frequency_hz_ymax: float = scales.Slice.F0,
+                      waveform_color: str = "midnightblue",
+                      mesh_colormap: str = "inferno",
+                      units_time: str = "s",
+                      units_frequency: str = "Hz",
+                      wf_panel_2_units: str = "Norm",
+                      mesh_panel_0_cbar_units: str = "bits",
+                      figure_title: str = "Time-Frequency Representation",
+                      figure_title_show: bool = True):
 
     # This is the template for the TFR workhorse. Creating a TFR class may be practical.
 
@@ -628,7 +635,8 @@ def plot_wf_mesh_vert(redvox_id: str,
     #                                         format=cbar_tick_fmt)
     mesh_panel_0_cbar.set_label(mesh_panel_0_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
     mesh_panel_0_cax.tick_params(labelsize='large')
-    mesh_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
+    if figure_title_show:
+        mesh_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
     mesh_panel_0.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
     mesh_panel_0.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     mesh_panel_0.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
