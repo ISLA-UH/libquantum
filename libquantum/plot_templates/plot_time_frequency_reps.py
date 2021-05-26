@@ -191,7 +191,12 @@ def plot_wf_wf_wf_vert(redvox_id: str,
                        waveform_color: str = "midnightblue",
                        units_time: str = "s",
                        figure_title: str = "Time Domain Representation",
-                       figure_title_show: bool = True):
+                       figure_title_show: bool = True,
+                       label_panel_show: bool = False,
+                       labels_panel_2: str = "(a)",
+                       labels_panel_1: str = "(b)",
+                       labels_panel_0: str = "(c)",
+                       label_fontweight: str = None):
     """
     Template for aligned time-series display
     :param redvox_id:
@@ -209,7 +214,12 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     :param waveform_color:
     :param units_time:
     :param figure_title:
-    :param figure_title_show: True to display, False for publications
+    :param figure_title_show: True to display title, False for publications
+    :param label_panel_show: Default is False, True for publication
+    :param labels_panel_2: Default is (a)
+    :param labels_panel_1: Default is (b)
+    :param labels_panel_0: Default is (c)
+    :param label_fontweight: matplotlib.text property
     :return:
     """
 
@@ -261,6 +271,9 @@ def plot_wf_wf_wf_vert(redvox_id: str,
         wf_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
 
     wf_panel_0.plot(wf_panel_0_time_zero, wf_panel_0_sig, color=waveform_color)
+    if label_panel_show:
+        wf_panel_0.text(0.01, 0.95, labels_panel_0, transform=wf_panel_0.transAxes,
+                        fontsize=params_tfr.figure_parameters.text_size, fontweight=label_fontweight, va='top')
     wf_panel_0.set_ylabel(wf_panel_0_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_0.set_xlim(time_xmin, time_xmax)
     wf_panel_0.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
@@ -270,6 +283,9 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     wf_panel_0.yaxis.get_offset_text().set_x(-0.034)
 
     wf_panel_1.plot(wf_panel_1_time_zero, wf_panel_1_sig, color=waveform_color)
+    if label_panel_show:
+        wf_panel_1.text(0.01, 0.95, labels_panel_1, transform=wf_panel_1.transAxes,
+                        fontsize=params_tfr.figure_parameters.text_size, fontweight=label_fontweight, va='top')
     wf_panel_1.set_ylabel(wf_panel_1_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_1.set_xlim(time_xmin, time_xmax)
     wf_panel_1.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
@@ -279,6 +295,9 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     wf_panel_1.yaxis.get_offset_text().set_x(-0.034)
 
     wf_panel_2.plot(wf_panel_2_time_zero, wf_panel_2_sig, color=waveform_color)
+    if label_panel_show:
+        wf_panel_2.text(0.01, 0.95, labels_panel_2, transform=wf_panel_2.transAxes,
+                        fontsize=params_tfr.figure_parameters.text_size, fontweight=label_fontweight, va='top')
     wf_panel_2.set_ylabel(wf_panel_2_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_2.set_xlim(time_xmin, time_xmax)
     wf_panel_2.tick_params(axis='x', which='both', bottom=False, labelbottom=True, labelsize='large')
