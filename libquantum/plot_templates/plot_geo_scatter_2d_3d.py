@@ -34,10 +34,10 @@ def location_3d(x, y, z, color_guide,
                 plot_line: bool = False):
 
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     if plot_line:
-        ax.plot3D(x, y, z, 'gray')
-    im = ax.scatter3D(x, y, z, s=dot_size, c=color_guide, marker='o', cmap=color_map)
+        ax.plot(x, y, z, 'gray')
+    im = ax.scatter(x, y, z, s=dot_size, c=color_guide, marker='o', cmap=color_map)
     ax.view_init(azim=azimuth_degrees, elev=elevation_degrees)
     plt.title(fig_title)
     ax.set_xlabel(x_label)
@@ -55,8 +55,8 @@ def loc_quiver_3d(x, y, z, u, v, w, color_guide,
                   arrow_length: float = 0.5):
     # TODO: Add arrow color
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    im = ax.scatter3D(x, y, z, s=dot_size, c=color_guide, marker='o', cmap=color_map)
+    ax = fig.add_subplot(projection='3d')
+    im = ax.scatter(x, y, z, s=dot_size, c=color_guide, marker='o', cmap=color_map)
     ax.quiver(x, y, z, u, v, w, length=arrow_length)
     ax.view_init(azim=azimuth_degrees, elev=elevation_degrees)
     plt.title(fig_title)
@@ -78,7 +78,7 @@ def loc_overlay_3d(x1, y1, z1, color1, legend1,
                    azimuth_degrees: float = -115, elevation_degrees: float = 34):
 
     fig = plt.figure()
-    ax = fig.gca(projection='3d')
+    ax = fig.add_subplot(projection='3d')
     ax.plot(x1, y1, z1, markersize=dot_size1, color=color1, marker='o', label=legend1, alpha=alpha1)
     ax.plot(x2, y2, z2, markersize=dot_size2, color=color2, marker='o', label=legend2, alpha=alpha2)
     ax.view_init(azim=azimuth_degrees, elev=elevation_degrees)
