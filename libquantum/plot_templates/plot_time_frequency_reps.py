@@ -31,7 +31,7 @@ class FigureAttributes:
                  line_style='-'):
 
         self.fig_scale = 2.0
-        self.fig_dpi = 150
+        self.fig_dpi = 300
         self.ratio = fig_size_ratio
         self.font_size_1st_level = np.rint(self.fig_scale * fontsize1_scale)
         self.font_size_2nd_level = np.rint(self.fig_scale * fontsize2_scale)

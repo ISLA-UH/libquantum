@@ -11,7 +11,7 @@ EPSILON = np.finfo(np.float64).eps
 MICROS_TO_S = 1E-6
 MICROS_TO_MILLIS = 1E-3
 KPA_TO_PA = 1E3
-DEGREES_TO_M = 111.
+DEGREES_TO_KM = 111.
 """
 Standardized scales
 """
