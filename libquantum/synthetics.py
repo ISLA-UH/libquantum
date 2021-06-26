@@ -1,9 +1,101 @@
 import numpy as np
 import scipy.signal as signal
 from typing import Optional
+from libquantum import utils, scales, atoms
 
 
 # Synthetics for rdvxm testing
+
+def gabor_tight_grain(band_order_Nth: float,
+                      scale_frequency_center_hz: float,
+                      frequency_sample_rate_hz: float,
+                      index_shift: float = 0,
+                      scale_base: float = scales.Slice.G2):
+    """
+
+    :param band_order_Nth:
+    :param scale_frequency_center_hz:
+    :param frequency_sample_rate_hz:
+    :param index_shift:
+    :param scale_base:
+    :return:
+    """
+
+    # Fundamental chirp parameters
+    cycles_M, quality_factor_Q, gamma = \
+        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, scale_base)
+    scale_atom = atoms.chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
+    p_complex = atoms.chirp_p_complex(scale_atom, gamma, index_shift)
+
+    # Time from nominal duration
+    grain_duration_s = cycles_M/scale_frequency_center_hz
+    time_s = np.arange(int(np.round(grain_duration_s*frequency_sample_rate_hz)))/frequency_sample_rate_hz
+    offset_time_s = np.max(time_s)/2.
+
+    xtime_shifted = atoms.chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
+    wavelet_gauss = np.exp(-p_complex * xtime_shifted**2)
+    wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_M*xtime_shifted/scale_atom)
+    tight_grain_taper = utils.taper_tukey(wavelet_gabor, 0.1)
+    tight_grain = np.copy(wavelet_gabor)*tight_grain_taper
+
+    return tight_grain
+
+
+def tukey_tight_grain(band_order_Nth: float,
+                      scale_frequency_center_hz: float,
+                      frequency_sample_rate_hz: float,
+                      fraction_cosine: float=0.5,
+                      index_shift: float = 0,
+                      scale_base: float = scales.Slice.G2):
+    """
+
+    :param band_order_Nth:
+    :param scale_frequency_center_hz:
+    :param frequency_sample_rate_hz:
+    :param index_shift:
+    :param scale_base:
+    :return:
+    """
+
+    # Fundamental chirp parameters
+    cycles_M, quality_factor_Q, gamma = \
+        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, scale_base)
+    scale_atom = atoms.chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
+    p_complex = atoms.chirp_p_complex(scale_atom, gamma, index_shift)
+
+    # Time from nominal duration
+    grain_duration_s = cycles_M/scale_frequency_center_hz
+    time_s = np.arange(int(np.round(grain_duration_s*frequency_sample_rate_hz)))/frequency_sample_rate_hz
+    offset_time_s = np.max(time_s)/2.
+
+    xtime_shifted = atoms.chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
+    # Pull out phase component from gaussian envelope
+    wavelet_gauss_phase = np.imag(-p_complex * xtime_shifted**2)
+    wavelet_gabor = np.exp(1j * cycles_M*xtime_shifted/scale_atom + 1j * wavelet_gauss_phase)
+    tight_grain_taper = utils.taper_tukey(wavelet_gabor, fraction_cosine)
+    tight_grain = np.copy(wavelet_gabor)*tight_grain_taper
+
+    return tight_grain
+
+
+def gabor_grain_frequencies(frequency_order_input: float,
+                            frequency_low_input: float,
+                            frequency_high_input: float,
+                            frequency_sample_rate_input: float,
+                            frequency_base_input: float = scales.Slice.G2,
+                            frequency_ref_input: float = 1.0) -> (np.ndarray, np.ndarray):
+
+    scale_order, scale_base, _, frequency_ref, frequency_center_algebraic, \
+    frequency_center, frequency_start, frequency_end = \
+        scales.band_frequencies_low_high(frequency_order_input, frequency_base_input,
+                                         frequency_ref_input,
+                                         frequency_low_input,
+                                         frequency_high_input,
+                                         frequency_sample_rate_input)
+
+    return frequency_center, frequency_start, frequency_end
+
+
 def gt_rdvxm_center_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
                                 noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
     """

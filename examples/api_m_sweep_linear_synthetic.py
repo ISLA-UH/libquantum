@@ -37,11 +37,11 @@ if __name__ == "__main__":
 
     # Blueshift sweep
     sig_wf_blu, sig_wf_epoch_s = synthetics.chirp_linear_in_noise(snr_bits=12.,
-                                                              sample_rate_hz=sig_wf_sample_rate_hz,
-                                                              duration_s=sig_duration_s,
-                                                              frequency_start_hz=sig_frequency_hz_start,
-                                                              frequency_end_hz=sig_frequency_hz_end,
-                                                              intro_s=head_s, outro_s=head_s)
+                                                                  sample_rate_hz=sig_wf_sample_rate_hz,
+                                                                  duration_s=sig_duration_s,
+                                                                  frequency_start_hz=sig_frequency_hz_start,
+                                                                  frequency_end_hz=sig_frequency_hz_end,
+                                                                  intro_s=head_s, outro_s=head_s)
     sig_wf_red = np.flipud(sig_wf_blu)
 
     # Choose origin and red/blue shift

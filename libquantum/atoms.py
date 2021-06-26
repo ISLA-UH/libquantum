@@ -51,6 +51,48 @@ def chirp_complex(band_order_Nth: float,
     return wavelet_gabor, time_shifted_s, amp_dict_0, amp_dict_1
 
 
+def chirp_complex(band_order_Nth: float,
+                  time_s: np.ndarray,
+                  offset_time_s: float,
+                  scale_frequency_center_hz: float,
+                  frequency_sample_rate_hz: float,
+                  index_shift: float = 0,
+                  scale_base: float = scales.Slice.G2):
+    """
+    # TODO: This is the core function. Optimize this!!
+    # TODO: Construct matrix output when frequency_center is a vector
+    Quantum chirp for specified band_order_Nth and arbitrary time duration
+    Unscaled, to be used by both Dictionary 1 and Dictionary 2
+    :param band_order_Nth: Nth order of constant Q bands
+    :param time_s: time in seconds, duration should be greater than or equal to M/fc
+    :param offset_time_s: offset time in seconds, should be between min and max of time_s
+    :param scale_frequency_center_hz: center frequency fc in Hz
+    :param frequency_sample_rate_hz: sample rate on Hz
+    :param index_shift: Redshift = -1, Blueshift = +1, None=0
+    :param scale_base: G2 or G3
+    :return: waveform_complex, time_shifted_s
+    """
+
+    xtime_shifted = chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
+    time_shifted_s = xtime_shifted/frequency_sample_rate_hz
+
+    # Fundamental chirp parameters
+    # TODO: Accept range of frequencies, construct matrix
+    cycles_M, quality_factor_Q, gamma = \
+        chirp_MQG_from_N(band_order_Nth, index_shift, scale_base)
+    scale_atom = chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
+    p_complex = chirp_p_complex(scale_atom, gamma, index_shift)
+    amp_dict_0, amp_dict_1 = chirp_amplitude(scale_atom, gamma, index_shift)
+
+    # TODO: Write function to return uncertainty
+    # time_std = scale_atom/np.sqr(2)
+    # time_std_s = time_std/frequency_sample_rate_hz
+    wavelet_gauss = np.exp(-p_complex * xtime_shifted**2)
+    wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_M*xtime_shifted/scale_atom)
+
+    return wavelet_gabor, time_shifted_s, amp_dict_0, amp_dict_1
+
+
 def chirp_spectrum(frequency_hz,
                    offset_time_s,
                    band_order_Nth,
@@ -263,6 +305,7 @@ def chirp_frequency_bands(scale_order_input: float,
                                          frequency_sample_rate_input=frequency_sample_rate_input)
     cycles_M, quality_Q, gamma = chirp_MQG_from_N(order_Nth, index_shift, scale_base)
 
+    # print("atoms.chirp_frequency_bands, center freq:", frequency_center_geometric)
     return order_Nth, cycles_M, quality_Q, gamma, frequency_center_geometric, frequency_start, frequency_end
 
 
