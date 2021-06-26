@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     # "Ideal" wavelet chirp type
     order_number_input = 12
-    overlap_fractional = 0.25
+    overlap_fraction = 0.25
     glide_direction = -1
 
     EVENT_NAME = "q-glide_N" + str(order_number_input)
@@ -59,8 +59,9 @@ if __name__ == "__main__":
         # Explicit; sequence order is key, leave as is for debugging
         sig_step_len = len(sig_step)
         sig_red_len = len(sig_wf_red)
-        overlap_points = int(overlap_fractional * sig_step_len)
+        overlap_points = int(overlap_fraction * sig_step_len)
 
+        # TODO: there must be a tuning between the overlap_fraction and fraction_cosine. Find it.
         if sig_red_len > 0:
             sig_step = np.concatenate([np.zeros(sig_red_len-overlap_points), sig_step])
             sig_wf_red = np.concatenate([sig_wf_red, np.zeros(sig_step_len-overlap_points)])
