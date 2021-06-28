@@ -150,6 +150,62 @@ def stft_from_sig(sig_wf,
     return STFT, STFT_bits, time_stft_s, frequency_stft_hz
 
 
+def stft_reassign_from_sig(sig_wf,
+                           frequency_sample_rate_hz,
+                           band_order_Nth):
+    """Librosa STFT is complex FFT grid, not power"""
+
+    sig_duration_s = len(sig_wf)/frequency_sample_rate_hz
+    _, min_frequency_hz = scales.from_duration(band_order_Nth, sig_duration_s)
+
+    order_Nth, cycles_M, quality_Q, \
+    frequency_center, frequency_start, frequency_end = \
+        scales.frequency_bands_g2f1(scale_order_input=band_order_Nth,
+                                    frequency_low_input=min_frequency_hz,
+                                    frequency_sample_rate_input=frequency_sample_rate_hz)
+
+    # Choose the spectral resolution as the key parameter
+    frequency_resolution_min_hz = np.min(frequency_end - frequency_start)
+    frequency_resolution_max_hz = np.max(frequency_end - frequency_start)
+    frequency_resolution_hz_alg = np.mean(frequency_end - frequency_start)
+    frequency_resolution_hz_geo = np.sqrt(frequency_resolution_min_hz*frequency_resolution_max_hz)
+    stft_time_duration_s = 1/frequency_resolution_hz_geo
+    stft_points_per_seg = int(frequency_sample_rate_hz*stft_time_duration_s)
+
+    # From CQT
+    stft_points_hop, _, _, _, _ = \
+        scales.cqt_frequency_bands_g2f1(band_order_Nth,
+                                        min_frequency_hz,
+                                        frequency_sample_rate_hz,
+                                        is_power_2=False)
+
+    print('Reassigned STFT Duration, NFFT, HOP:', len(sig_wf), stft_points_per_seg, stft_points_hop)
+
+    STFT_Scaling = 2*np.sqrt(np.pi)/stft_points_per_seg
+
+    # Reassigned frequencies require a 'best fit' solution.
+    frequency_stft_rsg_hz, time_stft_rsg_s, STFT_mag = \
+        librosa.reassigned_spectrogram(sig_wf, sr=frequency_sample_rate_hz,
+                                       n_fft=stft_points_per_seg,
+                                       hop_length=stft_points_hop, win_length=None,
+                                       window='hann', center=False, pad_mode='reflect')
+
+    # Must be scaled to match scipy psd
+    STFT_mag *= STFT_Scaling
+    STFT_bits = utils.log2epsilon(STFT_mag)
+
+    # Standard mesh times and frequencies for plotting - nice to have both
+    time_stft_s = librosa.times_like(STFT_mag, sr=frequency_sample_rate_hz,
+                                     hop_length=stft_points_hop)
+    frequency_stft_hz = librosa.core.fft_frequencies(sr=frequency_sample_rate_hz,
+                                                     n_fft=stft_points_per_seg)
+
+    # Reassigned frequencies are not the same as the standard mesh frequencies
+    return STFT_mag, STFT_bits, \
+           time_stft_s, frequency_stft_hz, \
+           time_stft_rsg_s, frequency_stft_rsg_hz
+
+
 # GENERAL FFT TOOLS
 def fft_real_bits(sig, sample_interval_s):
     # FFT for sigetic, by the book
