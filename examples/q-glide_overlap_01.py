@@ -77,11 +77,11 @@ if __name__ == "__main__":
             sig_wf_red = sig_step
 
     # Add head and tail
-    # sig_wf_red = np.concatenate([np.zeros(head_points), sig_wf_red, np.zeros(head_points)])
+    sig_wf_red = np.concatenate([np.zeros(head_points), sig_wf_red, np.zeros(head_points)])
 
-    # # Add noise
-    # noise_wf = synthetics.white_noise_fbits(sig=sig_wf_red, std_bit_loss=8)
-    # sig_wf_red = sig_wf_red + noise_wf
+    # Add noise
+    noise_wf = synthetics.white_noise_fbits(sig=sig_wf_red, std_bit_loss=8)
+    sig_wf_red = sig_wf_red + noise_wf
 
     sig_time_s = np.arange(len(sig_wf_red))/sig_wf_sample_rate_hz
     sig_duration_s = np.max(sig_time_s)
@@ -237,11 +237,11 @@ if __name__ == "__main__":
                                        band_order_Nth=order_number_input)
     mic_stft_rsg_snr, mic_stft_rsg_snr_bits, mic_stft_rsg_snr_entropy = entropy.snr_mean_max(mic_stft_rsg)
 
-    print('stft_rsg', mic_stft_rsg)
-    print('stft shape', mic_stft.shape)
-    print('stft_rsg shape', mic_stft_rsg.shape)
-    print('f shape', mic_stft2_frequency_hz.shape)
-    print('t shape', mic_stft2_time_s.shape)
+    # print('stft_rsg', mic_stft_rsg)
+    # print('stft shape', mic_stft.shape)
+    # print('stft_rsg shape', mic_stft_rsg.shape)
+    # print('f shape', mic_stft2_frequency_hz.shape)
+    # print('t shape', mic_stft2_time_s.shape)
 
     # print("t_rsg:", mic_stft_rsg_time_s)
     # print("f_rsg:", mic_stft_rsg_frequency_hz)
@@ -298,23 +298,4 @@ if __name__ == "__main__":
                                     figure_title="Reassigned STFT for " + EVENT_NAME,
                                     frequency_hz_ymin=cwt_frequency_low_hz,
                                     frequency_hz_ymax=cwt_frequency_high_hz)
-
-    # # Librosa plot
-    # fig, ax = plt.subplots(nrows=2, sharex=True, sharey=True)
-    # img = librosa.display.specshow(mic_stft_rsg_bits, x_axis="s", y_axis="linear", sr=sig_wf_sample_rate_hz,
-    #                                hop_length=128, ax=ax[0])
-    # ax[0].set(title="Spectrogram", xlabel=None)
-    # ax[0].label_outer()
-    # ax[1].scatter(mic_stft_rsg_time_s,
-    #               mic_stft_rsg_frequency_hz,
-    #               c=mic_stft_rsg_bits, cmap="magma", alpha=0.1, s=5)
-    # ax[1].set_title("Reassigned spectrogram")
-    # fig.colorbar(img, ax=ax, format="%+2.f bits")
-
-    # # Export to wav directory
-    # wav_sample_rate_hz = 8000.
-    # export_filename = os.path.join(output_wav_directory, wav_filename + "_8kz.wav")
-    # synth_wav = 0.9 * np.real(sig_wf) / np.max(np.abs((np.real(sig_wf))))
-    # scipy.io.wavfile.write(export_filename, int(wav_sample_rate_hz), synth_wav)
-
     plt.show()
