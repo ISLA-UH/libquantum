@@ -329,8 +329,7 @@ def gt_blast_derivative_period_center(time_center_s, pseudo_period_s):
     sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
     sigintG17 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
     p_GTd[sigint1] = -1.
-    p_GTd[sigintG17] = -2./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) + \
-                       -1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
+    p_GTd[sigintG17] = -1./6. * (3. + np.sqrt(6) - 3*tau[sigintG17]) * (1. - tau[sigintG17] + np.sqrt(6))
     return p_GTd
 
 
@@ -346,9 +345,13 @@ def gt_blast_integral_period_center(time_center_s, pseudo_period_s):
     sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
     sigintG17 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
     p_GTi[sigint1] = (1. - tau[sigint1]/2.)*tau[sigint1]
+
     p_GTi[sigintG17] = -tau[sigintG17]/72. * (
             3 * tau[sigintG17]**3 - 4 * (3 + 2 * np.sqrt(6)) * tau[sigintG17]**2 +
-            6 * (9 + 4 * np.sqrt(6)) * tau[sigintG17] + 12 * (7 + 2 * np.sqrt(6)))
+            6 * (9 + 4 * np.sqrt(6)) * tau[sigintG17] - 12 * (7 + 2 * np.sqrt(6)))
+
+    integration_constant = p_GTi[sigint1][-1] - p_GTi[sigintG17][0]
+    p_GTi[sigintG17] += integration_constant
 
     return p_GTi
 
