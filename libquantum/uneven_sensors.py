@@ -3,6 +3,7 @@ import obspy.signal.filter
 import pandas as pd
 from libquantum import scales, utils
 import scipy.signal as signal
+from typing import Tuple
 import matplotlib.pyplot as plt
 
 
@@ -169,86 +170,50 @@ def highpass_from_diff(sensor_waveform: np.ndarray,
     return sensor_waveform_reconstruct, frequency_filter_low
 
 
-# TODO: Integrate with bar results
-def sensor_uneven_3c(sensor_x, sensor_y, sensor_z, sensor_epoch, sensor_sample_rate):
-    mag_waveform = [sensor_x, sensor_y, sensor_z]
-    
-    mag_epoch_diff = sensor_epoch[:-1]
-    
-    mag_diff = np.diff(mag_waveform)
-    
-    mag_waveform_dp_filtered_all = []
-    mag_waveform_reconstruct_all = []
-    
-    for vector in range(len(mag_waveform)):
-    
-        # condition for when the record is too short for high pass at 100 seconds.
-        # Needs to be at least 200 seconds
-        if sensor_epoch[-1] - sensor_epoch[0] < 200:
-            raise ValueError('Sensor record is too short for performing scalogram computations.' +
-                             'Please provide a record longer than 200 seconds (3 minutes and 20 seconds).')
-    
-        # apply high pass filter at 100 seconds for sample rate calculated from the mag sensor.
-        mag_waveform_dp_filtered = obspy.signal.filter.highpass(mag_diff[vector], 0.01, sensor_sample_rate, corners=4,
-                                                                zerophase=True)
-        mag_waveform_dp_filtered_all.append(mag_waveform_dp_filtered)
-    
-        # mag data reconstruct reconstruct mag from dP: P(0) = 0, P(i) = dP(i) + P(i-1)
-        mag_waveform_reconstruct = np.zeros(len(mag_epoch_diff))
-        mag_waveform_reconstruct[0] = 0
-    
-        # loop over the time series and reconstruct each data point
-        for j in range(1, len(mag_waveform_reconstruct)):
-            mag_waveform_reconstruct[j] = mag_waveform_dp_filtered[j] + mag_waveform_reconstruct[j - 1]
-    
-        mag_waveform_reconstruct_all.append(mag_waveform_reconstruct)
-    
-    # calculate and subtract the mean of each vector from each vector to remove the "DC offset".
-    # Loop through each vector.
-    mag_waveform_mean_removed_all = []
-    
-    for vector in range(len(mag_waveform_reconstruct_all)):
-        vector_mean = np.mean(mag_waveform_reconstruct_all[vector])
-    
-        # subtract the mean of each vector from each value in that vector
-        mag_waveform_mean_removed = []
-        for j in range(len(mag_waveform_reconstruct_all[vector])):
-            mag_waveform_mean_removed = mag_waveform_reconstruct_all[vector] - vector_mean
-        mag_waveform_mean_removed_all.append(mag_waveform_mean_removed)
-    
-    # calculate/ display the mean of each vector AFTER removing the mean
-    mag_x_mean_removed = mag_waveform_mean_removed_all[0]
-    mag_y_mean_removed = mag_waveform_mean_removed_all[1]
-    mag_z_mean_removed = mag_waveform_mean_removed_all[2]
-    
-    # calculate the max of all the components for use in the plot limits later on.
-    mag_x_max_of_mean = np.max(mag_x_mean_removed)
-    mag_y_max_of_mean = np.max(mag_y_mean_removed)
-    mag_z_max_of_mean = np.max(mag_z_mean_removed)
-    max_all_components = [mag_x_max_of_mean, mag_y_max_of_mean, mag_z_max_of_mean]
-    max_final = np.round(np.max(max_all_components))
-    min_final = -max_final
+# This section was initiated by Kei
+# Apply exponential filter on accelerometer to separate gravity and linear acceleration
+# Based on the "past-gen" Android code without incorporation of the gyroscope
+# http://josejuansanchez.org/android-sensors-overview/gravity_and_linear_acceleration/README.html
+# Generalized to the general class of DC mode removal
+# Last updated: 29 June 2021
 
-    # plot setup for displaying the mean removed signal from each component
-    df = pd.DataFrame({'x': mag_epoch_diff, 'x-component': mag_x_mean_removed, 'y-component': mag_y_mean_removed,
-                       'z-component': mag_z_mean_removed})
 
-    # Calculate mag intensity from all three components
-    mag_intensity_all = []
-    for j in range(len(mag_x_mean_removed)):
-        mag_intensity = np.sqrt(((mag_x_mean_removed[j]) ** 2) + ((mag_y_mean_removed[j]) ** 2) +
-                                ((mag_z_mean_removed[j]) ** 2))
-        mag_intensity_all.append(mag_intensity)
-    
-    # plot setup for mag intensity plot
-    df2 = pd.DataFrame({'x': mag_epoch_diff, 'y': mag_intensity_all})
+def get_sensor_lowpass(sensor_wf: np.ndarray,
+                       sensor_sample_rate_hz: float,
+                       lowpass_frequency_hz: float = 1):
+    """
+    based on the slack thread: https://tinyurl.com/f6t3h2fp
+    :param sensor_wf:
+    :param sensor_sample_rate_hz:
+    :param low_pass_frequency_hz:
+    :return:
+    """
 
-    # # calculate the fft
-    # mag_sample_rate = [mag_sample_rate]
-    # mag_intensity_array = [np.array(mag_intensity_all)]
-    # time_fft, frequency_fft, energy_fft, snr_fft = spectra.spectra_fft(mag_intensity_array, mag_sample_rate,
-    #                                                                    redvox_id, minimum_frequency=0.1)
-    #
-    # # calculate fft limits for plotting
-    # max_energy = (np.amax(energy_fft))
-    # min_energy = (np.amin(energy_fft))
+    smoothing_factor = lowpass_frequency_hz / sensor_sample_rate_hz
+    # initialize gravity array
+    sensor_lowpass = np.zeros(len(sensor_wf))
+
+    # loop through to update gravity information
+    for i in range(len(sensor_lowpass) - 1):
+        sensor_lowpass[i + 1] = (1 - smoothing_factor) * sensor_lowpass[i] + smoothing_factor * sensor_wf[i + 1]
+
+    return sensor_lowpass
+
+
+def get_lowpass_and_highpass(sensor_wf: np.ndarray, sensor_sample_rate_hz: float,
+                                        lowpass_frequency_hz: float = 1) -> Tuple[np.ndarray, np.ndarray]:
+    """
+
+    :param sensor_wf:
+    :param sensor_sample_rate_hz:
+    :param low_pass_sample_rate_hz:
+    :return:
+    """
+
+    # extract low-frequency component via exponential filtering
+    sensor_lowpass = get_sensor_lowpass(sensor_wf, sensor_sample_rate_hz, lowpass_frequency_hz)
+
+    # subtract low-frequency component from waveform
+    sensor_highpass = sensor_wf - sensor_lowpass
+
+    return sensor_lowpass, sensor_highpass

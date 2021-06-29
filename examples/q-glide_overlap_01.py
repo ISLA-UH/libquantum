@@ -2,7 +2,6 @@ import os
 import numpy as np
 import scipy.io.wavfile
 import matplotlib.pyplot as plt
-import librosa.display
 from libquantum import atoms, entropy, scales, spectra, utils, synthetics
 import libquantum.plot_templates.plot_time_frequency_reps as pltq
 import libquantum.plot_templates.plot_time_frequency_picks as pltpk
@@ -18,6 +17,7 @@ if __name__ == "__main__":
     order_number_input = 12
     overlap_fraction = 0.25
     glide_direction = -1
+    # glide_direction = -1.5
 
     #grain_type_str = 'tukey'
     grain_type_str = 'gauss'
@@ -26,6 +26,7 @@ if __name__ == "__main__":
     print("Event Name: " + EVENT_NAME)
     wav_filename = EVENT_NAME
 
+    do_save_wave = False
     input_directory = "/Users/mgarces/Documents/DATA_API_M/synthetics"
     output_wav_directory = os.path.join(input_directory, "wav")
     station_id_str = 'synth'
@@ -76,12 +77,12 @@ if __name__ == "__main__":
         else:
             sig_wf_red = sig_step
 
-    # Add head and tail
-    sig_wf_red = np.concatenate([np.zeros(head_points), sig_wf_red, np.zeros(head_points)])
-
-    # Add noise
-    noise_wf = synthetics.white_noise_fbits(sig=sig_wf_red, std_bit_loss=8)
-    sig_wf_red = sig_wf_red + noise_wf
+    # # Add head and tail
+    # sig_wf_red = np.concatenate([np.zeros(head_points), sig_wf_red, np.zeros(head_points)])
+    #
+    # # Add noise
+    # noise_wf = synthetics.white_noise_fbits(sig=sig_wf_red, std_bit_loss=8)
+    # sig_wf_red = sig_wf_red + noise_wf
 
     sig_time_s = np.arange(len(sig_wf_red))/sig_wf_sample_rate_hz
     sig_duration_s = np.max(sig_time_s)
@@ -101,6 +102,13 @@ if __name__ == "__main__":
 
     # Antialias filter synthetic
     synthetics.antialias_halfNyquist(sig_wf)
+
+    # Export to wav directory
+    if do_save_wave:
+        wav_sample_rate_hz = 8000.
+        export_filename = os.path.join(output_wav_directory, wav_filename + "_8kz.wav")
+        synth_wav = 0.9 * np.real(sig_wf) / np.max(np.abs((np.real(sig_wf))))
+        scipy.io.wavfile.write(export_filename, int(wav_sample_rate_hz), synth_wav)
 
     # Frame to mic start and end and plot
     event_reference_time_epoch_s = sig_wf_epoch_s[0]
