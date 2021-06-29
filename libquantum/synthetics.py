@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.signal as signal
 from scipy.integrate import cumulative_trapezoid
-from typing import List, Tuple, Optional
+from typing import Optional
 from libquantum import utils, scales, atoms
 
 
@@ -204,22 +204,28 @@ def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: flo
 # GT Test Pulse
 def gt_blast_center_integral_and_derivative(frequency_peak_hz, sample_rate_hz):
     """
+    Integral and derivative relative to tau (NOT time_s)
     :param duration_s:
     :param frequency_peak_hz:
     :param sample_rate_hz:
     :return:
     """
 
-    duration_s = 16/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
+    duration_s = 2/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
     pseudo_period_s = 1/frequency_peak_hz
+    time_pos_s = pseudo_period_s/4.
     duration_points = int(duration_s*sample_rate_hz)
     time_center_s = np.arange(duration_points)/sample_rate_hz
     time_center_s -= time_center_s[-1]/2.
+    tau_center = time_center_s/time_pos_s
+    tau_interval = np.mean(np.diff(tau_center))
+
     sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
     sig_gt_i = gt_blast_integral_period_center(time_center_s, pseudo_period_s)
     sig_gt_d = gt_blast_derivative_period_center(time_center_s, pseudo_period_s)
+    sig_gt_d[np.argmax(sig_gt)-1] = np.max(np.diff(sig_gt))/tau_interval
 
-    return time_center_s, sig_gt, sig_gt_i, sig_gt_d
+    return tau_center, sig_gt, sig_gt_i, sig_gt_d
 
 
 def gt_blast_center_fast(frequency_peak_hz, sample_rate_hz):
@@ -314,6 +320,7 @@ def gt_blast_period_center(time_center_s, pseudo_period_s):
     sigintG17 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
     p_GT[sigint1] = (1. - tau[sigint1])
     p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
+
     return p_GT
 
 
@@ -329,7 +336,8 @@ def gt_blast_derivative_period_center(time_center_s, pseudo_period_s):
     sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
     sigintG17 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
     p_GTd[sigint1] = -1.
-    p_GTd[sigintG17] = -1./6. * (3. + np.sqrt(6) - 3*tau[sigintG17]) * (1. - tau[sigintG17] + np.sqrt(6))
+    p_GTd[sigintG17] = -1./6. * (3. + np.sqrt(6) - 3*tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17])
+
     return p_GTd
 
 

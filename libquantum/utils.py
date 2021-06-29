@@ -8,6 +8,7 @@ from typing import Tuple
 import numpy as np
 from scipy import signal
 
+from scipy.integrate import cumulative_trapezoid
 from libquantum.scales import EPSILON, MICROS_TO_S, KPA_TO_PA
 from redvox.common import date_time_utils as dt
 from redvox.common.station import Station
@@ -29,6 +30,56 @@ def datetime_now_epoch_micros() -> float:
     return dt.datetime_to_epoch_microseconds_utc(dt.now())
 
 
+# Integrals and derivatives
+def integrate_cumtrapz(timestamps_s: np.ndarray,
+                       sensor_wf: np.ndarray,
+                       initial_value: float = 0) -> np.ndarray:
+    """
+    Cumulative trapazoid integration using scipy.integrate.cumulative_trapezoid
+    Initiated by Kei 2106, work in progress. See blast_derivative_integral for validation.
+    :param timestamps_s: timestamps corresponding to the data in seconds
+    :param sensor_wf: data to integrate using cumulative trapezoid
+    :param initial_value: the value to add in the initial of the integrated data to match length of input (default is 0)
+    :return: integrated data with the same length as the input
+    """
+    integrated_data = cumulative_trapezoid(x=timestamps_s,
+                                           y=sensor_wf,
+                                           initial=initial_value)
+    return integrated_data
+
+
+def derivative_gradient(timestamps_s: np.ndarray,
+                        sensor_wf: np.ndarray) -> np.ndarray:
+    """
+    Derivative using gradient
+
+    :param timestamps_s: timestamps corresponding to the data in seconds
+    :param sensor_wf: data to integrate using cumulative trapezoid
+    :return: derivative data with the same length as the input
+    """
+    # derivative_data = np.gradient(sensor_wf)/np.gradient(timestamps_s)
+    derivative_data = np.gradient(sensor_wf, timestamps_s)
+
+    return derivative_data
+
+
+def derivative_diff(timestamps_s: np.ndarray,
+                    sensor_wf: np.ndarray) -> np.ndarray:
+    """
+    Derivative using diff
+
+    :param timestamps_s: timestamps corresponding to the data in seconds
+    :param sensor_wf: data to integrate using cumulative trapezoid
+    :return: derivative data with the same length as the input. Hold/repeat last value
+    """
+
+    derivative_data0 = np.diff(sensor_wf)/np.diff(timestamps_s)
+    derivative_data = np.append(derivative_data0, derivative_data0[-1])
+
+    return derivative_data
+
+
+# Normalization
 class NormType(Enum):
     """
     Enumeration of normalization types.
@@ -155,92 +206,6 @@ def barometer_build_station(station: Station, raw: bool = True) -> Tuple[np.ndar
         barometer_wf = detrend_nan(np.array(barometer_raw))
 
     return barometer_wf, barometer_epoch_s, barometer_sample_rate_hz, barometer_nans
-
-
-def accelerometer_build_station(station: Station,
-                                mean_type: str = "simple",
-                                raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float]:
-    """
-    gets accelerometer data from a station
-    :param station: the station with data
-    :param mean_type: under development
-    :param raw: if false (default), boolean or nan mean removed
-    :return: the accelerometer data, the timestamps, and the estimated sample rate
-    """
-    accelerometer_sample_rate_hz = station.accelerometer_sensor().sample_rate_hz
-    accelerometer_raw = station.accelerometer_sensor().samples()
-    accelerometer_epoch_s = station.accelerometer_sensor().data_timestamps() * MICROS_TO_S
-
-    if raw:
-        accelerometer_wf = np.array(accelerometer_raw)
-    else:
-        if mean_type == "simple":
-            # Demeans and replaces nans with zeros for 3C sensors
-            # TODO: Write function
-            accelerometer_wf = np.nan_to_num(np.subtract(accelerometer_raw.transpose(), np.nanmean(accelerometer_raw, axis=1))).transpose()
-        else:
-            # Placeholder for diff solution with nans
-            accelerometer_wf = np.nan_to_num(np.subtract(accelerometer_raw.transpose(), np.nanmean(accelerometer_raw, axis=1))).transpose()
-
-    return accelerometer_wf, accelerometer_epoch_s, accelerometer_sample_rate_hz
-
-
-def gyroscope_build_station(station: Station,
-                            mean_type: str = "simple",
-                            raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float]:
-    """
-    gets gyroscope data from a station
-    :param station: the station with data
-    :param mean_type: under development
-    :param raw: if false (default), boolean or nan mean removed
-    :return: the gyroscope data, the timestamps, and the estimated sample rate
-    """
-    gyroscope_sample_rate_hz = station.gyroscope_sensor().sample_rate_hz
-    gyroscope_raw = station.gyroscope_sensor().samples()
-    gyroscope_epoch_s = station.gyroscope_sensor().data_timestamps() * MICROS_TO_S
-
-    if raw:
-        gyroscope_wf = np.array(gyroscope_raw)
-    else:
-        if mean_type == "simple":
-            # Demeans and replaces nans with zeros for 3C sensors
-            # TODO: Write function
-            gyroscope_wf = np.nan_to_num(np.subtract(gyroscope_raw.transpose(), np.nanmean(gyroscope_raw, axis=1))).transpose()
-        else:
-            # Placeholder for diff solution with nans
-            gyroscope_wf = np.nan_to_num(np.subtract(gyroscope_raw.transpose(), np.nanmean(gyroscope_raw, axis=1))).transpose()
-
-    return gyroscope_wf, gyroscope_epoch_s, gyroscope_sample_rate_hz
-
-
-def magnetometer_build_station(station: Station,
-                               mean_type: str = "simple",
-                               raw: bool = False) -> Tuple[np.ndarray, np.ndarray, float]:
-    """
-    gets magnetometer data from a station
-    :param station: the station with data
-    :param mean_type: under development
-    :param raw: if false (default), boolean or nan mean removed
-    :return: the magnetometer data, the timestamps, and the estimated sample rate
-    """
-    magnetometer_sample_rate_hz = station.magnetometer_sensor().sample_rate_hz
-    magnetometer_raw = station.magnetometer_sensor().samples()
-    magnetometer_epoch_s = station.magnetometer_sensor().data_timestamps() * MICROS_TO_S
-
-    if raw:
-        magnetometer_wf = np.array(magnetometer_raw)
-    else:
-        if mean_type == "simple":
-            # Demeans and replaces nans with zeros for 3C sensors
-            # TODO: Write function
-            magnetometer_wf = \
-                np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
-        else:
-            # Placeholder for diff solution with nans
-            magnetometer_wf = \
-                np.nan_to_num(np.subtract(magnetometer_raw.transpose(), np.nanmean(magnetometer_raw, axis=1))).transpose()
-
-    return magnetometer_wf, magnetometer_epoch_s, magnetometer_sample_rate_hz
 
 
 class ExtractionType(Enum):
