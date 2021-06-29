@@ -1,11 +1,11 @@
 import numpy as np
 import scipy.signal as signal
-from typing import Optional
+from scipy.integrate import cumulative_trapezoid
+from typing import List, Tuple, Optional
 from libquantum import utils, scales, atoms
 
 
 # Synthetics for rdvxm testing
-
 def gabor_tight_grain(band_order_Nth: float,
                       scale_frequency_center_hz: float,
                       frequency_sample_rate_hz: float,
@@ -202,6 +202,26 @@ def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: flo
 
 
 # GT Test Pulse
+def gt_blast_center_integral_and_derivative(frequency_peak_hz, sample_rate_hz):
+    """
+    :param duration_s:
+    :param frequency_peak_hz:
+    :param sample_rate_hz:
+    :return:
+    """
+
+    duration_s = 16/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
+    pseudo_period_s = 1/frequency_peak_hz
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_gt_i = gt_blast_integral_period_center(time_center_s, pseudo_period_s)
+    sig_gt_d = gt_blast_derivative_period_center(time_center_s, pseudo_period_s)
+
+    return time_center_s, sig_gt, sig_gt_i, sig_gt_d
+
+
 def gt_blast_center_fast(frequency_peak_hz, sample_rate_hz):
     """
     TODO: Set default of 16 bits for std_loss_bits
@@ -297,6 +317,42 @@ def gt_blast_period_center(time_center_s, pseudo_period_s):
     return p_GT
 
 
+def gt_blast_derivative_period_center(time_center_s, pseudo_period_s):
+    # Garces (2019) ground truth GT blast pulse
+    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    # time_start = time_zero - time_pos
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GTd = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GTd[sigint1] = -1.
+    p_GTd[sigintG17] = -2./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) + \
+                       -1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
+    return p_GTd
+
+
+def gt_blast_integral_period_center(time_center_s, pseudo_period_s):
+    # Garces (2019) ground truth GT blast pulse
+    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    # time_start = time_zero - time_pos
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GTi = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GTi[sigint1] = (1. - tau[sigint1]/2.)*tau[sigint1]
+    p_GTi[sigintG17] = -tau[sigintG17]/72. * (
+            3 * tau[sigintG17]**3 - 4 * (3 + 2 * np.sqrt(6)) * tau[sigintG17]**2 +
+            6 * (9 + 4 * np.sqrt(6)) * tau[sigintG17] + 12 * (7 + 2 * np.sqrt(6)))
+
+    return p_GTi
+
+
 def gt_blast_ft(frequency_peak_hz, frequency_hz):
     w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
     ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
@@ -374,5 +430,22 @@ def antialias_halfNyquist(synth):
 def frequency_algebraic_Nth(frequency_geometric, band_order_Nth):
     frequency_algebra = frequency_geometric*(np.sqrt(1+1/(8*band_order_Nth**2)))
     return frequency_algebra
+
+
+def integrate_cumtrapz(timestamps_s: np.ndarray,
+                       sensor_wf: np.ndarray,
+                       initial_value: float = 0) -> np.ndarray:
+    """
+    cumulative trapazoid integration using scipy.integrate.cumulative_trapezoid
+
+    :param timestamps_s: timestamps corresponding to the data in seconds
+    :param sensor_wf: data to integrate using cumulative trapezoid
+    :param initial_value: the value to add in the initial of the integrated data to match length of input (default is 0)
+    :return: integrated data with the same length as the input
+    """
+    integrated_data = cumulative_trapezoid(x=timestamps_s,
+                                           y=sensor_wf,
+                                           initial=initial_value)
+    return integrated_data
 
 
