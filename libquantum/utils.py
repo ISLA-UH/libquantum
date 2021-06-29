@@ -9,9 +9,20 @@ import numpy as np
 from scipy import signal
 
 from scipy.integrate import cumulative_trapezoid
-from libquantum.scales import EPSILON, MICROS_TO_S, KPA_TO_PA
+from libquantum.scales import EPSILON
 from redvox.common import date_time_utils as dt
-from redvox.common.station import Station
+
+
+def taper_tukey(sig_wf_or_time: np.ndarray,
+                fraction_cosine: float) -> np.ndarray:
+    """
+    Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
+    fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+    :param sig_wf_or_time: input signal or time
+    :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
+    :return: tukey taper window amplitude
+    """
+    return signal.windows.tukey(M=np.size(sig_wf_or_time), alpha=fraction_cosine, sym=True)
 
 
 def datetime_now_epoch_s() -> float:
