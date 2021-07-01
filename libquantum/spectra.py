@@ -280,7 +280,7 @@ def fft_welch_snr_power(f_center, Sxx, Sxx2):
 
 def resample8K(sig: np.ndarray, frequency_sample_hz: float) -> np.ndarray:
     """
-    Resample to 8k sample rate
+    Resample to 8k sample rate. Fourier method is better.
     :param sig: time series
     :param frequency_sample_hz:
     :return: ndarray

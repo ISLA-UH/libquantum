@@ -67,7 +67,7 @@ def musical_scale_hz():
                                     frequency_base_input=2,
                                     frequency_ref_input=440,
                                     frequency_low_input=16.35,
-                                    frequency_sample_rate_input=16000)
+                                    frequency_sample_rate_input=48000)
 
 
 def band_periods_nyquist(scale_order_input: float, scale_base_input: float,

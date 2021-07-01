@@ -10,20 +10,20 @@ def gabor_tight_grain(band_order_Nth: float,
                       scale_frequency_center_hz: float,
                       frequency_sample_rate_hz: float,
                       index_shift: float = 0,
-                      scale_base: float = scales.Slice.G2):
+                      frequency_base_input: float = scales.Slice.G2):
     """
 
     :param band_order_Nth:
     :param scale_frequency_center_hz:
     :param frequency_sample_rate_hz:
     :param index_shift:
-    :param scale_base:
+    :param frequency_base_input:
     :return:
     """
 
     # Fundamental chirp parameters
     cycles_M, quality_factor_Q, gamma = \
-        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, scale_base)
+        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, frequency_base_input)
     scale_atom = atoms.chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
     p_complex = atoms.chirp_p_complex(scale_atom, gamma, index_shift)
 
@@ -46,20 +46,20 @@ def tukey_tight_grain(band_order_Nth: float,
                       frequency_sample_rate_hz: float,
                       fraction_cosine: float=0.5,
                       index_shift: float = 0,
-                      scale_base: float = scales.Slice.G2):
+                      frequency_base_input: float = scales.Slice.G2):
     """
 
     :param band_order_Nth:
     :param scale_frequency_center_hz:
     :param frequency_sample_rate_hz:
     :param index_shift:
-    :param scale_base:
+    :param frequency_base_input:
     :return:
     """
 
     # Fundamental chirp parameters
     cycles_M, quality_factor_Q, gamma = \
-        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, scale_base)
+        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, frequency_base_input)
     scale_atom = atoms.chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
     p_complex = atoms.chirp_p_complex(scale_atom, gamma, index_shift)
 
