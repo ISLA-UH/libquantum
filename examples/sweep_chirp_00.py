@@ -29,7 +29,7 @@ if __name__ == "__main__":
     print("Event Name: " + EVENT_NAME)
     wav_filename = EVENT_NAME
 
-    do_save_wave = False
+    do_save_wave = True
     do_reassignment = False
     input_directory = "/Users/mgarces/Documents/DATA_API_M/synthetics"
     output_wav_directory = os.path.join(input_directory, "wav")
