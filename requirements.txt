@@ -1,5 +1,5 @@
 numpy == 1.19.5  # Tensorflow spec - it's very picky
-scipy >= 1.6.3
+scipy >= 1.5.1
 pandas >= 1.2.4
 redvox >= 3.0.0
 libwwz >= 1.0.1
