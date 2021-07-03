@@ -1,11 +1,11 @@
 numpy == 1.19.5  # Tensorflow spec - it's very picky
-scipy >= 1.6.1
-pandas >= 1.2.3
-redvox >= 3.0.0rc31
-libwwz >= 1.0.0
+scipy >= 1.6.3
+pandas >= 1.2.4
+redvox >= 3.0.0
+libwwz >= 1.0.1
 
 # Plotting
-matplotlib >= 3.3.2
+matplotlib >= 3.4.2
 
 # TFR
 librosa
