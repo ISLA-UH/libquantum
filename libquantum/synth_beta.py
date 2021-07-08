@@ -7,18 +7,37 @@ import matplotlib.pyplot as plt
 
 """LAST UPDATED: 20200528 MAG"""
 
-def datetime_now_epoch_s():
-    datetime_now_epoch_s = dt.datetime_to_epoch_seconds_utc(dt.now())
-    return datetime_now_epoch_s
 
-def datetime_now_epoch_micros():
-    datetime_now_epoch_micros = dt.datetime_to_epoch_microseconds_utc(dt.now())
-    return datetime_now_epoch_micros
+# Auxiliary modules for building stations
+def datetime_now_epoch_s() -> float:
+    """
+    Returns the invocation Unix time in seconds
+
+    :return: The current epoch timestamp as seconds since the epoch UTC
+    """
+    return dt.datetime_to_epoch_seconds_utc(dt.now())
+
+
+def datetime_now_epoch_micros() -> float:
+    """
+    Returns the invocation Unix time in microseconds
+
+    :return: The current epoch timestamp as microseconds since the epoch UTC
+    """
+    return dt.datetime_to_epoch_microseconds_utc(dt.now())
+
 
 def norm_max(sig):
+    """
+    Normalize signal
+
+    :param sig: array-like with signal waveform
+    :return: array-like with normalized signal
+    """
     # TODO: Fix for all so it works with parquet df
     sig_norm = sig/np.max(np.abs(sig))
     return sig_norm
+
 
 def norm_L1(sig):
     sig /= np.sum(sig)

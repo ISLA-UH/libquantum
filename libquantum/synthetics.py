@@ -1,3 +1,8 @@
+"""
+This module constructs synthetic signals
+Last updated: 8 July 2021
+"""
+
 import numpy as np
 import scipy.signal as signal
 from scipy.integrate import cumulative_trapezoid
@@ -84,6 +89,17 @@ def gabor_grain_frequencies(frequency_order_input: float,
                             frequency_sample_rate_input: float,
                             frequency_base_input: float = scales.Slice.G2,
                             frequency_ref_input: float = 1.0) -> (np.ndarray, np.ndarray):
+    """
+
+
+    :param frequency_order_input:
+    :param frequency_low_input:
+    :param frequency_high_input:
+    :param frequency_sample_rate_input:
+    :param frequency_base_input:
+    :param frequency_ref_input:
+    :return:
+    """
 
     scale_order, scale_base, _, frequency_ref, frequency_center_algebraic, \
     frequency_center, frequency_start, frequency_end = \
@@ -100,6 +116,7 @@ def gt_rdvxm_center_noise_16bit(duration_points: int = 2**12, sample_rate_hz: fl
                                 noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
     """
     Construct the GT explosion pulse of Garces (2019) in Gaussion noise with SNR in bits re signal STD
+
     :param duration_points:
     :param sample_rate_hz:
     :param noise_std_loss_bits:
@@ -130,6 +147,7 @@ def gt_rdvxm_center_noise_uneven(sensor_epoch_micros: np.array, start_epoch_micr
     """
     Construct the GT explosion pulse of Garces (2019) for uneven sensor time
     in Gaussion noise with SNR in bits re signal STD
+
     :param sensor_epoch_micros:
     :param start_epoch_micros:
     :param duration_points:
@@ -158,6 +176,15 @@ def gt_rdvxm_center_noise_uneven(sensor_epoch_micros: np.array, start_epoch_micr
 
 def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
                             noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+    """
+
+
+    :param duration_points:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :param frequency_center_hz:
+    :return:
+    """
 
     duration_s = duration_points/sample_rate_hz
     if frequency_center_hz:
@@ -182,6 +209,15 @@ def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float 
 
 def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
                                noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+    """
+
+
+    :param duration_points:
+    :param sample_rate_hz:
+    :param noise_std_loss_bits:
+    :param frequency_center_hz:
+    :return:
+    """
 
     duration_s = duration_points/sample_rate_hz
     if frequency_center_hz:
@@ -205,7 +241,7 @@ def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: flo
 def gt_blast_center_integral_and_derivative(frequency_peak_hz, sample_rate_hz):
     """
     Integral and derivative relative to tau (NOT time_s)
-    :param duration_s:
+
     :param frequency_peak_hz:
     :param sample_rate_hz:
     :return:
@@ -228,13 +264,13 @@ def gt_blast_center_integral_and_derivative(frequency_peak_hz, sample_rate_hz):
     return tau_center, sig_gt, sig_gt_i, sig_gt_d
 
 
-def gt_blast_center_fast(frequency_peak_hz, sample_rate_hz):
+def gt_blast_center_fast(frequency_peak_hz,
+                         sample_rate_hz):
     """
     TODO: Set default of 16 bits for std_loss_bits
-    :param duration_s:
+
     :param frequency_peak_hz:
     :param sample_rate_hz:
-    :param noise_std_loss_bits:
     :return:
     """
 
@@ -259,10 +295,8 @@ def gt_blast_center_noise_uneven(sensor_epoch_s: np.array,
     """
     Construct the GT explosion pulse of Garces (2019) for even or uneven sensor time
     in Gaussion noise with SNR in bits re signal STD
-    :param sensor_epoch_micros:
-    :param start_epoch_micros:
-    :param duration_points:
-    :param sample_rate_hz:
+
+    :param sensor_epoch_s:
     :param noise_std_loss_bits:
     :param frequency_center_hz:
     :return:
@@ -289,6 +323,7 @@ def gt_blast_center_noise_uneven(sensor_epoch_s: np.array,
 def gt_blast_center_noise(duration_s, frequency_peak_hz, sample_rate_hz, noise_std_loss_bits):
     """
     TODO: Set default of 16 bits for std_loss_bits
+
     :param duration_s:
     :param frequency_peak_hz:
     :param sample_rate_hz:
@@ -308,6 +343,13 @@ def gt_blast_center_noise(duration_s, frequency_peak_hz, sample_rate_hz, noise_s
 
 
 def gt_blast_period_center(time_center_s, pseudo_period_s):
+    """
+
+
+    :param time_center_s:
+    :param pseudo_period_s:
+    :return:
+    """
     # Garces (2019) ground truth GT blast pulse
     # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
     # time_start = time_zero - time_pos
@@ -325,6 +367,13 @@ def gt_blast_period_center(time_center_s, pseudo_period_s):
 
 
 def gt_blast_derivative_period_center(time_center_s, pseudo_period_s):
+    """
+
+
+    :param time_center_s:
+    :param pseudo_period_s:
+    :return:
+    """
     # Garces (2019) ground truth GT blast pulse
     # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
     # time_start = time_zero - time_pos
@@ -342,6 +391,13 @@ def gt_blast_derivative_period_center(time_center_s, pseudo_period_s):
 
 
 def gt_blast_integral_period_center(time_center_s, pseudo_period_s):
+    """
+
+
+    :param time_center_s:
+    :param pseudo_period_s:
+    :return:
+    """
     # Garces (2019) ground truth GT blast pulse
     # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
     # time_start = time_zero - time_pos
@@ -365,6 +421,13 @@ def gt_blast_integral_period_center(time_center_s, pseudo_period_s):
 
 
 def gt_blast_ft(frequency_peak_hz, frequency_hz):
+    """
+
+
+    :param frequency_peak_hz:
+    :param frequency_hz:
+    :return:
+    """
     w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
     ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
     ft_G17_negative = np.exp(-1j*w_scaled*(1+np.sqrt(6.)))/(3.*w_scaled**4.) * \
@@ -375,6 +438,13 @@ def gt_blast_ft(frequency_peak_hz, frequency_hz):
 
 
 def gt_blast_spectral_density(frequency_peak_hz, frequency_hz):
+    """
+
+
+    :param frequency_peak_hz:
+    :param frequency_hz:
+    :return:
+    """
     fourier_tx = gt_blast_ft(frequency_peak_hz, frequency_hz)
     spectral_density = 2*np.abs(fourier_tx*np.conj(fourier_tx))
     spectral_density_peak = np.max(spectral_density)
@@ -385,6 +455,18 @@ def gt_blast_spectral_density(frequency_peak_hz, frequency_hz):
 def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
                           frequency_start_hz, frequency_end_hz,
                           intro_s, outro_s,):
+    """
+
+
+    :param snr_bits:
+    :param sample_rate_hz:
+    :param duration_s:
+    :param frequency_start_hz:
+    :param frequency_end_hz:
+    :param intro_s:
+    :param outro_s:
+    :return:
+    """
 
     sig_time_s = np.arange(int(sample_rate_hz*duration_s))/sample_rate_hz
     chirp_wf = signal.chirp(sig_time_s, frequency_start_hz, sig_time_s[-1],
@@ -402,6 +484,7 @@ def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
 def white_noise_fbits(sig: np.ndarray, std_bit_loss: float) -> np.ndarray:
     """
     Compute white noise with zero mean and standard deviation that is snr_bits below the input signal
+
     :param sig: input signal, detrended
     :param std_bit_loss: number of bits below signal standard deviation
     :return: gaussian noise with zero mean
@@ -419,6 +502,7 @@ def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -> np.ndarray:
     """
     Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
     fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+
     :param sig_or_time: input signal or time
     :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
     :return: tukey taper window amplitude
@@ -429,6 +513,12 @@ def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -> np.ndarray:
 
 
 def antialias_halfNyquist(synth):
+    """
+
+
+    :param synth:
+    :return:
+    """
     # Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
     # Signal frequencies are scaled by Nyquist
     filter_order = 2
