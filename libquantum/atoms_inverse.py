@@ -7,6 +7,13 @@ Atom Reconstruction - inverse CWT for Dictionary 0. Not for chirps, yet.
 
 
 def morlet2_reconstruct(band_order_Nth, scale_frequency_center_hz, frequency_sample_rate_hz):
+    """
+
+    :param band_order_Nth:
+    :param scale_frequency_center_hz:
+    :param frequency_sample_rate_hz:
+    :return:
+    """
 
     cycles_M, quality_factor_Q = scales.wavelet_MQ_from_N(band_order_Nth)
     morlet2_scale = cycles_M*frequency_sample_rate_hz/scale_frequency_center_hz/(2. * np.pi)
@@ -44,7 +51,7 @@ def inv_morlet2_imag(band_order_Nth, time_s, offset_time_s, scale_frequency_cent
     xtime_shifted, xscale, cycles_M, rescale = \
         inv_morlet2_prep(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, frequency_sample_rate_hz)
 
-    wavelet_gauss =  np.exp(-0.5 * (xtime_shifted / xscale) ** 2)
+    wavelet_gauss = np.exp(-0.5 * (xtime_shifted / xscale) ** 2)
     wavelet_gabor_imag = wavelet_gauss * np.sin(cycles_M*(xtime_shifted / xscale))
 
     # Rescale to Morlet wavelet and take the conjugate for imag

@@ -1,3 +1,9 @@
+"""
+This module contains time frequency plots for picks
+
+Last updated: 7 July 2021
+"""
+
 import enum
 from typing import List, Tuple
 import math

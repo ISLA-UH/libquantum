@@ -1,5 +1,6 @@
 """
 This module contains general utilities that can work with values containing nans.
+Last updated: 7 July 2021
 """
 
 from enum import Enum
@@ -18,6 +19,7 @@ def taper_tukey(sig_wf_or_time: np.ndarray,
     """
     Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
     fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+
     :param sig_wf_or_time: input signal or time
     :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
     :return: tukey taper window amplitude
@@ -28,6 +30,7 @@ def taper_tukey(sig_wf_or_time: np.ndarray,
 def datetime_now_epoch_s() -> float:
     """
     Returns the invocation Unix time in seconds
+
     :return: The current epoch timestamp as seconds since the epoch UTC
     """
     return dt.datetime_to_epoch_seconds_utc(dt.now())
@@ -36,6 +39,7 @@ def datetime_now_epoch_s() -> float:
 def datetime_now_epoch_micros() -> float:
     """
     Returns the invocation Unix time in microseconds
+
     :return: The current epoch timestamp as microseconds since the epoch UTC
     """
     return dt.datetime_to_epoch_microseconds_utc(dt.now())
@@ -48,6 +52,7 @@ def integrate_cumtrapz(timestamps_s: np.ndarray,
     """
     Cumulative trapazoid integration using scipy.integrate.cumulative_trapezoid
     Initiated by Kei 2106, work in progress. See blast_derivative_integral for validation.
+
     :param timestamps_s: timestamps corresponding to the data in seconds
     :param sensor_wf: data to integrate using cumulative trapezoid
     :param initial_value: the value to add in the initial of the integrated data to match length of input (default is 0)
@@ -93,6 +98,7 @@ def derivative_diff(timestamps_s: np.ndarray,
 class ExtractionType(Enum):
     """
     Enumeration of valid extraction types.
+
     ARGMAX = max of the absolute value of the signal
     SIGMAX = fancier signal picker, from POSITIVE max
     BITMAX = fancier signal picker, from ABSOLUTE max
@@ -109,6 +115,7 @@ def sig_extract(sig: np.ndarray, time_epoch_s: np.ndarray,
                 extract_type: ExtractionType = ExtractionType.ARGMAX) -> Tuple[np.ndarray, np.ndarray, float]:
     """
     Extract signal and time relative to reference index
+
     :param sig: input signal
     :param time_epoch_s: signal epoch time
     :param intro_s: time before pick
@@ -116,7 +123,7 @@ def sig_extract(sig: np.ndarray, time_epoch_s: np.ndarray,
     :param pick_bits_below_max: pick treshold in bits below max
     :param pick_time_interval_s: pick time interval between adjacent max point
     :param extract_type: Type of extraction, see ExtractionType class
-    :return:
+    :return: extracted signal np.ndarray, extracted signal timestamps np.ndarray, and pick time
     """
 
     sig_sample_interval_s = np.mean(np.diff(time_epoch_s))
@@ -158,6 +165,7 @@ def sig_frame(sig: np.ndarray, time_epoch_s: np.ndarray,
               epoch_s_start: float, epoch_s_stop: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Frame one-component signal within start and stop epoch times
+
     :param sig: input signal
     :param time_epoch_s: input epoch time in seconds
     :param epoch_s_start: start epoch time
@@ -173,9 +181,10 @@ def sig_frame(sig: np.ndarray, time_epoch_s: np.ndarray,
 
 
 def sig3c_frame(sig3c: np.ndarray, time_epoch_s: np.ndarray,
-                epoch_s_start: float, epoch_s_stop: float):
+                epoch_s_start: float, epoch_s_stop: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Frame three-component signal within start and stop epoch times
+
     :param sig3c: input signal with three components
     :param time_epoch_s: input epoch time in seconds
     :param epoch_s_start: start epoch time
@@ -193,6 +202,7 @@ def sig3c_frame(sig3c: np.ndarray, time_epoch_s: np.ndarray,
 def dbepsilon(x: np.ndarray) -> np.ndarray:
     """
     Converts the absolute value of a time series to dB
+
     :param x: time series
     :return: ndarray
     """
@@ -203,6 +213,7 @@ def dbepsilon(x: np.ndarray) -> np.ndarray:
 def dbepsilon_max(x: np.ndarray) -> float:
     """
     Returns the max of the absolute value of a time series to dB
+
     :param x: time series
     :return: float
     """
@@ -213,6 +224,7 @@ def dbepsilon_max(x: np.ndarray) -> float:
 def log2epsilon(x: np.ndarray) -> np.ndarray:
     """
     log 2 of the absolute value of linear amplitude, with EPSILON to avoid singularities
+
     :param x: time series or fft - not power
     :return: ndarray
     """
@@ -223,6 +235,7 @@ def log2epsilon(x: np.ndarray) -> np.ndarray:
 def log2epsilon_max(x: np.ndarray) -> float:
     """
     max of the log 2 of absolute value of linear amplitude, with EPSILON to avoid singularities
+
     :param x: time series or fft - not power
     :return: float
     """
@@ -280,6 +293,7 @@ def picker_signal_bit_index(sig: np.array, sig_sample_rate_hz: float,
 def picker_comb(sig_pick, index_pick):
     """
     Constructs a comb function from the picks
+
     :param sig_pick: 1D record corresponding to the picks
     :param index_pick: indexes for the picks
     :return: comb with unit amplitude
@@ -297,8 +311,9 @@ Matrix transformations
 def sum_columns(sxx: np.ndarray) -> np.ndarray:
     """
     Sum over all the columns in a 1D or 2D array
+
     :param sxx: input vector or matrix
-    :return: ndarray
+    :return: ndarray with sum
     """
     if not isinstance(sxx, np.ndarray):
         raise TypeError('Input must be array.')
@@ -321,8 +336,9 @@ def sum_columns(sxx: np.ndarray) -> np.ndarray:
 def mean_columns(sxx: np.ndarray) -> np.ndarray:
     """
     Compute the mean of the columns in a 1D or 2D array
+
     :param sxx: input vector or matrix
-    :return: ndarray
+    :return: ndarray with mean
     """
     if not isinstance(sxx, np.ndarray):
         raise TypeError('Input must be array.')
@@ -345,6 +361,7 @@ def mean_columns(sxx: np.ndarray) -> np.ndarray:
 def just_tile(array1d_in: np.ndarray, shape_out: tuple) -> np.ndarray:
     """
     Constructs tiled array from 1D array to the shape specified by shape_out
+
     :param array1d_in: 1D array or vector
     :param shape_out: Tuple with output array shape.
     :return: ndarray
@@ -362,8 +379,9 @@ def just_tile(array1d_in: np.ndarray, shape_out: tuple) -> np.ndarray:
 def sum_tile(sxx: np.ndarray) -> np.ndarray:
     """
     Compute the sum of the columns in a 1D or 2D array and then re-tile to the original size
+
     :param sxx: input vector or matrix
-    :return: ndarray
+    :return: ndarray of sum
     """
     sum_c = sum_columns(sxx)
 
@@ -381,9 +399,10 @@ def sum_tile(sxx: np.ndarray) -> np.ndarray:
 def mean_tile(sxx: np.ndarray, shape_out) -> np.ndarray:
     """
     Compute the mean of the columns in a 1D or 2D array and then re-tile to the original size
+
     :param sxx: input vector or matrix
     :param shape_out: shape of output vector or matrix
-    :return: ndarray
+    :return: ndarray of mean
     """
     sum_c = mean_columns(sxx)
 
@@ -402,6 +421,7 @@ def d1tile_x_d2(d1: np.ndarray, d2: np.ndarray) -> np.ndarray:
     """
     Create array of repeated values with dimensions that match those of energy array
     Useful to multiply frequency-dependent values to frequency-time matrices
+
     :param d1: 1D input vector, nominally frequency/scale multipliers
     :param d2: 2D array, first dimension should be that same as d1
     :return:
