@@ -107,12 +107,22 @@ class AudioParams:
     figure_parameters: FigureParameters = FigureParameters(AspectRatioType.R1920x1080)
 
 
-def origin_time_correction(time_input, start_time_epoch: float, units_time: str):
+def origin_time_correction(time_input: np.ndarray,
+                           start_time_epoch: float,
+                           units_time: str) -> Tuple[str, np.ndarray]:
+    """
+    Sanitize time
+
+    :param time_input: array with timestamps
+    :param start_time_epoch: start time in epoch UTC
+    :param units_time: units of time
+    :return: time label and time elapsed from start
+    """
     # Sanitizing/scrubbing time is a key function.
-    # TEST EXTENSIVELY!
+    # TODO: TEST EXTENSIVELY!
     # Elapsed time from start of the record. Watch out with start alignment.
     time_elapsed_from_start = time_input - time_input[0]
-    # Need to construct a function to return time from start_time_epoch if they are not the same
+    # TODO: Need to construct a function to return time from start_time_epoch if they are not the same
     if start_time_epoch != time_input[0]:
         time_from_epoch_start = time_input[0] - start_time_epoch
     if start_time_epoch == 0:
@@ -130,7 +140,17 @@ def mesh_time_frequency_edges(frequency: np.ndarray,
                               time: np.ndarray,
                               frequency_ymin: float,
                               frequency_ymax: float,
-                              frequency_scaling: str = "linear"):
+                              frequency_scaling: str = "linear") -> Tuple[np.ndarray, np.ndarray, float, float]:
+    """
+    Find time and frequency edges for plotting
+
+    :param frequency: array with frequencies
+    :param time: array with timestamps
+    :param frequency_ymin: minimum frequency for y-axis
+    :param frequency_ymax: maximum frequency for y-axis
+    :param frequency_scaling: "log" or "linear". Default is "linear"
+    :return: min and max frequency for plot, time and frequency edges
+    """
 
     # TODO: Stress test. All these need recovery/override paths
     if frequency_ymin > frequency_ymax:
@@ -166,7 +186,16 @@ def mesh_time_frequency_edges(frequency: np.ndarray,
 
 def mesh_colormap_limits(mesh_array: np.ndarray,
                          colormap_scaling: str = "auto",
-                         color_range: float = 16):
+                         color_range: float = 16.):
+    """
+    Find colormap limits for plotting
+
+    :param mesh_array: array with mesh
+    :param colormap_scaling: one of: "auto" (max/min of input mesh), "range" (max of input mesh minus color range given)
+        or "abs" (absolute max/min of input mesh)
+    :param color_range: default is 16.0
+    :return: colormap min and max values
+    """
     if colormap_scaling == "auto":
         color_max = np.max(mesh_array)
         color_min = np.min(mesh_array)
@@ -194,14 +223,14 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
                               frequency_scaling: str = "log",
                               mesh_shading: str = "auto",
                               mesh_panel_1_colormap_scaling: str = "auto",
-                              mesh_panel_1_color_max: float = 15,
-                              mesh_panel_1_color_range: float = 15,
-                              mesh_panel_1_color_min: float = 0,
+                              mesh_panel_1_color_max: float = 15.,
+                              mesh_panel_1_color_range: float = 15.,
+                              mesh_panel_1_color_min: float = 0.,
                               mesh_panel_0_colormap_scaling: str = "auto",
-                              mesh_panel_0_color_max: float = 15,
-                              mesh_panel_0_color_range: float = 15,
-                              mesh_panel_0_color_min: float = 0,
-                              start_time_epoch: float = 0,
+                              mesh_panel_0_color_max: float = 15.,
+                              mesh_panel_0_color_range: float = 15.,
+                              mesh_panel_0_color_min: float = 0.,
+                              start_time_epoch: float = 0.,
                               frequency_hz_ymin: float = scales.Slice.FU,
                               frequency_hz_ymax: float = scales.Slice.F0,
                               waveform_color: str = "midnightblue",
@@ -212,7 +241,48 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
                               mesh_panel_1_cbar_units: str = "bits",
                               mesh_panel_0_cbar_units: str = "bits",
                               figure_title: str = "Time-Frequency Representation",
-                              figure_title_show: bool = True):
+                              figure_title_show: bool = True) -> None:
+    """
+    Plot 3 vertical panels - scatter (top panel), mesh (middle panel) and signal waveform (bottom panel)
+
+    :param redvox_id: name of station
+    :param wf_panel_2_sig: array with signal waveform for bottom panel
+    :param wf_panel_2_time: array with signal timestamps for bottom panel
+    :param mesh_time: array with mesh time
+    :param mesh_frequency: array with mesh frequencies
+    :param scatter_time: array with time for scatter plot
+    :param scatter_frequency: array with frequencies for scatter plot
+    :param mesh_panel_1_trf: array with mesh tfr data for mesh plot (middle panel)
+    :param mesh_panel_0_tfr: array with mesh tfr data for scatter plot (top panel)
+    :param params_tfr: parameters for tfr. Check AudioParams().
+    :param frequency_scaling: "log" or "linear". Default is "log"
+    :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
+    :param mesh_panel_1_colormap_scaling: color scaling for mesh plot (middle panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_1_color_max, mesh_panel_1_color_range, mesh_panel_1_color_min). Default is "auto"
+    :param mesh_panel_1_color_max: maximum value for color scaling for mesh plot (middle panel). Default is 15.0
+    :param mesh_panel_1_color_range: range between maximum and minimum values in color scaling for mesh plot
+        (middle panel). Default is 15.0
+    :param mesh_panel_1_color_min: minimum value for color scaling for mesh plot (middle panel). Default is 0.0
+    :param mesh_panel_0_colormap_scaling: color scaling for scatter plot (top panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_0_color_max, mesh_panel_0_color_range, mesh_panel_0_color_min). Default is "auto"
+    :param mesh_panel_0_color_max: maximum value for color scaling for scatter plot (top panel). Default is 15.0
+    :param mesh_panel_0_color_range:range between maximum and minimum values in color scaling for scatter plot
+        (top panel). Default is 15.0
+    :param mesh_panel_0_color_min: minimum value for color scaling for scatter plot (top panel). Default is 0.0
+    :param start_time_epoch: start time in epoch UTC. Default is 0.0
+    :param frequency_hz_ymin: minimum frequency for y-axis
+    :param frequency_hz_ymax: maximum frequency for y-axis
+    :param waveform_color: color of waveform for bottom panel. Default is "midnightblue"
+    :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
+    :param units_time: units of time. Default is "s"
+    :param units_frequency: units of frequency. Default is "Hz"
+    :param wf_panel_2_units: units of waveform plot (bottom panel). Default is "Norm"
+    :param mesh_panel_1_cbar_units: units of colorbar for mesh plot (middle panel). Default is "bits"
+    :param mesh_panel_0_cbar_units: units of colorbar for scatter plot (top panel). Default is "bits"
+    :param figure_title: title of figure
+    :param figure_title_show: show title if True. Default is True
+    :return: plot
+    """
 
     # Scatter inherits mesh colormap, but can have its own dynamic range
     # This is the template for the TFR workhorse. Creating a TFR class would be practical.
@@ -407,7 +477,6 @@ def plot_wf_scatter_vert(redvox_id: str,
                          mesh_panel_0_tfr: np.ndarray,
                          params_tfr=AudioParams(),
                          frequency_scaling: str = "log",
-                         mesh_shading: str = "auto",
                          mesh_panel_0_colormap_scaling: str = "auto",
                          mesh_panel_0_color_max: float = 15,
                          mesh_panel_0_color_range: float = 15,
@@ -422,7 +491,37 @@ def plot_wf_scatter_vert(redvox_id: str,
                          wf_panel_2_units: str = "Norm",
                          mesh_panel_0_cbar_units: str = "bits",
                          figure_title: str = "Time-Frequency Representation",
-                         figure_title_show: bool = True):
+                         figure_title_show: bool = True) -> None:
+    """
+    Plot 2 vertical panels - scatter (top panel) and signal waveform (bottom panel)
+
+    :param redvox_id: name of station
+    :param wf_panel_2_sig: array with signal waveform for bottom panel
+    :param wf_panel_2_time: array with signal timestamps for bottom panel
+    :param mesh_time: array with mesh time
+    :param mesh_frequency: array with mesh frequencies
+    :param mesh_panel_0_tfr: array with mesh tfr data for scatter plot (top panel)
+    :param params_tfr: parameters for tfr. Check AudioParams().
+    :param frequency_scaling: "log" or "linear". Default is "log"
+    :param mesh_panel_0_colormap_scaling: color scaling for scatter plot (top panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_0_color_max, mesh_panel_0_color_range, mesh_panel_0_color_min). Default is "auto"
+    :param mesh_panel_0_color_max: maximum value for color scaling for scatter plot (top panel). Default is 15.0
+    :param mesh_panel_0_color_range:range between maximum and minimum values in color scaling for scatter plot
+        (top panel). Default is 15.0
+    :param mesh_panel_0_color_min: minimum value for color scaling for scatter plot (top panel). Default is 0.0
+    :param start_time_epoch: start time in epoch UTC. Default is 0.0
+    :param frequency_hz_ymin: minimum frequency for y-axis
+    :param frequency_hz_ymax: maximum frequency for y-axis
+    :param waveform_color: color of waveform for bottom panel. Default is "midnightblue"
+    :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
+    :param units_time: units of time. Default is "s"
+    :param units_frequency: units of frequency. Default is "Hz"
+    :param wf_panel_2_units: units of waveform plot (bottom panel). Default is "Norm"
+    :param mesh_panel_0_cbar_units: units of colorbar for scatter plot (top panel). Default is "bits"
+    :param figure_title: title of figure
+    :param figure_title_show: show title if True. Default is True
+    :return: plot
+    """
 
     # This is the template for the TFR workhorse. Creating a TFR class may be practical.
 
