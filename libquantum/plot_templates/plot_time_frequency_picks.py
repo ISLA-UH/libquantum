@@ -279,7 +279,7 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
     :param wf_panel_2_units: units of waveform plot (bottom panel). Default is "Norm"
     :param mesh_panel_1_cbar_units: units of colorbar for mesh plot (middle panel). Default is "bits"
     :param mesh_panel_0_cbar_units: units of colorbar for scatter plot (top panel). Default is "bits"
-    :param figure_title: title of figure
+    :param figure_title: title of figure. Default is "Time-Frequency Representation"
     :param figure_title_show: show title if True. Default is True
     :return: plot
     """

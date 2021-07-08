@@ -101,7 +101,17 @@ class AudioParams:
     figure_parameters: FigureParameters = FigureParameters(AspectRatioType.R1920x1080)
 
 
-def origin_time_correction(time_input, start_time_epoch: float, units_time: str):
+def origin_time_correction(time_input: np.ndarray,
+                           start_time_epoch: float,
+                           units_time: str) -> Tuple[str, np.ndarray]:
+    """
+    Sanitize time
+
+    :param time_input: array with timestamps
+    :param start_time_epoch: start time in epoch UTC
+    :param units_time: units of time
+    :return: time label and time elapsed from start
+    """
     # Sanitizing/scrubbing time is a key function.
     # TEST EXTENSIVELY!
     # Elapsed time from start of the record. Watch out with start alignment.
@@ -124,7 +134,17 @@ def mesh_time_frequency_edges(frequency: np.ndarray,
                               time: np.ndarray,
                               frequency_ymin: float,
                               frequency_ymax: float,
-                              frequency_scaling: str = "linear"):
+                              frequency_scaling: str = "linear") -> Tuple[np.ndarray, np.ndarray, float, float]:
+    """
+    Find time and frequency edges for plotting
+
+    :param frequency: array with frequencies
+    :param time: array with timestamps
+    :param frequency_ymin: minimum frequency for y-axis
+    :param frequency_ymax: maximum frequency for y-axis
+    :param frequency_scaling: "log" or "linear". Default is "linear"
+    :return: min and max frequency for plot, time and frequency edges
+    """
 
     # TODO: Stress test. All these need recovery/override paths
     if frequency_ymin > frequency_ymax:
@@ -161,6 +181,16 @@ def mesh_time_frequency_edges(frequency: np.ndarray,
 def mesh_colormap_limits(mesh_array: np.ndarray,
                          colormap_scaling: str = "auto",
                          color_range: float = 16):
+    """
+    Find colormap limits for plotting
+
+    :param mesh_array: array with mesh
+    :param colormap_scaling: one of: "auto" (max/min of input mesh), "range" (max of input mesh minus color range given)
+        or "abs" (absolute max/min of input mesh)
+    :param color_range: default is 16.0
+    :return: colormap min and max values
+    """
+
     if colormap_scaling == "auto":
         color_max = np.max(mesh_array)
         color_min = np.min(mesh_array)
@@ -196,31 +226,32 @@ def plot_wf_wf_wf_vert(redvox_id: str,
                        labels_panel_2: str = "(a)",
                        labels_panel_1: str = "(b)",
                        labels_panel_0: str = "(c)",
-                       labels_fontweight: str = None):
+                       labels_fontweight: str = None) -> None:
     """
     Template for aligned time-series display
-    :param redvox_id:
-    :param wf_panel_0_sig:
-    :param wf_panel_0_time:
-    :param wf_panel_1_sig:
-    :param wf_panel_1_time:
-    :param wf_panel_2_sig:
-    :param wf_panel_2_time:
-    :param start_time_epoch:
-    :param wf_panel_0_units:
-    :param wf_panel_1_units:
-    :param wf_panel_2_units:
-    :param params_tfr:
-    :param waveform_color:
-    :param units_time:
-    :param figure_title:
+
+    :param redvox_id: name of station
+    :param wf_panel_0_sig: array with signal waveform for top panel
+    :param wf_panel_0_time: array with signal timestamps for top panel
+    :param wf_panel_1_sig: array with signal waveform for middle panel
+    :param wf_panel_1_time: array with signal timestamps for middle panel
+    :param wf_panel_2_sig: array with signal waveform for bottom panel
+    :param wf_panel_2_time: array with signal timestamps for bottom panel
+    :param start_time_epoch: start time in epoch UTC. Default is 0.0
+    :param wf_panel_0_units: units of signal (top panel). Default is "Norm"
+    :param wf_panel_1_units: units of signal (middle panel). Default is "Norm"
+    :param wf_panel_2_units: units of signal (bottom panel). Default is "Norm"
+    :param params_tfr: parameters for tfr. Check AudioParams().
+    :param waveform_color: color of waveforms. Default is "midnightblue"
+    :param units_time: units of time. Default is "s"
+    :param figure_title: title of figure. Default is "Time Domain Representation"
     :param figure_title_show: True to display title, False for publications
-    :param label_panel_show: Default is False, True for publication
-    :param labels_panel_2: Default is (a)
-    :param labels_panel_1: Default is (b)
-    :param labels_panel_0: Default is (c)
+    :param label_panel_show: show panel labelling. Default is False, True for publication
+    :param labels_panel_2: label for bottom panel. Default is (a)
+    :param labels_panel_1: label for middle panel. Default is (b)
+    :param labels_panel_0: label for top panel. Default is (c)
     :param labels_fontweight: matplotlib.text property
-    :return:
+    :return: plot
     """
 
     # TEST EXTENSIVELY!
@@ -342,7 +373,47 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
                            mesh_panel_1_cbar_units: str = "bits",
                            mesh_panel_0_cbar_units: str = "bits",
                            figure_title: str = "Time-Frequency Representation",
-                           figure_title_show: bool = True):
+                           figure_title_show: bool = True) -> None:
+
+    """
+    Plot 3 vertical panels - mesh (top panel), mesh (middle panel) and signal waveform (bottom panel)
+
+    :param redvox_id: name of station
+    :param wf_panel_2_sig: array with signal waveform for bottom panel
+    :param wf_panel_2_time: array with signal timestamps for bottom panel
+    :param mesh_time: array with mesh time
+    :param mesh_frequency: array with mesh frequencies
+    :param mesh_panel_1_trf: array with mesh tfr data for mesh plot (middle panel)
+    :param mesh_panel_0_tfr: array with mesh tfr data for mesh plot (top panel)
+    :param params_tfr: parameters for tfr. Check AudioParams().
+    :param frequency_scaling: "log" or "linear". Default is "log"
+    :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
+     :param mesh_panel_1_colormap_scaling: color scaling for mesh plot (middle panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_1_color_max, mesh_panel_1_color_range, mesh_panel_1_color_min). Default is "auto"
+    :param mesh_panel_1_color_max: maximum value for color scaling for mesh plot (middle panel). Default is 15.0
+    :param mesh_panel_1_color_range: range between maximum and minimum values in color scaling for mesh plot
+        (middle panel). Default is 15.0
+    :param mesh_panel_1_color_min: minimum value for color scaling for mesh plot (middle panel). Default is 0.0
+    :param mesh_panel_0_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_0_color_max, mesh_panel_0_color_range, mesh_panel_0_color_min). Default is "auto"
+    :param mesh_panel_0_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
+    :param mesh_panel_0_color_range:range between maximum and minimum values in color scaling for scatter plot
+        (top panel). Default is 15.0
+    :param mesh_panel_0_color_min: minimum value for color scaling for mesh plot (top panel). Default is 0.0
+    :param start_time_epoch: start time in epoch UTC. Default is 0.0
+    :param frequency_hz_ymin: minimum frequency for y-axis
+    :param frequency_hz_ymax: maximum frequency for y-axis
+    :param waveform_color: color of waveform for bottom panel. Default is "midnightblue"
+    :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
+    :param units_time: units of time. Default is "s"
+    :param units_frequency: units of frequency. Default is "Hz"
+    :param wf_panel_2_units: units of waveform plot (bottom panel). Default is "Norm"
+    :param mesh_panel_1_cbar_units: units of colorbar for mesh plot (middle panel). Default is "bits"
+    :param mesh_panel_0_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
+    :param figure_title: title of figure. Default is "Time-Frequency Representation"
+    :param figure_title_show: show title if True. Default is True
+    :return: plot
+    """
 
     # This is the template for the TFR workhorse. Creating a TFR class would be practical.
 
@@ -559,7 +630,38 @@ def plot_wf_mesh_vert(redvox_id: str,
                       wf_panel_2_units: str = "Norm",
                       mesh_panel_0_cbar_units: str = "bits",
                       figure_title: str = "Time-Frequency Representation",
-                      figure_title_show: bool = True):
+                      figure_title_show: bool = True) -> None:
+    """
+    Plot 2 vertical panels - mesh (top panel) and signal waveform (bottom panel)
+
+    :param redvox_id: name of station
+    :param wf_panel_2_sig: array with signal waveform for bottom panel
+    :param wf_panel_2_time: array with signal timestamps for bottom panel
+    :param mesh_time: array with mesh time
+    :param mesh_frequency: array with mesh frequencies
+    :param mesh_panel_0_tfr: array with mesh tfr data for mesh plot (top panel)
+    :param params_tfr: parameters for tfr. Check AudioParams().
+    :param frequency_scaling: "log" or "linear". Default is "log"
+    :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
+    :param mesh_panel_0_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_0_color_max, mesh_panel_0_color_range, mesh_panel_0_color_min). Default is "auto"
+    :param mesh_panel_0_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
+    :param mesh_panel_0_color_range:range between maximum and minimum values in color scaling for scatter plot
+        (top panel). Default is 15.0
+    :param mesh_panel_0_color_min: minimum value for color scaling for mesh plot (top panel). Default is 0.0
+    :param start_time_epoch: start time in epoch UTC. Default is 0.0
+    :param frequency_hz_ymin: minimum frequency for y-axis
+    :param frequency_hz_ymax: maximum frequency for y-axis
+    :param waveform_color: color of waveform for bottom panel. Default is "midnightblue"
+    :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
+    :param units_time: units of time. Default is "s"
+    :param units_frequency: units of frequency. Default is "Hz"
+    :param wf_panel_2_units: units of waveform plot (bottom panel). Default is "Norm"
+    :param mesh_panel_0_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
+    :param figure_title: title of figure. Default is "Time-Frequency Representation"
+    :param figure_title_show: show title if True. Default is True
+    :return: plot
+    """
 
     # This is the template for the TFR workhorse. Creating a TFR class may be practical.
 
