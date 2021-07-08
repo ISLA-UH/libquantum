@@ -80,14 +80,13 @@ if __name__ == "__main__":
                                              index_shift=glide_direction,
                                              frequency_base_input=scale_base)
 
-
-        # Logarithmic shortening, not obvious
+        # The logarithmic shortening is not obvious
         # Explicit; sequence order is key, leave as is for debugging
         sig_step_len = len(sig_step)
         sig_red_len = len(sig_wf_red)
         overlap_points = int(overlap_fraction * sig_step_len)
 
-        # TODO: there must be a tuning between the overlap_fraction and fraction_cosine. Find it.
+        # What is optimal tuning between the overlap_fraction and fraction_cosine?
         if sig_red_len > 0:
             sig_step = np.concatenate([np.zeros(sig_red_len-overlap_points), sig_step])
             sig_wf_red = np.concatenate([sig_wf_red, np.zeros(sig_step_len-overlap_points)])
@@ -112,12 +111,6 @@ if __name__ == "__main__":
     sig_wf_epoch_s = sig_time_s + run_time_epoch_s
     sig_wf = np.copy(np.imag(sig_wf_red))
 
-    # plt.figure()
-    # plt.plot(sig_time_s, sig_wf)
-    # plt.grid(True)
-    # plt.title('Redshift')
-    # plt.show()
-
     # Antialias filter synthetic
     synthetics.antialias_halfNyquist(sig_wf)
 
@@ -139,10 +132,7 @@ if __name__ == "__main__":
     print('Lowest frequency in hz that can support this order for this signal duration is ', min_frequency_hz)
     print('Scale with signal duration and to Nyquist, default G2 base re F1')
 
-
-    # TFR SECTION
-    # This could be placed in a loop
-    # Compute complex wavelet transform (cwt) by specifying the start and end center frequencies
+    # TFR: Compute complex wavelet transform (cwt) by specifying the start and end center frequencies
     # and getting the n-1 band below it.
 
     cwt_frequency_high_hz = np.max(frequency_end_hz)*scale_edge**2
@@ -286,15 +276,6 @@ if __name__ == "__main__":
                                            band_order_Nth=order_number_input)
         mic_stft_rsg_snr, mic_stft_rsg_snr_bits, mic_stft_rsg_snr_entropy = entropy.snr_mean_max(mic_stft_rsg)
 
-        # print('stft_rsg', mic_stft_rsg)
-        # print('stft shape', mic_stft.shape)
-        # print('stft_rsg shape', mic_stft_rsg.shape)
-        # print('f shape', mic_stft2_frequency_hz.shape)
-        # print('t shape', mic_stft2_time_s.shape)
-
-        # print("t_rsg:", mic_stft_rsg_time_s)
-        # print("f_rsg:", mic_stft_rsg_frequency_hz)
-        # Plot reassigned STFT, same as STFT (good to verify)
         pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                     wf_panel_2_sig=sig_wf,
                                     wf_panel_2_time=sig_wf_epoch_s,
