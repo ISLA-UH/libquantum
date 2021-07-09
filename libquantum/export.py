@@ -108,7 +108,7 @@ def plot_wf(figure_number: int,
     """
     figure_size_x, figure_size_y, text_size = plot_parameters()
     # x_multiplier = number of periods
-    figure_name = './figures/'+ synth_type +'.png'
+    figure_name = './figures/' + synth_type + '.png'
     fig = plt.figure(figure_number, figsize=(figure_size_x, figure_size_y))
     plt.plot(time, synth, symbol)
     plt.title(title, size=text_size)

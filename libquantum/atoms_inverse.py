@@ -6,8 +6,11 @@ Atom Reconstruction - inverse CWT for Dictionary 0. Not for chirps, yet.
 """
 
 
-def morlet2_reconstruct(band_order_Nth, scale_frequency_center_hz, frequency_sample_rate_hz):
+def morlet2_reconstruct(band_order_Nth,  # TODO MAG: complete type and return
+                        scale_frequency_center_hz,
+                        frequency_sample_rate_hz):
     """
+    TODO MAG: complete me
 
     :param band_order_Nth:
     :param scale_frequency_center_hz:
@@ -21,7 +24,21 @@ def morlet2_reconstruct(band_order_Nth, scale_frequency_center_hz, frequency_sam
     return morlet2_scale, reconstruct
 
 
-def inv_morlet2_prep(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, frequency_sample_rate_hz):
+def inv_morlet2_prep(band_order_Nth,  # TODO MAG: complete type and return
+                     time_s,
+                     offset_time_s,
+                     scale_frequency_center_hz,
+                     frequency_sample_rate_hz):
+    """
+    TODO MAG: complete me
+
+    :param band_order_Nth:
+    :param time_s:
+    :param offset_time_s:
+    :param scale_frequency_center_hz:
+    :param frequency_sample_rate_hz:
+    :return:
+    """
 
     cycles_M, quality_factor_Q = scales.wavelet_MQ_from_N(band_order_Nth)
     morlet2_scale, reconstruct = morlet2_reconstruct(band_order_Nth, scale_frequency_center_hz, frequency_sample_rate_hz)
@@ -30,8 +47,23 @@ def inv_morlet2_prep(band_order_Nth, time_s, offset_time_s, scale_frequency_cent
     return xtime_shifted, morlet2_scale, cycles_M, reconstruct
 
 
-def inv_morlet2_real(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, cwt_amp_real,
+def inv_morlet2_real(band_order_Nth,  # TODO MAG: complete type and return
+                     time_s,
+                     offset_time_s,
+                     scale_frequency_center_hz,
+                     cwt_amp_real,
                      frequency_sample_rate_hz):
+    """
+    TODO MAG: complete me
+
+    :param band_order_Nth:
+    :param time_s:
+    :param offset_time_s:
+    :param scale_frequency_center_hz:
+    :param cwt_amp_real:
+    :param frequency_sample_rate_hz:
+    :return:
+    """
 
     xtime_shifted, xscale, cycles_M, rescale = \
         inv_morlet2_prep(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, frequency_sample_rate_hz)
@@ -45,9 +77,24 @@ def inv_morlet2_real(band_order_Nth, time_s, offset_time_s, scale_frequency_cent
     return morlet2_inv_real
 
 
-def inv_morlet2_imag(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, cwt_amp_imag,
+def inv_morlet2_imag(band_order_Nth,  # TODO MAG: complete type and return
+                     time_s,
+                     offset_time_s,
+                     scale_frequency_center_hz,
+                     cwt_amp_imag,
                      frequency_sample_rate_hz):
-    # TODO: Explain why pi/2 shift has to be removed!
+    """
+    TODO MAG: complete me
+
+    :param band_order_Nth:
+    :param time_s:
+    :param offset_time_s:
+    :param scale_frequency_center_hz:
+    :param cwt_amp_imag:
+    :param frequency_sample_rate_hz:
+    :return:
+    """
+    # TODO MAG: Explain why pi/2 shift has to be removed!
     xtime_shifted, xscale, cycles_M, rescale = \
         inv_morlet2_prep(band_order_Nth, time_s, offset_time_s, scale_frequency_center_hz, frequency_sample_rate_hz)
 

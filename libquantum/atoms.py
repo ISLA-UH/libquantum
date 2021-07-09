@@ -415,8 +415,8 @@ def cwt_chirp_from_sig(sig_wf: np.ndarray,
                        dictionary_type: str = "norm"):
     """
     COMMENTS IN  PROGRESS
-    :param band_order_Nth:
     :param sig_wf:
+    :param band_order_Nth:
     :param frequency_sample_rate_hz:
     :param cwt_type:
     :param index_shift:
