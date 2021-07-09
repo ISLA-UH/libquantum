@@ -8,6 +8,7 @@ import numpy as np
 import scipy.signal as signal
 from libquantum import scales
 from libquantum import utils
+from typing import Tuple
 
 """
 The purpose of this code is to construct quantized, standardized information packets
@@ -63,6 +64,7 @@ def chirp_spectrum(frequency_hz,
                    scale_base: float = scales.Slice.G2):
     """
     Spectrum of quantum wavelet for specified band_order_Nth and arbitrary time duration
+
     :param frequency_hz: frequency range below Nyquist
     :param offset_time_s: time of wavelet centroid
     :param band_order_Nth: Nth order of constant Q bands
@@ -97,7 +99,7 @@ def chirp_spectrum(frequency_hz,
 
 def chirp_MQG_from_N(band_order_Nth: float,
                      index_shift: float = 0,
-                     scale_base: float = scales.Slice.G2):
+                     scale_base: float = scales.Slice.G2) -> Tuple[float, float, float]:
     """
     Compute the quality factor Q and multiplier M for a specified band order N
     N is THE quantization parameter for the binary constant Q wavelet filters
@@ -105,7 +107,7 @@ def chirp_MQG_from_N(band_order_Nth: float,
     :param band_order_Nth: Band order, must be > 0.75 or reverts to N=3
     :param index_shift: TODO
     :param scale_base: TODO
-    :return: float, float
+    :return:
     """
     if band_order_Nth < 0.7:
         # raise TypeError('N<0.7 specified, using N = {}.'.format(str(3)))
@@ -192,6 +194,7 @@ def chirp_p_complex(scale_atom, gamma, index_shift):
 def chirp_amplitude(scale_atom, gamma, index_shift):
     """
     Fundamental chirp variable
+
     :param scale_atom:
     :param gamma:
     :param index_shift:
@@ -208,6 +211,7 @@ def chirp_time(time_s: np.ndarray,
                frequency_sample_rate_hz: float):
     """
     Scaled time-shifted time
+
     :param time_s:
     :param offset_time_s:
     :param frequency_sample_rate_hz:
@@ -281,6 +285,7 @@ def chirp_centered_4cwt(band_order_Nth: float,
                         dictionary_type = "norm"):
     """
     Gabor atoms for CWT computation centered on the duration of signal
+
     :param sig_or_time: time or time series, wavelet matches this duration
     :param band_order_Nth: Nth order of constant Q bands
     :param scale_frequency_center_hz: center frequency fc in Hz

@@ -4,6 +4,7 @@ Last updated: 8 July 2021
 """
 
 import numpy as np
+from typing import Tuple
 """LAST UPDATED: 191113 MAG"""
 
 
@@ -104,7 +105,7 @@ def _get_setup(time_array_s: np.array,
                source_position_vector_initial_xyz_m: np.array,
                source_position_vector_final_xyz_m: np.array,
                receiver_position_vector_initial_xyz_m: np.array,
-               receiver_position_vector_final_xyz_m: np.array) -> (int, np.array, float, float):
+               receiver_position_vector_final_xyz_m: np.array) -> Tuple[int, np.array, float, float]:
     """
     Apply a doppler shift on a source moving towards the receiver
 
@@ -158,7 +159,7 @@ def _get_final_vals(spacetime_matrix: np.array,
                     object_speed_mps: float,
                     num_dimensions: int,
                     num_samples: int,
-                    inverse: bool = False) -> (np.ndarray, np.ndarray, np.ndarray):
+                    inverse: bool = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Compute array of times in seconds, Magnitude of range and time, omega over omega center
 
@@ -216,7 +217,7 @@ def doppler_forward(tau_source_s: np.array,
                     source_position_vector_initial_xyz_m: np.array,
                     source_position_vector_final_xyz_m: np.array,
                     receiver_position_vector_initial_xyz_m: np.array,
-                    receiver_position_vector_final_xyz_m: np.array) -> (np.ndarray, np.ndarray, np.ndarray):
+                    receiver_position_vector_final_xyz_m: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Apply a doppler shift on a source moving towards the receiver
 
@@ -260,7 +261,7 @@ def image_doppler_forward(tau_source_s: np.array,
                           source_position_vector_initial_xyz_m: np.array,
                           source_position_vector_final_xyz_m: np.array,
                           receiver_position_vector_initial_xyz_m: np.array,
-                          receiver_position_vector_final_xyz_m: np.array) -> (np.ndarray, np.ndarray, np.ndarray):
+                          receiver_position_vector_final_xyz_m: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Apply a doppler shift on a perceived source moving towards the receiver
 
@@ -293,7 +294,7 @@ def doppler_inverse(inv_time_receiver_s: np.array,
                     source_position_vector_initial_xyz_m: np.array,
                     source_position_vector_final_xyz_m: np.array,
                     receiver_position_vector_initial_xyz_m: np.array,
-                    receiver_position_vector_final_xyz_m: np.array) -> (np.ndarray, np.ndarray, np.ndarray):
+                    receiver_position_vector_final_xyz_m: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Apply a doppler shift on an inverse
 
@@ -335,7 +336,7 @@ def image_doppler_inverse(inv_time_receiver_s: np.array,
                           source_position_vector_initial_xyz_m: np.array,
                           source_position_vector_final_xyz_m: np.array,
                           receiver_position_vector_initial_xyz_m: np.array,
-                          receiver_position_vector_final_xyz_m: np.array) -> (np.ndarray, np.ndarray, np.ndarray):
+                          receiver_position_vector_final_xyz_m: np.array) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Apply a doppler shift on an image inverse
 
