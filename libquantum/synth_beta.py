@@ -27,48 +27,110 @@ def datetime_now_epoch_micros() -> float:
     return dt.datetime_to_epoch_microseconds_utc(dt.now())
 
 
-def norm_max(sig):
+def norm_max(sig: np.ndarray) -> np.ndarray:
     """
-    Normalize signal
+    Normalize signal using absolute max value in signal
 
     :param sig: array-like with signal waveform
     :return: array-like with normalized signal
     """
-    # TODO: Fix for all so it works with parquet df
     sig_norm = sig/np.max(np.abs(sig))
     return sig_norm
 
 
-def norm_L1(sig):
+def norm_L1(sig: np.ndarray) -> np.ndarray:
+    """
+    Normalize signal using L1 Normalization method
+
+    :param sig: array-like with signal waveform
+    :return: array-like with normalized signal
+    """
     sig /= np.sum(sig)
     return sig
 
-def norm_L2(sig):
+
+def norm_L2(sig: np.ndarray) -> np.ndarray:
+    """
+    Normalize signal using L2 Normalization method
+
+    :param sig: array-like with signal waveform
+    :return: array-like with normalized signal
+    """
     sig /= np.sqrt(np.sum(sig**2))
     return sig
 
-def amplitude_tukey(scaled_time_tau, fraction_cosine):
+
+def amplitude_tukey(scaled_time_tau: np.ndarray,
+                    fraction_cosine: float = 0.5) -> np.ndarray:
+    """
+    Return a Tukey window, also known as a tapered cosine window
+
+    :param scaled_time_tau: array-like with time
+    :param fraction_cosine: shape parameter of the Tukey window, representing the fraction of the window inside the
+        cosine tapered region. Default is 0.5
+    :return: np.ndarray with Tukey window
+    """
     number_points = np.size(scaled_time_tau)
     amplitude = tukey(number_points, fraction_cosine)
     return amplitude
 
-def amplitude_attenuation(frequency_hz, alpha_nepers_s2_m, range_m):
+
+def amplitude_attenuation(frequency_hz,  # TODO MAG: Complete type
+                          alpha_nepers_s2_m,
+                          range_m):
+    """
+    Attenuate amplitude
+
+    :param frequency_hz: TODO MAG: Complete me
+    :param alpha_nepers_s2_m:
+    :param range_m:
+    :return:
+    """
     amplitude = np.exp(-alpha_nepers_s2_m*range_m*frequency_hz**2)
     return amplitude
 
-def amplitude_spherical(wavelength_m, range_m):
+
+def amplitude_spherical(wavelength_m,
+                        range_m):  # TODO MAG: Complete type
+    """
+    TODO MAG: Complete me
+
+    :param wavelength_m:
+    :param range_m:
+    :return:
+    """
     amplitude = np.ones(range_m.size)
     if range_m > wavelength_m:
         amplitude = 1/range_m
     return amplitude
 
-def amplitude_cylindrical(wavelength_m, range_m):
+
+def amplitude_cylindrical(wavelength_m,  # TODO MAG: Complete type
+                          range_m):
+    """
+    TODO MAG: Complete me
+
+    :param wavelength_m:
+    :param range_m:
+    :return:
+    """
     amplitude = np.ones(range_m.size)
     if range_m > wavelength_m:
         amplitude = 1/np.sqrt(range_m)
     return amplitude
 
-def gt_blast(time_s, time_zero_s, time_pos_s):
+
+def gt_blast(time_s: np.ndarray,
+             time_zero_s: float,
+             time_pos_s: float) -> np.ndarray:
+    """
+    Garces (2019) ground truth blast pulse
+
+    :param time_s: array-like with timestamps
+    :param time_zero_s: start time in seconds
+    :param time_pos_s: TODO MAG: Complete me
+    :return: TODO MAG: Complete me
+    """
     # Garces (2019) ground truth blast pulse
     # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
     # time_start = time_zero - time_pos
@@ -82,7 +144,22 @@ def gt_blast(time_s, time_zero_s, time_pos_s):
     p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
     return p_GT
 
-def wavelet_hellborne(time_s, offset_time_s, order_cycles_M, scale_frequency_center_hz):
+
+def wavelet_hellborne(time_s: np.ndarray,  # TODO MAG: Complete type and return
+                      offset_time_s,
+                      order_cycles_M,
+                      scale_frequency_center_hz):
+    """
+    Hellborne Gabor wavelet
+    From Mallat (2009), the angular lifetime is the product and the scale and sigma.
+    Identified as the hellborne lifetime in Garces(2020).
+
+    :param time_s: array-like with timestamps
+    :param offset_time_s: offset time in seconds
+    :param order_cycles_M:  TODO MAG: Complete me
+    :param scale_frequency_center_hz: TODO MAG: Complete me
+    :return: TODO MAG: Complete me
+    """
     time_shifted_s = time_s - offset_time_s
     # Hellborne Gabor wavelet
     # From Mallat (2009), the angular lifetime is the product and the scale and sigma.
@@ -95,8 +172,18 @@ def wavelet_hellborne(time_s, offset_time_s, order_cycles_M, scale_frequency_cen
     wavelet_gabor = wavelet_gauss * np.exp(1j * scale_angular_frequency_radps * time_shifted_s)
     return wavelet_gabor
 
+
 # NEW FUNCION FAMILY, 2^n points, centered
-def gt_blast_cycle(scale_frequency_center_hz, sample_rate_hz):
+def gt_blast_cycle(scale_frequency_center_hz,  # TODO MAG: Complete type and return
+                   sample_rate_hz: float):
+    """
+    Garces (2019) ground truth blast pulse rederived for hellborne testing.
+    Centered at the zero crossing time, 2^n points
+
+    :param scale_frequency_center_hz: TODO MAG: Complete me
+    :param sample_rate_hz:  sample rate in Hz
+    :return: TODO MAG: Complete me
+    """
     # Garces (2019) ground truth blast pulse rederived for hellborne testing.
     # Centered at the zero crossing time, 2^n points
     order_cycles_M = np.sqrt(6)/2.  ## <~ srt(2)
@@ -116,10 +203,23 @@ def gt_blast_cycle(scale_frequency_center_hz, sample_rate_hz):
     p_GT[sigint2] = -1./6. * tau[sigint2] * (np.sqrt(6) - tau[sigint2]) ** 2.
     return scaled_time, p_GT
 
-def wavelet_hellborne_cycles(order_Nth, order_cycles_M, scale_frequency_center_hz, sample_rate_hz):
-    # Hellborne Gabor wavelet
-    # From Mallat (2009), the angular lifetime is the product and the scale and sigma.
-    # Identified as the hellborne lifetime in Garces(2020).
+
+def wavelet_hellborne_cycles(order_Nth,  # TODO MAG: Complete type and return
+                             order_cycles_M,
+                             scale_frequency_center_hz,
+                             sample_rate_hz: float):
+    """
+    Hellborne Gabor wavelet
+    From Mallat (2009), the angular lifetime is the product and the scale and sigma.
+    Identified as the hellborne lifetime in Garces(2020).
+
+    :param order_Nth: TODO MAG: Complete me
+    :param order_cycles_M:
+    :param scale_frequency_center_hz:
+    :param sample_rate_hz: sample rate in Hz
+    :return:
+    """
+
     scale_lifetime_s = order_cycles_M / scale_frequency_center_hz   # Lifetime, sigma
     # 2**n points
     duration_points = int(2**(np.ceil(np.log2(scale_lifetime_s*sample_rate_hz))))
@@ -135,10 +235,23 @@ def wavelet_hellborne_cycles(order_Nth, order_cycles_M, scale_frequency_center_h
     wavelet_gabor = wavelet_gauss * np.exp(1j * scale_angular_frequency_radps * time_shifted_s)
     return scaled_time, wavelet_gauss, wavelet_gabor, bandedge_dB
 
-def wavelet_hellborne_dB(order_Nth, bandedge_dB, scale_frequency_center_hz, sample_rate_hz):
-    # Hellborne Gabor wavelet
-    # From Mallat (2009), the angular lifetime is the product and the scale and sigma.
-    # Identified as the hellborne lifetime in Garces(2020).
+
+def wavelet_hellborne_dB(order_Nth,   # TODO MAG: Complete type and return
+                         bandedge_dB,
+                         scale_frequency_center_hz,
+                         sample_rate_hz: float):
+    """
+    Hellborne Gabor wavelet
+    From Mallat (2009), the angular lifetime is the product and the scale and sigma.
+    Identified as the hellborne lifetime in Garces(2020).
+
+    :param order_Nth: TODO MAG: Complete me
+    :param bandedge_dB:
+    :param scale_frequency_center_hz:
+    :param sample_rate_hz: sample rate in Hz
+    :return:
+    """
+
     order_cycles_M = order_Nth * np.sqrt(4.*bandedge_dB/(5.*np.log10(np.exp(1))))
     scale_lifetime_s = order_cycles_M / scale_frequency_center_hz   # Lifetime, sigma
     # 2**n points
@@ -156,23 +269,54 @@ def wavelet_hellborne_dB(order_Nth, bandedge_dB, scale_frequency_center_hz, samp
 
 
 ### BACK TO LEGACY
-def chirp_amplitude_hellborne(scaled_time_tau, symmetry, conv_rate_scaled):
+def chirp_amplitude_hellborne(scaled_time_tau: np.ndarray,  # TODO MAG: Complete type and return
+                              symmetry,
+                              conv_rate_scaled):
+    """
+    TODO MAG: Complete me
+
+    :param scaled_time_tau: array-like with time
+    :param symmetry:
+    :param conv_rate_scaled:
+    :return:
+    """
     alpha = np.pi  # Attenuation rate, for defining System Q
     if np.abs(symmetry) > 1:
         symmetry = 0.95
         print('Fix symmetry, magnitude must be less than one')
     phase_decay = (2.*scaled_time_tau)**2/(1.-np.abs(symmetry))
     phase_hyper = 1. - symmetry*np.tanh(2.*np.pi*scaled_time_tau*conv_rate_scaled)
-    # TODO: fix rounding off errors near |s|=1, conv=1 as system does not know how to do L'Hopitals.
+    # TODO MAG: fix rounding off errors near |s|=1, conv=1 as system does not know how to do L'Hopitals.
     amplitude = np.exp(-alpha*phase_decay*phase_hyper)
     return amplitude
 
-def chirp_amplitude_hann(scaled_time_tau):
+
+def chirp_amplitude_hann(scaled_time_tau: np.ndarray) -> np.ndarray:
+    """
+    Hann window for chirp
+
+    :param scaled_time_tau: array-like with time
+    :return: np.ndarray with Hann window
+    """
     amplitude = np.cos(np.pi*scaled_time_tau)**2
     return amplitude
 
-def chirp_phase_freq_quad(scaled_phase_psi, scaled_duration_T,
-                     scaled_frequency_start, scaled_bandpass_mu, theta_radians):
+
+def chirp_phase_freq_quad(scaled_phase_psi,   # TODO MAG: Complete type and return
+                          scaled_duration_T,
+                          scaled_frequency_start,
+                          scaled_bandpass_mu,
+                          theta_radians):
+    """
+    TODO MAG: Complete me
+
+    :param scaled_phase_psi:
+    :param scaled_duration_T:
+    :param scaled_frequency_start:
+    :param scaled_bandpass_mu:
+    :param theta_radians:
+    :return:
+    """
     scaled_phase_psi_0 = np.pi*scaled_duration_T
     phase_radians = scaled_frequency_start*(scaled_phase_psi-scaled_phase_psi_0) + \
                   scaled_bandpass_mu*(scaled_phase_psi**2 - scaled_phase_psi_0**2)/(2.*np.pi*scaled_duration_T) + \
@@ -181,8 +325,24 @@ def chirp_phase_freq_quad(scaled_phase_psi, scaled_duration_T,
     scaled_frequency = scaled_frequency_start + 2*scaled_bandpass_mu*tau_plus_half
     return phase_radians, scaled_frequency
 
-def chirp_phase_freq_hann(scaled_phase_psi, scaled_duration_T, hann_harmonic,
-                    scaled_frequency_start, scaled_bandpass_mu, theta_radians):
+
+def chirp_phase_freq_hann(scaled_phase_psi,  # TODO MAG: Complete type and return
+                          scaled_duration_T,
+                          hann_harmonic,
+                          scaled_frequency_start,
+                          scaled_bandpass_mu,
+                          theta_radians):
+    """
+    TODO MAG: Complete me
+
+    :param scaled_phase_psi:
+    :param scaled_duration_T:
+    :param hann_harmonic:
+    :param scaled_frequency_start:
+    :param scaled_bandpass_mu:
+    :param theta_radians:
+    :return:
+    """
     scaled_window = scaled_duration_T/hann_harmonic
     scaled_phase_psi_0 = np.pi*scaled_duration_T
     phase_start = (scaled_frequency_start + scaled_bandpass_mu)*(scaled_phase_psi-scaled_phase_psi_0)
@@ -193,7 +353,16 @@ def chirp_phase_freq_hann(scaled_phase_psi, scaled_duration_T, hann_harmonic,
     scaled_frequency = scaled_frequency_start + 2*scaled_bandpass_mu*(np.sin(np.pi*hann_harmonic*tau_plus_half)**2)
     return phase_radians, scaled_frequency
 
-def harmonics(phase_radians, harmonic_label_int):
+
+def harmonics(phase_radians,  # TODO MAG: Complete type and return
+              harmonic_label_int):
+    """
+    TODO MAG: Complete me
+
+    :param phase_radians:
+    :param harmonic_label_int:
+    :return:
+    """
     # Overtoner. harmonic_label_int = 0 is a pure tone.
     synth = np.zeros(phase_radians.size)
     mode_number = np.arange(harmonic_label_int+1)+1
@@ -202,7 +371,16 @@ def harmonics(phase_radians, harmonic_label_int):
     synth *= 1.  # /(harmonic_label_int+1)
     return synth, mode_number
 
-def sawtooth(phase_radians, harmonic_label_int):
+
+def sawtooth(phase_radians,
+             harmonic_label_int):  # TODO MAG: Complete type and return
+    """
+    TODO MAG: Complete me
+
+    :param phase_radians:
+    :param harmonic_label_int:
+    :return:
+    """
     # harmonic_label_int = 0 is a pure tone.
     synth = np.zeros(phase_radians.size)
     mode_number = np.arange(harmonic_label_int+1)+1
@@ -211,7 +389,16 @@ def sawtooth(phase_radians, harmonic_label_int):
     synth *= 2./np.pi
     return synth, mode_number
 
-def saw(phase_radians, harmonic_label_int):
+
+def saw(phase_radians,
+        harmonic_label_int):  # TODO MAG: Complete type and return
+    """
+    TODO MAG: Complete me
+
+    :param phase_radians:
+    :param harmonic_label_int:
+    :return:
+    """
     # harmonic_label_int = 0 is a pure tone.
     # For simpler superposition of image
     synth = np.zeros(phase_radians.size)
@@ -230,7 +417,16 @@ def saw(phase_radians, harmonic_label_int):
 #     synth *= 2./np.pi
 #     return synth
 
-def square(phase_radians, harmonic_label_int):
+
+def square(phase_radians,
+           harmonic_label_int):  # TODO MAG: Complete type and return
+    """
+    TODO MAG: Complete me
+
+    :param phase_radians:
+    :param harmonic_label_int:
+    :return:
+    """
     # harmonic_label_int = 0 is a pure tone.
     synth = np.zeros(phase_radians.size)
     mode_number = 2*np.arange(harmonic_label_int+1) + 1
@@ -238,6 +434,7 @@ def square(phase_radians, harmonic_label_int):
         synth += -np.sin((2*i + 1)*phase_radians)/(2*i + 1)
     synth *= 4./np.pi
     return synth, mode_number
+
 
 def harmonics_range(phase_radians, harmonic_label_int, frequency_hz, alpha, range_m):
     # Overtoner. harmonic_label_int = 0 is a pure tone.
@@ -460,6 +657,7 @@ def plot_wf(figure_number, synth_type, title, time, synth, symbol):
 def plot_wf_unix(figure_number, synth_type, title, time, synth, symbol):
     """
     Plots a waveform with unix time in human format
+
     :param figure_number:
     :param synth_type:
     :param title:

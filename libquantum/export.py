@@ -1,11 +1,30 @@
+"""
+This module contains functions for exporting libquantum data products
+Last updated: 8 July 2021
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from libquantum import scales
 from libquantum import atoms
+from typing import Tuple
 
 
-def print_scales_to_screen(scale_order_input: float, scale_base_input: float,
-                           scale_ref_input: float, scale_sample_interval_input: float, scale_high_input: float):
+def print_scales_to_screen(scale_order_input: float,
+                           scale_base_input: float,
+                           scale_ref_input: float,
+                           scale_sample_interval_input: float,
+                           scale_high_input: float) -> None:
+    """
+
+
+    :param scale_order_input:
+    :param scale_base_input:
+    :param scale_ref_input:
+    :param scale_sample_interval_input:
+    :param scale_high_input:
+    :return:
+    """
+
     scale_order, scale_base, scale_band_number, \
     scale_ref, scale_center_algebraic, scale_center_geometric, \
     scale_start, scale_end = \
@@ -22,9 +41,21 @@ def print_scales_to_screen(scale_order_input: float, scale_base_input: float,
                                                 scale_start[i], scale_end[i]))
 
 
-def print_frequencies_to_screen(frequency_order_input: float, frequency_base_input: float,
+def print_frequencies_to_screen(frequency_order_input: float,
+                                frequency_base_input: float,
                                 frequency_ref_input: float,
-                                frequency_low_input: float, frequency_sample_rate_input: float):
+                                frequency_low_input: float,
+                                frequency_sample_rate_input: float) -> None:
+    """
+
+
+    :param frequency_order_input:
+    :param frequency_base_input:
+    :param frequency_ref_input:
+    :param frequency_low_input:
+    :param frequency_sample_rate_input:
+    :return:
+    """
     frequency_order, frequency_base, frequency_band_number, \
     frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
     frequency_start, frequency_end = \
@@ -41,7 +72,11 @@ def print_frequencies_to_screen(frequency_order_input: float, frequency_base_inp
                                                 frequency_start[i], frequency_end[i]))
 
 
-def plot_parameters():
+def plot_parameters() -> Tuple[int, int, int]:
+    """
+    Return plot parameters
+    :return: Return figure size (x,y), text size
+    """
     # Aspect ratio of 1920 x 1080 (1080p), 16:9
     # scale = 1/3 => 640 x 360 (360p)
     # scale = 2/3 =>  1280 x 720 (720p)
@@ -54,7 +89,23 @@ def plot_parameters():
     return figure_size_x, figure_size_y, text_size
 
 
-def plot_wf(figure_number, synth_type, title, time, synth, symbol):
+def plot_wf(figure_number: int,
+            synth_type,
+            title: str,
+            time,
+            synth,
+            symbol):
+    """
+
+
+    :param figure_number:
+    :param synth_type:
+    :param title:
+    :param time:
+    :param synth:
+    :param symbol:
+    :return:
+    """
     figure_size_x, figure_size_y, text_size = plot_parameters()
     # x_multiplier = number of periods
     figure_name = './figures/'+ synth_type +'.png'

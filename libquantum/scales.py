@@ -1,10 +1,9 @@
-import numpy as np
-
 """
 CREATED: 20200901
 Construct standardized scales
 MAG LAST UPDATED:
 """
+import numpy as np
 
 """ Smallest number for 64-bit floats. Deploy to avoid division by zero or log zero singularities"""
 EPSILON = np.finfo(np.float64).eps
