@@ -20,7 +20,7 @@ if __name__ == "__main__":
     input_directory = "/Users/mgarces/Documents/DATA_API_M/synthetics"
     output_wav_directory = os.path.join(input_directory, "wav")
 
-    order_number_input = 24
+    order_number_input = 3
 
     station_id_str = 'synth'
     run_time_epoch_s = utils.datetime_now_epoch_s()
