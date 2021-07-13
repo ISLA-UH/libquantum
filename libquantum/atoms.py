@@ -1,7 +1,5 @@
 """
 This module contains functions to construct quantized, standardized information packets using binary metrics.
-
-Last updated: 7 July 2021
 """
 
 import numpy as np
@@ -369,7 +367,7 @@ def cwt_chirp_complex(band_order_Nth: float,
     if cwt_type == "morlet2":
         scale_atom = chirp_scale(cycles_M, frequency_cwt_hz_flipped, frequency_sample_rate_hz)
         cwt = signal.cwt(sig_wf, signal.morlet2, scale_atom, w=cycles_M)
-    # TODO: Optimize this as in signal.cwt. Conv can take matrices.
+        # TODO: Optimize this as in signal.cwt. Conv can take matrices.
 
     elif cwt_type == "fft":
         # TODO: Can see "ghost" folding in fft, compared to "conv"
