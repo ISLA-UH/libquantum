@@ -1,11 +1,9 @@
 """
 This module contains functions for examining doppler shift in signals
-Last updated: 8 July 2021
 """
 
 import numpy as np
 from typing import Tuple
-"""LAST UPDATED: 191113 MAG"""
 
 
 def time_duration(time_vector: np.ndarray) -> float:

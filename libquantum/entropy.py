@@ -1,6 +1,6 @@
 """
 This module contains functions related to entropy
-Last updated: 8 July 2021
+Please refer to Garces, 2020
 """
 
 import numpy as np
@@ -83,7 +83,6 @@ def snr_ref_max(tfr_coeff_complex: np.ndarray,
 
 
 # FOR TRANSIENTS
-# TODO MAG: GET EXISTING CODE TO PERFORM THIS
 def snr_mean_max_profile(tfr_coeff_complex: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Computes the snr lin energy, snr in bits, and snr entropy defined in Garces (2020)
@@ -111,7 +110,6 @@ def snr_mean_max_profile(tfr_coeff_complex: np.ndarray) -> Tuple[np.ndarray, np.
 def snr_ref_max_profile(tfr_coeff_complex: np.ndarray,
                         energy_mean: float,
                         snr_max: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    # TODO MAG: BUILD THIS FOR TRANSIENTS
     """
     Computes the snr energy, snr bits and snr entropy from
     frequency-dependent noise model/profile mean energy and max snr per band

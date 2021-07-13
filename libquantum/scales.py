@@ -1,8 +1,7 @@
 """
-CREATED: 20200901
 Construct standardized scales
-MAG LAST UPDATED:
 """
+
 import numpy as np
 
 """ Smallest number for 64-bit floats. Deploy to avoid division by zero or log zero singularities"""
@@ -69,9 +68,11 @@ def musical_scale_hz():
                                     frequency_sample_rate_input=48000)
 
 
-def band_periods_nyquist(scale_order_input: float, scale_base_input: float,
+def band_periods_nyquist(scale_order_input: float,
+                         scale_base_input: float,
                          scale_ref_input: float,
-                         scale_sample_interval_input: float, scale_high_input: float) -> \
+                         scale_sample_interval_input: float,
+                         scale_high_input: float) -> \
         (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
     """Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE SECONDS
     scale = pseudo-period
@@ -86,11 +87,21 @@ def band_periods_nyquist(scale_order_input: float, scale_base_input: float,
                                   scale_nyquist_input, scale_high_input)
 
 
-def band_frequencies_nyquist(frequency_order_input: float, frequency_base_input: float,
+def band_frequencies_nyquist(frequency_order_input: float,
+                             frequency_base_input: float,
                              frequency_ref_input: float,
-                             frequency_low_input: float, frequency_sample_rate_input: float) -> \
+                             frequency_low_input: float,
+                             frequency_sample_rate_input: float) -> \
         (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
-    """Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
+    """
+    Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
+
+    :param frequency_order_input:
+    :param frequency_base_input:
+    :param frequency_ref_input:
+    :param frequency_low_input:
+    :param frequency_sample_rate_input:
+    :return:
     """
 
     scale_ref_input = 1/frequency_ref_input
@@ -121,7 +132,16 @@ def band_frequencies_low_high(frequency_order_input: float, frequency_base_input
                               frequency_high_input: float,
                               frequency_sample_rate_input: float) -> \
         (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
-    """Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
+    """
+    Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
+
+    :param frequency_order_input:
+    :param frequency_base_input:
+    :param frequency_ref_input:
+    :param frequency_low_input:
+    :param frequency_high_input:
+    :param frequency_sample_rate_input:
+    :return:
     """
 
     scale_ref_input = 1/frequency_ref_input
@@ -150,7 +170,8 @@ def band_frequencies_low_high(frequency_order_input: float, frequency_base_input
            frequency_start, frequency_end
 
 
-def band_intervals_periods(scale_order_input: float, scale_base_input: float,
+def band_intervals_periods(scale_order_input: float,
+                           scale_base_input: float,
                            scale_ref_input: float,
                            scale_low_input: float,
                            scale_high_input: float) -> \
