@@ -1,7 +1,5 @@
 """
 This module contains time frequency plots for picks
-
-Last updated: 7 July 2021
 """
 
 import enum
@@ -118,11 +116,11 @@ def origin_time_correction(time_input: np.ndarray,
     :param units_time: units of time
     :return: time label and time elapsed from start
     """
+
     # Sanitizing/scrubbing time is a key function.
-    # TODO: TEST EXTENSIVELY!
     # Elapsed time from start of the record. Watch out with start alignment.
     time_elapsed_from_start = time_input - time_input[0]
-    # TODO: Need to construct a function to return time from start_time_epoch if they are not the same
+
     if start_time_epoch != time_input[0]:
         time_from_epoch_start = time_input[0] - start_time_epoch
     if start_time_epoch == 0:
@@ -152,7 +150,6 @@ def mesh_time_frequency_edges(frequency: np.ndarray,
     :return: min and max frequency for plot, time and frequency edges
     """
 
-    # TODO: Stress test. All these need recovery/override paths
     if frequency_ymin > frequency_ymax:
         print("Higher frequency must be greater than lower frequency")
     if frequency[2] < frequency[1]:
@@ -291,7 +288,6 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
     time_label, wf_panel_2_elapsed_time = \
         origin_time_correction(wf_panel_2_time, start_time_epoch, units_time)
 
-    # TODO: Test extensively
     # Time is in the center of the window, frequency is in the fft coefficient center.
     # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
     # frequency and time must be increasing!
@@ -356,18 +352,6 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
     max_cbar_tick_len: int = sorted(all_cbar_ticks_lens)[-1]
     cbar_tick_fmt: str = f"%-{max_cbar_tick_len}s"
 
-    # pcolormesh_top = mesh_panel_0.scatter(scatter_time,
-    #                                       scatter_frequency,
-    #                                       c=mesh_panel_0_tfr,
-    #                                       vmin=mesh_panel_0_color_min,
-    #                                       vmax=mesh_panel_0_color_max,
-    #                                       cmap=mesh_colormap,
-    #                                       alpha=0.1,
-    #                                       s=5,
-    #                                       snap=True)
-
-    # Middle panel mesh --------------------------
-
     if mesh_shading == "auto":
         pcolormesh_mid: QuadMesh = mesh_panel_1.pcolormesh(mesh_time,
                                                            mesh_frequency,
@@ -401,9 +385,6 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
                                                ticks=[math.ceil(mesh_panel_1_color_min),
                                                       math.floor(mesh_panel_1_color_max)],
                                                format=cbar_tick_fmt)
-    # middle_panel_cbar: Colorbar = fig.colorbar(pcolormesh_mid, cax=middle_panel_cax,
-    #                                            ticks=[colormin_mid, colormax_mid],
-    #                                            format=cbar_tick_fmt)
     mesh_panel_1_cbar.set_label(mesh_panel_1_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
     mesh_panel_1_cax.tick_params(labelsize='large')
 
@@ -411,22 +392,20 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
     mesh_panel_1.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     mesh_panel_1.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
     mesh_panel_1.margins(x=0)
-    # mesh_panel_1.get_xaxis().set_ticklabels([])
     mesh_panel_1.set_yscale(frequency_scaling)
     mesh_panel_1.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
     mesh_panel_1.tick_params(axis='y', labelsize='large')
 
-
     # Top panel --------------------------
-    scatter_top = mesh_panel_0.scatter(scatter_time,
-                                       scatter_frequency,
-                                       c=mesh_panel_0_tfr,
-                                       vmin=mesh_panel_0_color_min,
-                                       vmax=mesh_panel_0_color_max,
-                                       cmap=mesh_colormap,
-                                       s=10,
-                                       alpha=0.1,
-                                       snap=True)
+    mesh_panel_0.scatter(scatter_time,
+                         scatter_frequency,
+                         c=mesh_panel_0_tfr,
+                         vmin=mesh_panel_0_color_min,
+                         vmax=mesh_panel_0_color_max,
+                         cmap=mesh_colormap,
+                         s=10,
+                         alpha=0.1,
+                         snap=True)
 
     mesh_panel_0_div: AxesDivider = make_axes_locatable(mesh_panel_0)
     mesh_panel_0_cax: plt.Axes = mesh_panel_0_div.append_axes("right", size="1%", pad="0.5%")
@@ -441,7 +420,6 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
     mesh_panel_0.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
     mesh_panel_0.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     mesh_panel_0.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
-    # mesh_panel_0.get_xaxis().set_ticklabels([])
     mesh_panel_0.set_yscale(frequency_scaling)
     mesh_panel_0.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
     mesh_panel_0.tick_params(axis='y', labelsize='large')
@@ -451,13 +429,10 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
     wf_panel_2.set_ylabel(wf_panel_2_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_2.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     wf_panel_2.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
-    # TODO: Left this in here for next plot set
-    # bottom_panel_wf.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
     wf_panel_2.grid(True)
     wf_panel_2.tick_params(axis='y', labelsize='large')
     wf_panel_2.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
     wf_panel_2.yaxis.get_offset_text().set_x(-0.034)
-
     wf_panel_2_div: AxesDivider = make_axes_locatable(wf_panel_2)
     wf_panel_2_cax: plt.Axes = wf_panel_2_div.append_axes("right", size="1%", pad="0.5%")
     wf_panel_2_cax.axis("off")
@@ -524,12 +499,10 @@ def plot_wf_scatter_vert(redvox_id: str,
     """
 
     # This is the template for the TFR workhorse. Creating a TFR class may be practical.
-
     # Time zeroing and scrubbing, if needed
     time_label, wf_panel_2_elapsed_time = \
         origin_time_correction(wf_panel_2_time, start_time_epoch, units_time)
 
-    # TODO: Test extensively
     # Time is in the center of the window, frequency is in the fft coefficient center.
     # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
     # frequency and time must be increasing!
@@ -592,9 +565,6 @@ def plot_wf_scatter_vert(redvox_id: str,
                                                ticks=[math.ceil(mesh_panel_0_color_min),
                                                       math.floor(mesh_panel_0_color_max)],
                                                format=cbar_tick_fmt)
-    # mesh_panel_0_cbar: Colorbar = fig.colorbar(pcolormesh, cax=mesh_panel_0_cax,
-    #                                         ticks=[colormin_top, colormax_top],
-    #                                         format=cbar_tick_fmt)
     mesh_panel_0_cbar.set_label(mesh_panel_0_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
     mesh_panel_0_cax.tick_params(labelsize='large')
     if figure_title_show:
@@ -602,7 +572,6 @@ def plot_wf_scatter_vert(redvox_id: str,
     mesh_panel_0.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
     mesh_panel_0.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     mesh_panel_0.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
-    # mesh_panel_0.get_xaxis().set_ticklabels([])
     mesh_panel_0.set_yscale(frequency_scaling)
     mesh_panel_0.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
     mesh_panel_0.tick_params(axis='y', labelsize='large')
@@ -612,8 +581,6 @@ def plot_wf_scatter_vert(redvox_id: str,
     wf_panel_2.set_ylabel(wf_panel_2_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_2.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     wf_panel_2.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
-    # TODO: Left this in here for next plot set
-    # bottom_panel_wf.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
     wf_panel_2.grid(True)
     wf_panel_2.tick_params(axis='y', labelsize='large')
     wf_panel_2.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")

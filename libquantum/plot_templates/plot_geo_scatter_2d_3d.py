@@ -1,7 +1,5 @@
 """
 This module contains 2D and 3 D geolocation scatter plots
-
-Last updated: 7 July 2021
 """
 
 import matplotlib.pyplot as plt

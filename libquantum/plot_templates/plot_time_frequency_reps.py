@@ -254,7 +254,6 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     :return: plot
     """
 
-    # TEST EXTENSIVELY!
     if start_time_epoch == 0:
         # Time sanitized if no input provided
         time_label: str = f"Time ({units_time})"
@@ -519,9 +518,6 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
                                                ticks=[math.ceil(mesh_panel_0_color_min),
                                                       math.floor(mesh_panel_0_color_max)],
                                                format=cbar_tick_fmt)
-    # mesh_panel_0_cbar: Colorbar = fig.colorbar(pcolormesh, cax=mesh_panel_0_cax,
-    #                                         ticks=[colormin_top, colormax_top],
-    #                                         format=cbar_tick_fmt)
     mesh_panel_0_cbar.set_label(mesh_panel_0_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
     mesh_panel_0_cax.tick_params(labelsize='large')
     if figure_title_show:
@@ -529,7 +525,6 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     mesh_panel_0.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
     mesh_panel_0.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     mesh_panel_0.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
-    # mesh_panel_0.get_xaxis().set_ticklabels([])
     mesh_panel_0.set_yscale(frequency_scaling)
     mesh_panel_0.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
     mesh_panel_0.tick_params(axis='y', labelsize='large')
@@ -569,9 +564,6 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
                                                ticks=[math.ceil(mesh_panel_1_color_min),
                                                       math.floor(mesh_panel_1_color_max)],
                                                format=cbar_tick_fmt)
-    # middle_panel_cbar: Colorbar = fig.colorbar(pcolormesh_mid, cax=middle_panel_cax,
-    #                                            ticks=[colormin_mid, colormax_mid],
-    #                                            format=cbar_tick_fmt)
     mesh_panel_1_cbar.set_label(mesh_panel_1_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
     mesh_panel_1_cax.tick_params(labelsize='large')
 
@@ -579,7 +571,6 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     mesh_panel_1.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     mesh_panel_1.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
     mesh_panel_1.margins(x=0)
-    # mesh_panel_1.get_xaxis().set_ticklabels([])
     mesh_panel_1.set_yscale(frequency_scaling)
     mesh_panel_1.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
     mesh_panel_1.tick_params(axis='y', labelsize='large')
