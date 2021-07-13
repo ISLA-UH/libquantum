@@ -13,7 +13,7 @@ if __name__ == "__main__":
     """
 
     # "Ideal" wavelet chirp type
-    order_number_input = 12
+    order_number_input = 3
     scale_base = scales.Slice.G3  # recurrent on decades
     scale_edge = scale_base ** (1.0 / (2.0 * order_number_input))
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     do_reassignment = False
     input_directory = "/Users/mgarces/Documents/DATA_API_M/synthetics"
     output_wav_directory = os.path.join(input_directory, "wav")
-    station_id_str = 'synth'
+    station_id_str = 'Synth'
     run_time_epoch_s = utils.datetime_now_epoch_s()
 
     # sig_wf_sample_rate_hz = 8000.
@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     # These are the design (input/request) parameters
     sig_wf_sample_rate_hz = 8000.
-    sig_frequency_low_hz = 40.
+    sig_frequency_low_hz = 16.
     sig_frequency_high_hz = 400.
     head_points = 4000
 
