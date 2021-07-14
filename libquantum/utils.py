@@ -1,6 +1,5 @@
 """
 This module contains general utilities that can work with values containing nans.
-Last updated: 7 July 2021
 """
 
 from enum import Enum
@@ -108,8 +107,10 @@ class ExtractionType(Enum):
     BITMAX: str = "bitmax"
 
 
-def sig_extract(sig: np.ndarray, time_epoch_s: np.ndarray,
-                intro_s: float, outro_s: float,
+def sig_extract(sig: np.ndarray,
+                time_epoch_s: np.ndarray,
+                intro_s: float,
+                outro_s: float,
                 pick_bits_below_max: float = 1.,
                 pick_time_interval_s: float = 1.,
                 extract_type: ExtractionType = ExtractionType.ARGMAX) -> Tuple[np.ndarray, np.ndarray, float]:
@@ -161,8 +162,10 @@ def sig_extract(sig: np.ndarray, time_epoch_s: np.ndarray,
     return sig_wf, sig_epoch_s, pick_time_epoch_s
 
 
-def sig_frame(sig: np.ndarray, time_epoch_s: np.ndarray,
-              epoch_s_start: float, epoch_s_stop: float) -> Tuple[np.ndarray, np.ndarray]:
+def sig_frame(sig: np.ndarray,
+              time_epoch_s: np.ndarray,
+              epoch_s_start: float,
+              epoch_s_stop: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Frame one-component signal within start and stop epoch times
 
@@ -180,8 +183,10 @@ def sig_frame(sig: np.ndarray, time_epoch_s: np.ndarray,
     return sig_wf, sig_epoch_s
 
 
-def sig3c_frame(sig3c: np.ndarray, time_epoch_s: np.ndarray,
-                epoch_s_start: float, epoch_s_stop: float) -> Tuple[np.ndarray, np.ndarray]:
+def sig3c_frame(sig3c: np.ndarray,
+                time_epoch_s: np.ndarray,
+                epoch_s_start: float,
+                epoch_s_stop: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Frame three-component signal within start and stop epoch times
 
@@ -247,14 +252,13 @@ def log2epsilon_max(x: np.ndarray) -> float:
 Picker modules
 """
 
-
-# TODO: Migrate to their own modules
 def picker_signal_max_index(sig: np.array,
                             sig_sample_rate_hz: float,
                             bits_pick: float,
                             time_interval_s: float) -> np.array:
     """
     Finds the picker index for the POSITIVE max of a signal
+
     :param sig: array of waveform data
     :param sig_sample_rate_hz: float sample rate of reference sensor
     :param bits_pick: detection threshold in bits loss
@@ -270,10 +274,13 @@ def picker_signal_max_index(sig: np.array,
     return time_index_pick
 
 
-def picker_signal_bit_index(sig: np.array, sig_sample_rate_hz: float,
-                            bits_pick: float, time_interval_s: float) -> np.array:
+def picker_signal_bit_index(sig: np.array,
+                            sig_sample_rate_hz: float,
+                            bits_pick: float,
+                            time_interval_s: float) -> np.ndarray:
     """
     Finds the picker index from the ABSOLUTE max in bits
+
     :param sig: array of waveform data
     :param sig_sample_rate_hz: float sample rate of reference sensor
     :param bits_pick: detection treshold in db loss
@@ -290,7 +297,8 @@ def picker_signal_bit_index(sig: np.array, sig_sample_rate_hz: float,
     return index_pick
 
 
-def picker_comb(sig_pick, index_pick):
+def picker_comb(sig_pick: np.ndarray,
+                index_pick: np.ndarray) -> np.ndarray:
     """
     Constructs a comb function from the picks
 
@@ -358,7 +366,8 @@ def mean_columns(sxx: np.ndarray) -> np.ndarray:
     return sum_c
 
 
-def just_tile(array1d_in: np.ndarray, shape_out: tuple) -> np.ndarray:
+def just_tile(array1d_in: np.ndarray,
+              shape_out: tuple) -> np.ndarray:
     """
     Constructs tiled array from 1D array to the shape specified by shape_out
 
@@ -396,7 +405,8 @@ def sum_tile(sxx: np.ndarray) -> np.ndarray:
     return sum_c_matrix
 
 
-def mean_tile(sxx: np.ndarray, shape_out) -> np.ndarray:
+def mean_tile(sxx: np.ndarray,
+              shape_out: np.ndarray) -> np.ndarray:
     """
     Compute the mean of the columns in a 1D or 2D array and then re-tile to the original size
 
@@ -417,14 +427,15 @@ def mean_tile(sxx: np.ndarray, shape_out) -> np.ndarray:
     return sum_c_matrix
 
 
-def d1tile_x_d2(d1: np.ndarray, d2: np.ndarray) -> np.ndarray:
+def d1tile_x_d2(d1: np.ndarray,
+                d2: np.ndarray) -> np.ndarray:
     """
     Create array of repeated values with dimensions that match those of energy array
     Useful to multiply frequency-dependent values to frequency-time matrices
 
     :param d1: 1D input vector, nominally frequency/scale multipliers
     :param d2: 2D array, first dimension should be that same as d1
-    :return:
+    :return: array with matching values
     """
     shape_out = d2.shape
 
