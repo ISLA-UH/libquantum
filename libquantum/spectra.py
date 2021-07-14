@@ -1,6 +1,3 @@
-"""
-This module contains functions to calculate CQT, STFT and SNR, among other spectra.
-"""
 import numpy as np
 import scipy.signal as signal
 import librosa
@@ -234,10 +231,29 @@ def stft_reassign_from_sig(sig_wf: np.ndarray,
 
 
 # GENERAL FFT TOOLS
+def fft_real_dB(sig: np.ndarray,
+                sample_interval_s: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    FFT, real frequencies only, magnitude in dB
+    :param sig: array with input signal
+    :param sample_interval_s: sample interval in seconds
+    :return: four numpy ndarrays with fft_frequency_pos, fft_sig_pos, fft_spectral_power_pos_dB,
+        fft_spectral_phase_radians
+    """
+    fft_points = len(sig)
+    fft_sig_pos = np.fft.rfft(sig)
+    # returns correct RMS power level sqrt(2) -> 1
+    fft_sig_pos /= fft_points
+    fft_frequency_pos = np.fft.rfftfreq(fft_points, d=sample_interval_s)
+    fft_spectral_power_pos_dB = 10.*np.log10(2.*(np.abs(fft_sig_pos))**2. + EPSILON)
+    fft_spectral_phase_radians = np.angle(fft_sig_pos)
+    return fft_frequency_pos, fft_sig_pos, fft_spectral_power_pos_dB, fft_spectral_phase_radians
+
+
 def fft_real_bits(sig: np.ndarray,
                   sample_interval_s: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-
+    FFT, real frequencies only, magnitude in bits
     :param sig: array with input signal
     :param sample_interval_s: sample interval in seconds
     :return: four numpy ndarrays with fft_frequency_pos, fft_sig_pos, fft_spectral_power_pos_bits,
@@ -282,7 +298,7 @@ def fft_complex_bits(sig: np.ndarray,
     # returns correct RMS power level
     fft_sig /= fft_points
     fft_frequency = np.fft.fftfreq(fft_points, d=sample_interval_s)
-    fft_spectral_bits = np.log2((np.abs(fft_sig) + EPSILON))
+    fft_spectral_bits = utils.log2epsilon(fft_sig)
     fft_spectral_phase_radians = np.angle(fft_sig)
     return fft_frequency, fft_sig, fft_spectral_bits, fft_spectral_phase_radians
 
@@ -332,7 +348,7 @@ def fft_welch_from_Sxx_bits(f_center: np.ndarray,
     # Estimate Welch periodogram by adding Sxx and dividing by the number of windows
     # Removes zero frequency
     Welch_Sxx = np.average(Sxx, axis=1)
-    Welch_Sxx_bits = 0.5*np.log2(np.abs(Welch_Sxx[1:]))
+    Welch_Sxx_bits = 0.5*utils.log2epsilon(Welch_Sxx[1:])
     f_center_nozero = f_center[1:]
     return f_center_nozero, Welch_Sxx_bits
 
@@ -357,19 +373,3 @@ def fft_welch_snr_power(f_center: np.ndarray,
     snr_power = Welch_Sxx2/Welch_Sxx
     snr_frequency = f_center[1:]
     return snr_frequency, snr_power
-
-
-def resample8K(sig: np.ndarray,
-               frequency_sample_hz: float) -> np.ndarray:
-    """
-    Resample to 8k sample rate. Fourier method is better.
-
-    :param sig: array with time series
-    :param frequency_sample_hz: frequency sample rate in Hz
-    :return: numpy ndarray with resampled sig
-    """
-    frequency_resample_hz = 8000.
-    sig_points = len(sig)
-    resample_points = int(sig_points*frequency_resample_hz/frequency_sample_hz)
-    sig_resample = signal.resample(sig, resample_points)
-    return sig_resample

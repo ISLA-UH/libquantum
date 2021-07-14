@@ -8,6 +8,7 @@ import scipy.signal as signal
 from scipy.integrate import cumulative_trapezoid
 from typing import Optional
 from libquantum import utils, scales, atoms
+from libquantum.scales import EPSILON
 
 
 # Synthetics for rdvxm testing
@@ -364,6 +365,33 @@ def gt_blast_period_center(time_center_s, pseudo_period_s):
     p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
 
     return p_GT
+
+
+def gt_hilbert_blast_period_center(time_center_s, pseudo_period_s):
+    # Hilbert transform of the Garces (2019) ground truth blast pulse
+    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    # time_start = time_zero - time_pos
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    a = 1 + np.sqrt(6)
+    zeta = (np.sqrt(3)-np.sqrt(2))/np.sqrt(3)
+    # Initialize GT
+    p_GT_H = np.zeros(tau.size)  # Hilbert of Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
+    sigint2 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
+    tau1 = tau[sigint1]
+    tau2 = tau[sigint2]
+
+    p_GT_H[sigint1] = 1. + (1-tau1)*np.log(tau1+EPSILON) - (1-tau1)*np.log(1-tau1+EPSILON)
+    # p_GT_H[sigint1] = 1. + (1-tau1)*np.log(-tau1) - (1-tau1)*np.log(1-tau1)
+    p_GT_H21 = (a-1)/6. * ( a*(2*a+5) - 1 + 6*tau2**2 - 3*tau2*(1+3*a) )
+    p_GT_H22 = (tau2-1)*(a-tau2)**2 * (np.log(a-tau2+EPSILON) - np.log(tau2-1+EPSILON))
+    # p_GT_H22 = (tau2-1)*(a-tau2)**2 * (np.log(a-tau2) - np.log(tau2-1+EPSILON))
+    p_GT_H[sigint2] = 1./6. * (p_GT_H21 + p_GT_H22)
+    p_GT_H /= np.pi
+
+    return p_GT_H
 
 
 def gt_blast_derivative_period_center(time_center_s, pseudo_period_s):

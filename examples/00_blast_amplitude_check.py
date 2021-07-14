@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from libquantum import atoms, entropy, scales, spectra, utils, synthetics
 import libquantum.plot_templates.plot_time_frequency_reps as pltq
-
 import libwwz
+
 
 if __name__ == "__main__":
     """
@@ -11,30 +11,37 @@ if __name__ == "__main__":
     # For a specified signal duration, there is only one key parameter: Order
     # TODO: INFERNO Rewrite
     """
+
     print('Tone synthetic')
-    order_number_input = 12
-    EVENT_NAME = "Tone Test"
+    order_number_input = 6
+    EVENT_NAME = "Blast Test"
     station_id_str = 'Synthya'
     run_time_epoch_s = utils.datetime_now_epoch_s()
 
     mic_sig_sample_rate_hz = 800.
+    # Target frequency
     sig_frequency_hz = 50.
-    sig_duration_s = 5.
+    pseudo_period_main_s = 1 / sig_frequency_hz
 
-    # Construct synthetic tone
-    mic_amp = 2**15
-    mic_sig_epoch_s = np.arange(int(mic_sig_sample_rate_hz * sig_duration_s)) / mic_sig_sample_rate_hz + run_time_epoch_s
-    mic_sig = mic_amp * np.sin(2*np.pi*sig_frequency_hz*mic_sig_epoch_s)
-    mic_sig += synthetics.white_noise_fbits(sig=mic_sig, std_bit_loss=4.)
+    # Duration set by the number of cycles
+    window_cycles = 4*32
+    window_duration_s = window_cycles*pseudo_period_main_s
+    # Use 2^n
+    time_points = 2**int(np.log2(window_duration_s * mic_sig_sample_rate_hz))
+    sig_duration_s = time_points / mic_sig_sample_rate_hz
+    std_bit_loss = 1.
 
+    time_center_s, mic_sig = \
+        synthetics.gt_blast_center_noise(sig_duration_s, sig_frequency_hz, mic_sig_sample_rate_hz, std_bit_loss)
+
+    mic_sig_epoch_s = time_center_s + run_time_epoch_s
     # Taper
     mic_sig *= utils.taper_tukey(mic_sig_epoch_s, fraction_cosine=0.1)
-    # Antialias filter synthetic
-    synthetics.antialias_halfNyquist(mic_sig)
-
+    # Max unit amplitude
+    mic_sig /= np.max(mic_sig)
     # Frame to mic start and end and plot
     event_reference_time_epoch_s = mic_sig_epoch_s[0]
-    # print('\nExtraction start time for mic: ', event_reference_time_epoch_s)
+    print('\nExtraction start time for mic: ', event_reference_time_epoch_s)
 
     max_time_s, min_frequency_hz = scales.from_duration(order_number_input, sig_duration_s)
     print('\nRequest Order N=', order_number_input)
@@ -51,8 +58,7 @@ if __name__ == "__main__":
     mic_cwt, mic_cwt_bits, mic_cwt_time_s, mic_cwt_frequency_hz = \
         atoms.cwt_chirp_from_sig(sig_wf=mic_sig,
                                  frequency_sample_rate_hz=mic_sig_sample_rate_hz,
-                                 band_order_Nth=order_number_input,
-                                 dictionary_type="tone")
+                                 band_order_Nth=order_number_input)
     mic_cwt_snr, mic_cwt_snr_bits, mic_cwt_snr_entropy = entropy.snr_mean_max(mic_cwt)
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=mic_sig,
@@ -74,8 +80,7 @@ if __name__ == "__main__":
     mic_cqt, mic_cqt_bits, mic_cqt_time_s, mic_cqt_frequency_hz = \
         spectra.cqt_from_sig(sig_wf=mic_sig,
                              frequency_sample_rate_hz=mic_sig_sample_rate_hz,
-                             band_order_Nth=order_number_input,
-                             dictionary_type="tone")
+                             band_order_Nth=order_number_input)
     mic_cqt_snr, mic_cqt_snr_bits, mic_cqt_snr_entropy = entropy.snr_mean_max(mic_cqt)
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=mic_sig,
@@ -98,9 +103,8 @@ if __name__ == "__main__":
         spectra.cqt_from_sig(sig_wf=mic_sig,
                              frequency_sample_rate_hz=mic_sig_sample_rate_hz,
                              band_order_Nth=order_number_input,
-                             cqt_window="cqt_gauss",
-                             dictionary_type="tone")
-    mic_cqtg_snr, mic_cqtg_snr_bits, mic_cqtg_snr_entropy = entropy.snr_mean_max(mic_cqt)
+                             cqt_window="cqt_gauss")
+    mic_cqtg_snr, mic_cqtg_snr_bits, mic_cqtg_snr_entropy = entropy.snr_mean_max(mic_cqtg)
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=mic_sig,
                                 wf_panel_2_time=mic_sig_epoch_s,
@@ -194,4 +198,5 @@ if __name__ == "__main__":
                                 figure_title="WWZ for " + EVENT_NAME,
                                 frequency_hz_ymin=fmin,
                                 frequency_hz_ymax=fmax)
+    
     plt.show()
