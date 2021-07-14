@@ -18,6 +18,7 @@ def gabor_tight_grain(band_order_Nth: float,
                       index_shift: float = 0,
                       frequency_base_input: float = scales.Slice.G2):
     """
+    Gabor grain with tight Tukey wrap to ensure zero at edges
 
     :param band_order_Nth:
     :param scale_frequency_center_hz:
@@ -54,6 +55,7 @@ def tukey_tight_grain(band_order_Nth: float,
                       index_shift: float = 0,
                       frequency_base_input: float = scales.Slice.G2):
     """
+    Tukey grain with same support as Gabor atom
 
     :param band_order_Nth:
     :param scale_frequency_center_hz:
@@ -91,7 +93,7 @@ def gabor_grain_frequencies(frequency_order_input: float,
                             frequency_base_input: float = scales.Slice.G2,
                             frequency_ref_input: float = 1.0) -> (np.ndarray, np.ndarray):
     """
-
+    Frequencies for g-chirps
 
     :param frequency_order_input:
     :param frequency_low_input:
@@ -111,68 +113,6 @@ def gabor_grain_frequencies(frequency_order_input: float,
                                          frequency_sample_rate_input)
 
     return frequency_center, frequency_start, frequency_end
-
-
-def gt_rdvxm_center_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
-                                noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
-    """
-    Construct the GT explosion pulse of Garces (2019) in Gaussion noise with SNR in bits re signal STD
-
-    :param duration_points:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
-    """
-
-    if frequency_center_hz:
-        pseudo_period_s = 1/frequency_center_hz
-    else:
-        pseudo_period_s = duration_points/sample_rate_hz/4.
-
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-    gt_white_aa.astype(np.float16)
-
-    return gt_white_aa
-
-
-def gt_rdvxm_center_noise_uneven(sensor_epoch_micros: np.array, start_epoch_micros: float,
-                                 duration_points: int = 2**12, sample_rate_hz: float = 80,
-                                 noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
-    """
-    Construct the GT explosion pulse of Garces (2019) for uneven sensor time
-    in Gaussion noise with SNR in bits re signal STD
-
-    :param sensor_epoch_micros:
-    :param start_epoch_micros:
-    :param duration_points:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
-    """
-
-    if frequency_center_hz:
-        pseudo_period_s = 1/frequency_center_hz
-    else:
-        pseudo_period_s = duration_points/sample_rate_hz/4.
-
-    # Convert to seconds
-    time_duration_s = duration_points/sample_rate_hz
-    time_center_s = (sensor_epoch_micros - start_epoch_micros)/1E6 - time_duration_s/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-
-    return gt_white_aa
 
 
 def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
@@ -236,248 +176,6 @@ def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: flo
     saw_white_aa.astype(np.float16)
 
     return saw_white_aa
-
-
-# GT Test Pulse
-def gt_blast_center_integral_and_derivative(frequency_peak_hz, sample_rate_hz):
-    """
-    Integral and derivative relative to tau (NOT time_s)
-
-    :param frequency_peak_hz:
-    :param sample_rate_hz:
-    :return:
-    """
-
-    duration_s = 2/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
-    pseudo_period_s = 1/frequency_peak_hz
-    time_pos_s = pseudo_period_s/4.
-    duration_points = int(duration_s*sample_rate_hz)
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    tau_center = time_center_s/time_pos_s
-    tau_interval = np.mean(np.diff(tau_center))
-
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_gt_i = gt_blast_integral_period_center(time_center_s, pseudo_period_s)
-    sig_gt_d = gt_blast_derivative_period_center(time_center_s, pseudo_period_s)
-    sig_gt_d[np.argmax(sig_gt)-1] = np.max(np.diff(sig_gt))/tau_interval
-
-    return tau_center, sig_gt, sig_gt_i, sig_gt_d
-
-
-def gt_blast_center_fast(frequency_peak_hz,
-                         sample_rate_hz):
-    """
-    TODO: Set default of 16 bits for std_loss_bits
-
-    :param frequency_peak_hz:
-    :param sample_rate_hz:
-    :return:
-    """
-
-    duration_s = 16/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
-    noise_std_loss_bits = 16                # 16 bit record, system noise
-    pseudo_period_s = 1/frequency_peak_hz
-    duration_points = int(duration_s*sample_rate_hz)
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-    return time_center_s, gt_white_aa
-
-
-# This is a very flexible variation
-def gt_blast_center_noise_uneven(sensor_epoch_s: np.array,
-                                 noise_std_loss_bits: float = 2,
-                                 frequency_center_hz: Optional[float] = None):
-    """
-    Construct the GT explosion pulse of Garces (2019) for even or uneven sensor time
-    in Gaussion noise with SNR in bits re signal STD
-
-    :param sensor_epoch_s:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
-    """
-
-    time_duration_s = sensor_epoch_s[-1]-sensor_epoch_s[0]
-
-    if frequency_center_hz:
-        pseudo_period_s = 1/frequency_center_hz
-    else:
-        pseudo_period_s = time_duration_s/4.
-
-    # Convert to seconds
-    time_center_s = sensor_epoch_s - sensor_epoch_s[0] - time_duration_s/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(np.copy(sig_gt), noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-
-    return gt_white_aa
-
-
-def gt_blast_center_noise(duration_s, frequency_peak_hz, sample_rate_hz, noise_std_loss_bits):
-    """
-    TODO: Set default of 16 bits for std_loss_bits
-
-    :param duration_s:
-    :param frequency_peak_hz:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :return:
-    """
-    pseudo_period_s = 1/frequency_peak_hz
-    duration_points = int(duration_s*sample_rate_hz)
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-    return time_center_s, gt_white_aa
-
-
-def gt_blast_period_center(time_center_s, pseudo_period_s):
-    """
-
-
-    :param time_center_s:
-    :param pseudo_period_s:
-    :return:
-    """
-    # Garces (2019) ground truth GT blast pulse
-    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
-    time_pos_s = pseudo_period_s/4.
-    tau = time_center_s/time_pos_s + 1.
-    # Initialize GT
-    p_GT = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
-    # Initialize time ranges
-    sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
-    sigintG17 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
-    p_GT[sigint1] = (1. - tau[sigint1])
-    p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
-
-    return p_GT
-
-
-def gt_hilbert_blast_period_center(time_center_s, pseudo_period_s):
-    # Hilbert transform of the Garces (2019) ground truth blast pulse
-    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
-    time_pos_s = pseudo_period_s/4.
-    tau = time_center_s/time_pos_s + 1.
-    a = 1 + np.sqrt(6)
-    zeta = (np.sqrt(3)-np.sqrt(2))/np.sqrt(3)
-    # Initialize GT
-    p_GT_H = np.zeros(tau.size)  # Hilbert of Granstrom-Triangular (GT), 2019
-    # Initialize time ranges
-    sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
-    sigint2 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
-    tau1 = tau[sigint1]
-    tau2 = tau[sigint2]
-
-    p_GT_H[sigint1] = 1. + (1-tau1)*np.log(tau1+EPSILON) - (1-tau1)*np.log(1-tau1+EPSILON)
-    # p_GT_H[sigint1] = 1. + (1-tau1)*np.log(-tau1) - (1-tau1)*np.log(1-tau1)
-    p_GT_H21 = (a-1)/6. * ( a*(2*a+5) - 1 + 6*tau2**2 - 3*tau2*(1+3*a) )
-    p_GT_H22 = (tau2-1)*(a-tau2)**2 * (np.log(a-tau2+EPSILON) - np.log(tau2-1+EPSILON))
-    # p_GT_H22 = (tau2-1)*(a-tau2)**2 * (np.log(a-tau2) - np.log(tau2-1+EPSILON))
-    p_GT_H[sigint2] = 1./6. * (p_GT_H21 + p_GT_H22)
-    p_GT_H /= np.pi
-
-    return p_GT_H
-
-
-def gt_blast_derivative_period_center(time_center_s, pseudo_period_s):
-    """
-
-
-    :param time_center_s:
-    :param pseudo_period_s:
-    :return:
-    """
-    # Garces (2019) ground truth GT blast pulse
-    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
-    time_pos_s = pseudo_period_s/4.
-    tau = time_center_s/time_pos_s + 1.
-    # Initialize GT
-    p_GTd = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
-    # Initialize time ranges
-    sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
-    sigintG17 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
-    p_GTd[sigint1] = -1.
-    p_GTd[sigintG17] = -1./6. * (3. + np.sqrt(6) - 3*tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17])
-
-    return p_GTd
-
-
-def gt_blast_integral_period_center(time_center_s, pseudo_period_s):
-    """
-
-
-    :param time_center_s:
-    :param pseudo_period_s:
-    :return:
-    """
-    # Garces (2019) ground truth GT blast pulse
-    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
-    time_pos_s = pseudo_period_s/4.
-    tau = time_center_s/time_pos_s + 1.
-    # Initialize GT
-    p_GTi = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
-    # Initialize time ranges
-    sigint1 = np.where((0.0 <= tau) & (tau <= 1.))  # ONLY positive pulse
-    sigintG17 = np.where((1. < tau) & (tau <= 1 + np.sqrt(6.)))  # GT balanced pulse
-    p_GTi[sigint1] = (1. - tau[sigint1]/2.)*tau[sigint1]
-
-    p_GTi[sigintG17] = -tau[sigintG17]/72. * (
-            3 * tau[sigintG17]**3 - 4 * (3 + 2 * np.sqrt(6)) * tau[sigintG17]**2 +
-            6 * (9 + 4 * np.sqrt(6)) * tau[sigintG17] - 12 * (7 + 2 * np.sqrt(6)))
-
-    integration_constant = p_GTi[sigint1][-1] - p_GTi[sigintG17][0]
-    p_GTi[sigintG17] += integration_constant
-
-    return p_GTi
-
-
-def gt_blast_ft(frequency_peak_hz, frequency_hz):
-    """
-
-
-    :param frequency_peak_hz:
-    :param frequency_hz:
-    :return:
-    """
-    w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
-    ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
-    ft_G17_negative = np.exp(-1j*w_scaled*(1+np.sqrt(6.)))/(3.*w_scaled**4.) * \
-                      (1j*w_scaled*np.sqrt(6.) + 3. +
-                       np.exp(1j*w_scaled*np.sqrt(6.))*(3.*w_scaled**2. + 1j*w_scaled*2.*np.sqrt(6.)-3.))
-    ft_G17 = (ft_G17_positive + ft_G17_negative)*np.pi/(2*np.pi*frequency_peak_hz)
-    return ft_G17
-
-
-def gt_blast_spectral_density(frequency_peak_hz, frequency_hz):
-    """
-
-
-    :param frequency_peak_hz:
-    :param frequency_hz:
-    :return:
-    """
-    fourier_tx = gt_blast_ft(frequency_peak_hz, frequency_hz)
-    spectral_density = 2*np.abs(fourier_tx*np.conj(fourier_tx))
-    spectral_density_peak = np.max(spectral_density)
-    # spectral_density_peak = np.pi/(2*np.pi*frequency_center_hz)
-    return spectral_density, spectral_density_peak
 
 
 def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
