@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from libquantum import atoms, entropy, scales, spectra, utils, synthetics
+from libquantum import blast_pulse as kaboom
 import libquantum.plot_templates.plot_time_frequency_reps as pltq
 import libwwz
 
@@ -15,7 +16,7 @@ if __name__ == "__main__":
     print('Tone synthetic')
     order_number_input = 6
     EVENT_NAME = "Blast Test"
-    station_id_str = 'Synthya'
+    station_id_str = 'Synth'
     run_time_epoch_s = utils.datetime_now_epoch_s()
 
     mic_sig_sample_rate_hz = 800.
@@ -32,7 +33,7 @@ if __name__ == "__main__":
     std_bit_loss = 1.
 
     time_center_s, mic_sig = \
-        synthetics.gt_blast_center_noise(sig_duration_s, sig_frequency_hz, mic_sig_sample_rate_hz, std_bit_loss)
+        kaboom.gt_blast_center_noise(sig_duration_s, sig_frequency_hz, mic_sig_sample_rate_hz, std_bit_loss)
 
     mic_sig_epoch_s = time_center_s + run_time_epoch_s
     # Taper
