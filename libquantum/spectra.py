@@ -1,34 +1,32 @@
+"""
+This module contains functions to calculate CQT, STFT and SNR, among other spectra.
+"""
 import numpy as np
 import scipy.signal as signal
 import librosa
 from libquantum import atoms, scales, utils
 from libquantum.scales import EPSILON
+from typing import Union, Tuple
 
 
-# def mesh_peaks_from_passband(mesh_2d, frequency_1d, frequency_min, frequency_max):
-#     """DEPRECATED, SEE TFR_GATE_PICK
-#     """
-#     index_frequency_hz_min_band = np.argmin(np.abs(frequency_1d - frequency_min))
-#     index_frequency_hz_max_band = np.argmin(np.abs(frequency_1d - frequency_max))
-#     mesh_max = np.max(mesh_2d[index_frequency_hz_min_band:index_frequency_hz_max_band, :],
-#                       axis=0)
-#     index_argmax = np.argmax(mesh_2d[index_frequency_hz_min_band:index_frequency_hz_max_band, :],
-#                              axis=0)
-#     frequency_peak = np.empty(index_argmax.shape)
-#
-#     for j in range(len(index_argmax)):
-#         frequency_peak[j] = frequency_1d[index_frequency_hz_min_band + index_argmax[j]]
-#
-#     return mesh_max, frequency_peak
+def quantum_gauss_stdev(points_number: int) -> float:
+    """
+    Calculate Gauss Standard Deviation based on the input number of points
 
-
-def quantum_gauss_stdev(points_number):
-    # TODO: Revisit and nail it
+    :param points_number: number of points
+    :return: float with standard deviation
+    """
     gauss_stdev = 0.5*points_number/np.pi
     return gauss_stdev
 
 
-def q_gauss(points_number):
+def q_gauss(points_number: int) -> np.ndarray:
+    """
+    Calculate Gauss envelope
+
+    :param points_number: number of points
+    :return: numpy array with envelope values
+    """
     gauss_stdev = quantum_gauss_stdev(points_number)
     gauss_amp = np.pi**(-0.25)
     gauss_envelope = gauss_amp*signal.get_window(('gaussian', gauss_stdev), points_number)
@@ -39,9 +37,17 @@ def cqt_scaling(band_order_Nth: float,
                 scale_frequency_center_hz: float,
                 frequency_sample_rate_hz: float,
                 tfr_shape: tuple,
-                dictionary_type: str = "norm"):
+                dictionary_type: str = "norm") -> Union[np.ndarray, float]:
+    """
+    Calculate
 
-    # TODO: Clear up scaling. Tidy up math, then code.
+    :param band_order_Nth: Nth order of constant Q bands
+    :param scale_frequency_center_hz: center frequency fc in Hz
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param tfr_shape: shape of TFR, Tuple
+    :param dictionary_type: "tone" or "norm". Default is 'norm'
+    :return: numpy array with scale values if dictionary_type
+    """
     atom_scales = atoms.chirp_scale_from_order(band_order_Nth,
                                                scale_frequency_center_hz,
                                                frequency_sample_rate_hz)
@@ -55,11 +61,21 @@ def cqt_scaling(band_order_Nth: float,
     return cqt_multipier
 
 
-def cqt_from_sig(sig_wf,
-                 frequency_sample_rate_hz,
-                 band_order_Nth,
+def cqt_from_sig(sig_wf: np.ndarray,
+                 frequency_sample_rate_hz: float,
+                 band_order_Nth: float,
                  cqt_window: str = 'hann',
-                 dictionary_type: str = "norm"):
+                 dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Compute the constant-Q transform of a signal.
+
+    :param sig_wf: array with input signal
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param band_order_Nth: Nth order of constant Q bands
+    :param cqt_window: string, "cqt_gauss" or librosa window specification for the basis filter. Default is 'hann'
+    :param dictionary_type: "tone" or "norm". Default is 'norm'
+    :return: four numpy ndarrays with CQT, CQT_bits, time_cqt_s, frequency_cqt_hz
+    """
     sig_duration_s = len(sig_wf)/frequency_sample_rate_hz
     min_scale_s, min_frequency_hz = scales.from_duration(band_order_Nth, sig_duration_s)
 
@@ -71,7 +87,6 @@ def cqt_from_sig(sig_wf,
                                         is_power_2=False)
 
     print('CQT Duration, NFFT, HOP:', len(sig_wf), cqt_points_per_seg_max, cqt_points_hop_min)
-    # TODO: This will bomb for non-integer N
     int_order_N = int(band_order_Nth)
     # CQT is not power
     if cqt_window == "cqt_gauss":
@@ -96,16 +111,22 @@ def cqt_from_sig(sig_wf,
                                  CQT.shape,
                                  dictionary_type)
     CQT *= cqt_multiplier
-    # print('Max Hann CQT:', np.max(np.abs(CQT)))
     CQT_bits = utils.log2epsilon(CQT)
 
     return CQT, CQT_bits, time_cqt_s, frequency_cqt_hz
 
 
-def stft_from_sig(sig_wf,
-                  frequency_sample_rate_hz,
-                  band_order_Nth):
-    """Librosa STFT is complex FFT grid, not power"""
+def stft_from_sig(sig_wf: np.ndarray,
+                  frequency_sample_rate_hz: float,
+                  band_order_Nth: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Librosa STFT is complex FFT grid, not power
+
+    :param sig_wf: array with input signal
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param band_order_Nth: Nth order of constant Q bands
+    :return: four numpy ndarrays with STFT, STFT_bits, time_stft_s, frequency_stft_hz
+    """
 
     sig_duration_s = len(sig_wf)/frequency_sample_rate_hz
     _, min_frequency_hz = scales.from_duration(band_order_Nth, sig_duration_s)
@@ -119,7 +140,6 @@ def stft_from_sig(sig_wf,
     # Choose the spectral resolution as the key parameter
     frequency_resolution_min_hz = np.min(frequency_end - frequency_start)
     frequency_resolution_max_hz = np.max(frequency_end - frequency_start)
-    frequency_resolution_hz_alg = np.mean(frequency_end - frequency_start)
     frequency_resolution_hz_geo = np.sqrt(frequency_resolution_min_hz*frequency_resolution_max_hz)
     stft_time_duration_s = 1/frequency_resolution_hz_geo
     stft_points_per_seg = int(frequency_sample_rate_hz*stft_time_duration_s)
@@ -150,10 +170,20 @@ def stft_from_sig(sig_wf,
     return STFT, STFT_bits, time_stft_s, frequency_stft_hz
 
 
-def stft_reassign_from_sig(sig_wf,
-                           frequency_sample_rate_hz,
-                           band_order_Nth):
-    """Librosa STFT is complex FFT grid, not power"""
+def stft_reassign_from_sig(sig_wf: np.ndarray,
+                           frequency_sample_rate_hz: float,
+                           band_order_Nth: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
+                                                           np.ndarray]:
+    """
+    Librosa STFT is complex FFT grid, not power
+    Reassigned frequencies are not the same as the standard mesh frequencies
+
+    :param sig_wf: array with input signal
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param band_order_Nth: Nth order of constant Q bands
+    :return: six numpy ndarrays with STFT, STFT_bits, time_stft_s, frequency_stft_hz, time_stft_rsg_s,
+        frequency_stft_rsg_hz
+    """
 
     sig_duration_s = len(sig_wf)/frequency_sample_rate_hz
     _, min_frequency_hz = scales.from_duration(band_order_Nth, sig_duration_s)
@@ -167,7 +197,6 @@ def stft_reassign_from_sig(sig_wf,
     # Choose the spectral resolution as the key parameter
     frequency_resolution_min_hz = np.min(frequency_end - frequency_start)
     frequency_resolution_max_hz = np.max(frequency_end - frequency_start)
-    frequency_resolution_hz_alg = np.mean(frequency_end - frequency_start)
     frequency_resolution_hz_geo = np.sqrt(frequency_resolution_min_hz*frequency_resolution_max_hz)
     stft_time_duration_s = 1/frequency_resolution_hz_geo
     stft_points_per_seg = int(frequency_sample_rate_hz*stft_time_duration_s)
@@ -201,13 +230,19 @@ def stft_reassign_from_sig(sig_wf,
                                                      n_fft=stft_points_per_seg)
 
     # Reassigned frequencies are not the same as the standard mesh frequencies
-    return STFT_mag, STFT_bits, \
-           time_stft_s, frequency_stft_hz, \
-           time_stft_rsg_s, frequency_stft_rsg_hz
+    return STFT_mag, STFT_bits, time_stft_s, frequency_stft_hz, time_stft_rsg_s, frequency_stft_rsg_hz
 
 
 # GENERAL FFT TOOLS
-def fft_real_bits(sig, sample_interval_s):
+def fft_real_bits(sig: np.ndarray,
+                  sample_interval_s: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+
+    :param sig: array with input signal
+    :param sample_interval_s: sample interval in seconds
+    :return: four numpy ndarrays with fft_frequency_pos, fft_sig_pos, fft_spectral_power_pos_bits,
+        fft_spectral_phase_radians
+    """
     # FFT for sigetic, by the book
     fft_points = len(sig)
     fft_sig_pos = np.fft.rfft(sig)
@@ -216,19 +251,31 @@ def fft_real_bits(sig, sample_interval_s):
     fft_frequency_pos = np.fft.rfftfreq(fft_points, d=sample_interval_s)
     fft_spectral_power_pos_bits = utils.log2epsilon(2.*np.abs(fft_sig_pos))
     fft_spectral_phase_radians = np.angle(fft_sig_pos)
-    return fft_frequency_pos, fft_sig_pos, \
-           fft_spectral_power_pos_bits, fft_spectral_phase_radians
+    return fft_frequency_pos, fft_sig_pos, fft_spectral_power_pos_bits, fft_spectral_phase_radians
 
 
-# Inverse Fourier Transform from positive FFT of a real function
-def ifft_real(fft_sig_pos):
+def ifft_real(fft_sig_pos) -> np.ndarray:
+    """
+    Calculate the inverse of the one-dimensional discrete Fourier Transform for real input.
+
+    :param fft_sig_pos: input array
+    :return: the truncated or zero-padded input, transformed along the axis
+    """
     ifft_sig = np.fft.irfft(fft_sig_pos).real
     fft_points = len(ifft_sig)
     ifft_sig *= fft_points
     return ifft_sig
 
 
-def fft_complex_bits(sig, sample_interval_s):
+def fft_complex_bits(sig: np.ndarray,
+                     sample_interval_s: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Compute the one-dimensional discrete Fourier Transform in bits
+
+    :param sig: array with input signal
+    :param sample_interval_s: sample interval in seconds
+    :return: four numpy arrays with fft_frequency, fft_sig, fft_spectral_bits, fft_spectral_phase_radians
+    """
     # FFT for sigetic, by the book
     fft_points = len(sig)
     fft_sig = np.fft.fft(sig)
@@ -241,7 +288,13 @@ def fft_complex_bits(sig, sample_interval_s):
 
 
 # Inverse Fourier Transform FFT of real function
-def ifft_complex(fft_sig_complex):
+def ifft_complex(fft_sig_complex) -> np.ndarray:
+    """
+    Compute the one-dimensional inverse discrete Fourier Transform.
+
+    :param fft_sig_complex: input array, can be complex.
+    :return: the truncated or zero-padded input, transformed along the axis
+    """
     ifft_sig = np.fft.ifft(fft_sig_complex)
     fft_points = len(ifft_sig)
     ifft_sig *= fft_points
@@ -249,15 +302,33 @@ def ifft_complex(fft_sig_complex):
 
 
 # Time shifted the FFT before inversion
-def fft_time_shift(fft_sig, fft_frequency, time_lead):
+def fft_time_shift(fft_sig: np.ndarray,
+                   fft_frequency: np.ndarray,
+                   time_lead: Union[int, float]) -> np.ndarray:
+    """
+    Time shift an FFT. Frequency and the time shift time_lead must have consistent units and be within window
+
+    :param fft_sig: FFT signal
+    :param fft_frequency: FFT frequencies
+    :param time_lead: time shift
+    :return: numpy ndarray with time shifted FFT signal
+    """
     # frequency and the time shift time_lead must have consistent units and be within window
     fft_phase_time_shift = np.exp(-1j*2*np.pi*fft_frequency*time_lead)
     fft_sig *= fft_phase_time_shift
     return fft_sig
 
 
-# Compute Welch periodogram from spectrogram
-def fft_welch_from_Sxx_bits(f_center, Sxx):
+# Compute Welch  from spectrogram
+def fft_welch_from_Sxx_bits(f_center: np.ndarray,
+                            Sxx: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Compute Welch periodogram from spectrogram
+
+    :param f_center: array of sample frequencies.
+    :param Sxx: numpy array with spectogram
+    :return: numpy array with frequencies, numpy array with Welch periodogram
+    """
     # Estimate Welch periodogram by adding Sxx and dividing by the number of windows
     # Removes zero frequency
     Welch_Sxx = np.average(Sxx, axis=1)
@@ -266,7 +337,17 @@ def fft_welch_from_Sxx_bits(f_center, Sxx):
     return f_center_nozero, Welch_Sxx_bits
 
 
-def fft_welch_snr_power(f_center, Sxx, Sxx2):
+def fft_welch_snr_power(f_center: np.ndarray,
+                        Sxx: np.ndarray,
+                        Sxx2: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Calculate SNR power from specogram
+
+    :param f_center: array of sample frequencies.
+    :param Sxx: numpy array with spectogram
+    :param Sxx2: numpy array with spectogram 2. Must have the same length as Sxx
+    :return: numpy ndarray with snr frequency, numpy ndarray with snr power
+    """
     # Estimate Welch periodogram by adding Sxx and dividing by the number of windows
     # Removes zero frequency
     Welch_Sxx = np.average(Sxx[1:], axis=1)
@@ -278,12 +359,14 @@ def fft_welch_snr_power(f_center, Sxx, Sxx2):
     return snr_frequency, snr_power
 
 
-def resample8K(sig: np.ndarray, frequency_sample_hz: float) -> np.ndarray:
+def resample8K(sig: np.ndarray,
+               frequency_sample_hz: float) -> np.ndarray:
     """
     Resample to 8k sample rate. Fourier method is better.
-    :param sig: time series
-    :param frequency_sample_hz:
-    :return: ndarray
+
+    :param sig: array with time series
+    :param frequency_sample_hz: frequency sample rate in Hz
+    :return: numpy ndarray with resampled sig
     """
     frequency_resample_hz = 8000.
     sig_points = len(sig)
