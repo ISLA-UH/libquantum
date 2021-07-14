@@ -36,7 +36,7 @@ def cqt_scaling(band_order_Nth: float,
                 tfr_shape: tuple,
                 dictionary_type: str = "norm") -> Union[np.ndarray, float]:
     """
-    Calculate
+    Calculate scale for CQT
 
     :param band_order_Nth: Nth order of constant Q bands
     :param scale_frequency_center_hz: center frequency fc in Hz
