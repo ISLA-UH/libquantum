@@ -1,6 +1,5 @@
 """
 This module contains functions for frequency picking
-Last updated: 8 July 2021
 """
 
 import numpy as np
