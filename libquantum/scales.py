@@ -3,6 +3,7 @@ Construct standardized scales
 """
 
 import numpy as np
+from typing import Tuple
 
 """ Smallest number for 64-bit floats. Deploy to avoid division by zero or log zero singularities"""
 EPSILON = np.finfo(np.float64).eps
@@ -42,7 +43,13 @@ class Slice:
     PREF_PA = 10132500.  # sea level pressure, kPa
 
 
-def planck_scale_s(scale_order):
+def planck_scale_s(scale_order: float) -> Tuple[float, float, float, float]:
+    """
+    Calculate Planck scale
+
+    :param scale_order: scale order
+    :return: center in seconds, minimum in seconds, maximum in seconds, quality factor Q
+    """
     # Assumes base 2, Slice.G2
     cycles_M, quality_factor_Q = wavelet_MQ_from_N(scale_order)
     scale_edge = Slice.G2 ** (1.0 / (2.0 * scale_order))
@@ -72,35 +79,68 @@ def band_periods_nyquist(scale_order_input: float,
                          scale_base_input: float,
                          scale_ref_input: float,
                          scale_sample_interval_input: float,
-                         scale_high_input: float) -> \
-        (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+                         scale_high_input: float) -> Tuple[float, float, np.ndarray, float, np.ndarray,
+                                                           np.ndarray, np.ndarray, np.ndarray]:
     """Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE SECONDS
-    scale = pseudo-period
+
+    Parameters
+    ----------
+    scale_order_input: float
+        Band order N, for ISO3 use N = 1.0 or 3.0 or 6.0 or 12.0 or 24.0
+    scale_base_input: float
+        reference base G; i.e. G3 = 10.**0.3 or G2 = 2.0
+    scale_ref_input: float
+        time reference: in seconds
     scale_sample_interval_input: float
-        Sample interval in seconds, sets lowest frequency
+        Sample interval for scale: float
     scale_high_input: float
-        Highest center scale of interest
+        Highest scale of interest in seconds
+
+    Returns
+    -------
+    scale_order: float
+        Band order N > 1, defaults to 1.
+    scale_base: float
+        positive reference Base G > 1, defaults to G3
+    scale_ref: float
+        positive reference scale
+    scale_band_number: numpy ndarray
+        Band number n
+    scale_center_algebraic: numpy ndarray
+        Algebraic center band scale
+    scale_center_geometric: numpy ndarray
+        Geometric center band scale
+    scale_start: numpy ndarray
+        Lower band edge scale
+    scale_end: numpy ndarray
+        Upper band edge scale
     """
     scale_nyquist_input = 2*scale_sample_interval_input
-    return band_intervals_periods(scale_order_input, scale_base_input,
-                                  scale_ref_input,
-                                  scale_nyquist_input, scale_high_input)
+    scale_order, scale_base, scale_band_number, scale_ref, scale_center_algebraic, scale_center_geometric, scale_start, \
+    scale_end = band_intervals_periods(scale_order_input=scale_order_input,
+                                       scale_base_input=scale_base_input,
+                                       scale_ref_input=scale_ref_input,
+                                       scale_low_input=scale_nyquist_input,
+                                       scale_high_input=scale_high_input)
+
+    return scale_order, scale_base, scale_band_number, scale_ref, scale_center_algebraic, scale_center_geometric, \
+           scale_start, scale_end
 
 
 def band_frequencies_nyquist(frequency_order_input: float,
                              frequency_base_input: float,
                              frequency_ref_input: float,
                              frequency_low_input: float,
-                             frequency_sample_rate_input: float) -> \
-        (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+                             frequency_sample_rate_input: float) -> Tuple[float, float, np.ndarray, float, float,
+                                                                          np.ndarray, np.ndarray, np.ndarray]:
     """
     Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
 
-    :param frequency_order_input:
-    :param frequency_base_input:
-    :param frequency_ref_input:
-    :param frequency_low_input:
-    :param frequency_sample_rate_input:
+    :param frequency_order_input: Nth order
+    :param frequency_base_input: G2 or G3
+    :param frequency_ref_input: reference frequency
+    :param frequency_low_input: lowest frequency of interest
+    :param frequency_sample_rate_input: sample rate
     :return:
     """
 
@@ -121,26 +161,26 @@ def band_frequencies_nyquist(frequency_order_input: float,
     frequency_center_algebraic = (frequency_end + frequency_start)/2.
     
     # Inherit the order, base, and band number
-    return scale_order, scale_base, -scale_band_number, \
-           frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
-           frequency_start, frequency_end
+    return scale_order, scale_base, -scale_band_number, frequency_ref, frequency_center_algebraic, \
+           frequency_center_geometric, frequency_start, frequency_end
 
 
-def band_frequencies_low_high(frequency_order_input: float, frequency_base_input: float,
+def band_frequencies_low_high(frequency_order_input: float,
+                              frequency_base_input: float,
                               frequency_ref_input: float,
                               frequency_low_input: float,
                               frequency_high_input: float,
-                              frequency_sample_rate_input: float) -> \
-        (float, float, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+                              frequency_sample_rate_input: float) -> Tuple[float, float, float, np.ndarray, np.ndarray,
+                                                                           np.ndarray, np.ndarray, np.ndarray]:
     """
     Evaluate Standard Logarithmic Interval Time Parameters: ALWAYS USE HZ
 
-    :param frequency_order_input:
-    :param frequency_base_input:
-    :param frequency_ref_input:
-    :param frequency_low_input:
-    :param frequency_high_input:
-    :param frequency_sample_rate_input:
+    :param frequency_order_input: Nth order
+    :param frequency_base_input: G2 or G3
+    :param frequency_ref_input: reference frequency
+    :param frequency_low_input: lowest frequency of interest
+    :param frequency_high_input: highest frequency of interest
+    :param frequency_sample_rate_input: sample rate
     :return:
     """
 
@@ -174,8 +214,8 @@ def band_intervals_periods(scale_order_input: float,
                            scale_base_input: float,
                            scale_ref_input: float,
                            scale_low_input: float,
-                           scale_high_input: float) -> \
-        (float, float, np.ndarray, float, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+                           scale_high_input: float) -> Tuple[float, float, np.ndarray, float, np.ndarray,
+                                                             np.ndarray, np.ndarray, np.ndarray]:
     """Evaluate Standard Logarithmic Interval Scale Parameters using time scales in seconds
     If scales are provided as frequency, previous computations convert to time.
     Designed to take bappsband to just below Nyquist, within a band edge.
@@ -205,8 +245,10 @@ def band_intervals_periods(scale_order_input: float,
         positive reference scale
     scale_band_number: numpy ndarray
         Band number n
-    scale_center: numpy ndarray
-        Center band scale
+    scale_center_algebraic: numpy ndarray
+        Algebraic center band scale
+    scale_center_geometric: numpy ndarray
+        Geometric center band scale
     scale_start: numpy ndarray
         Lower band edge scale
     scale_end: numpy ndarray
@@ -291,8 +333,7 @@ def band_intervals_periods(scale_order_input: float,
     # The spectrum is centered on the algebraic center scale
     scale_center_algebraic = (scale_start+scale_end)/2.
 
-    return scale_order, scale_base, scale_band_number, \
-           scale_ref, scale_center_algebraic, scale_center_geometric, \
+    return scale_order, scale_base, scale_band_number,  scale_ref, scale_center_algebraic, scale_center_geometric, \
            scale_start, scale_end
 
 
