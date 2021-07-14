@@ -69,7 +69,6 @@ def snr_ref_max(tfr_coeff_complex: np.ndarray,
     # Evaluate Log energy entropy (LEE) = log(p) and Shannon Entropy (SE) = -p*log(p)
     # Assumes linear spectral coefficien ts (not power), takes the square
     energy = np.abs(tfr_coeff_complex)**2
-    # energy_mean = np.mean(energy)
     snr_lin = energy/energy_mean
     # Surprisal = log(p)
     snr_bits = 0.5*utils.log2epsilon(snr_lin)
@@ -122,7 +121,6 @@ def snr_ref_max_profile(tfr_coeff_complex: np.ndarray,
     # Evaluate Log energy entropy (LEE) = log(p) and Shannon Entropy (SE) = -p*log(p)
     # Assumes linear spectral coefficien ts (not power), takes the square
     energy = np.abs(tfr_coeff_complex)**2
-    # energy_mean = np.mean(energy)
     snr_lin = energy/energy_mean
     # Surprisal = log(p)
     snr_bits = 0.5*utils.log2epsilon(snr_lin + EPSILON)
