@@ -1,8 +1,12 @@
+"""
+Example using libquantum scales and export modules
+"""
 from libquantum import export, scales
 
 if __name__ == "__main__":
     """
-    Example using libquantum scales and export modules
+    In this example: Planck band, Scale Period up to Nyquist, Scale Frequency up to Nyquist (G3),
+     Scale Frequency up to Nyquist (G2), and Equal tempered scale re A4 = 440 Hz
     """
 
     print('First Planck band, with minimum pseudo-period bandwidth = ', scales.Slice.T0S)

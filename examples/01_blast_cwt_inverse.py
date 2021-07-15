@@ -288,6 +288,7 @@ def plot_wiggles_complex_label(figure_number, xarray, wf_array, wf_label, xlim_m
 
 
 if __name__ == "__main__":
+    # TODO MAG: change description to explicitly explain what the code does
     """
     Do it all, clean it up, press-ready figures
     """
