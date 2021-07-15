@@ -29,7 +29,6 @@ def gt_blast_period_center(time_center_s: np.ndarray,
     :return: numpy array with GT blast pulse
     """
     # With the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
     time_pos_s = pseudo_period_s/4.
     tau = time_center_s/time_pos_s + 1.
     # Initialize GT
@@ -53,7 +52,6 @@ def gt_hilbert_blast_period_center(time_center_s: np.ndarray,
     :return: numpy array with Hilbert transform of the GT blast pulse
     """
     # With the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
     time_pos_s = pseudo_period_s/4.
     tau = time_center_s/time_pos_s + 1.
     a = 1 + np.sqrt(6)
@@ -168,7 +166,6 @@ def gt_blast_derivative_period_center(time_center_s: np.ndarray,
     """
     # Garces (2019) ground truth GT blast pulse
     # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
     time_pos_s = pseudo_period_s/4.
     tau = time_center_s/time_pos_s + 1.
     # Initialize GT
@@ -193,7 +190,6 @@ def gt_blast_integral_period_center(time_center_s: np.ndarray,
     """
     # Garces (2019) ground truth GT blast pulse
     # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
     time_pos_s = pseudo_period_s/4.
     tau = time_center_s/time_pos_s + 1.
     # Initialize GT

@@ -1,3 +1,7 @@
+"""
+This module calculates spectra: STFT, FFT, CQT
+"""
+
 import numpy as np
 import scipy.signal as signal
 import librosa

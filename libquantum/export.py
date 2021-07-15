@@ -21,8 +21,7 @@ def print_scales_to_screen(scale_order_input: float,
     :return: plot to screen
     """
 
-    scale_order, scale_base, scale_band_number, \
-    scale_ref, scale_center_algebraic, scale_center_geometric, \
+    scale_order, scale_base, scale_band_number, scale_ref, scale_center_algebraic, scale_center_geometric, \
     scale_start, scale_end = \
         scales.band_periods_nyquist(scale_order_input, scale_base_input,
                                     scale_ref_input,
@@ -52,9 +51,8 @@ def print_frequencies_to_screen(frequency_order_input: float,
     :param frequency_sample_rate_input: sample rate
     :return: plot to screen
     """
-    frequency_order, frequency_base, frequency_band_number, \
-    frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
-    frequency_start, frequency_end = \
+    frequency_order, frequency_base, frequency_band_number, frequency_ref, frequency_center_algebraic, \
+    frequency_center_geometric, frequency_start, frequency_end = \
         scales.band_frequencies_nyquist(frequency_order_input, frequency_base_input,
                                         frequency_ref_input,
                                         frequency_low_input, frequency_sample_rate_input)

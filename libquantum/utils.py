@@ -252,6 +252,7 @@ def log2epsilon_max(x: np.ndarray) -> float:
 Picker modules
 """
 
+
 def picker_signal_max_index(sig: np.array,
                             sig_sample_rate_hz: float,
                             bits_pick: float,

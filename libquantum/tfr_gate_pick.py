@@ -3,12 +3,13 @@ This module contains functions for frequency picking
 """
 
 import numpy as np
+from typing import Tuple, Union
 
 
 def submesh_from_passband(tfr_mesh_2d: np.ndarray,
                           frequency_1d: np.ndarray,
                           frequency_min: float,
-                          frequency_max: float):
+                          frequency_max: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Extracts only the coefficients in the passband of interest
 
@@ -30,7 +31,7 @@ def double_submesh_from_passband(tfr1_mesh_2d: np.ndarray,
                                  tfr2_mesh_2d: np.ndarray,
                                  frequency_1d: np.ndarray,
                                  frequency_min: float,
-                                 frequency_max: float):
+                                 frequency_max: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Extracts only the coefficients in the passband of interest for two np.ndarray mesh
 
@@ -53,7 +54,8 @@ def double_submesh_from_passband(tfr1_mesh_2d: np.ndarray,
 def mesh_peaks_from_passband(mesh_2d: np.ndarray,
                              frequency_1d: np.ndarray,
                              frequency_min: float,
-                             frequency_max: float):
+                             frequency_max: float) -> Tuple[Union[np.ndarray, int, float, complex], np.ndarray,
+                                                            np.ndarray]:
     """
     Find frequency peaks in the passband of interest for mesh
 
@@ -79,7 +81,8 @@ def mesh_peaks_from_passband(mesh_2d: np.ndarray,
 
 
 def mesh_peaks(mesh_2d: np.ndarray,
-               frequency_1d: np.ndarray):
+               frequency_1d: np.ndarray) -> Tuple[Union[np.ndarray, int, float, complex], np.ndarray,
+                                                  np.ndarray]:
     """
     Find frequency peaks in mesh
 
@@ -122,7 +125,7 @@ def peak_mask(tfr_1d: np.array,
 
 def mesh_mask(tfr_2d: np.array,
               tfr_1d_min: float,
-              tfr_1d_max: float):
+              tfr_1d_max: float) -> np.ndarray:
     """
     Uses the mighty np.ma framework, best for matrix-specific transforms
 
@@ -140,5 +143,3 @@ def mesh_mask(tfr_2d: np.array,
                        tfr_2d_masked)
 
     return tfr_2d_masked
-
-

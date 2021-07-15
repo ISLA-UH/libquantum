@@ -278,7 +278,6 @@ def band_intervals_periods(scale_order_input: float,
     # Check for compliance with ISO3 and/or ANSI S1.11 and for scale_order = 1, 3, 6, 12, and 24
     if scale_base == Slice.G3:
         pass
-        # print('Specified Base G3 = 10.**(3./10.) Meets ISO3 Preferred Series')
     elif scale_base == Slice.G2:
         pass
     elif scale_base < 1.:
@@ -293,7 +292,6 @@ def band_intervals_periods(scale_order_input: float,
     valid_scale_orders = (0.75, 1, 1.5, 3, 6, 12, 24, 48)
     if scale_order in valid_scale_orders:
         pass
-        # print('Specified Order = ' + repr(scale_order) + ' Meets ISO3 Preferred Series')
     elif scale_order < 0.75:
         print('Order must be greater than 0.75. Overriding to Order 1')
         scale_order = 1
@@ -365,7 +363,6 @@ def wavelet_MQ_from_N(band_order_Nth: float) -> Tuple[float, float]:
     :return: float, float
     """
     if band_order_Nth < 0.7:
-        # raise TypeError('N<0.7 specified, using N = {}.'.format(str(3)))
         print('N<0.7 specified, using N = ', 3)
         band_order_Nth = 3.
     order_bandedge = 2 ** (1. / 2. / band_order_Nth)  # kN in Garces 2013
@@ -413,7 +410,6 @@ def wavelet_support(band_order_Nth : float,
     """
     cycles_M, _ = wavelet_MQ_from_N(band_order_Nth)
     scale_frame_T_s = cycles_M / scale_frequency_center_hz   # Lifetime Tn, in seconds, M/fc
-    # scale_lifetime_T_horn_s = scale_frame_T_s / (2. * np.pi)  # Lifetime per cycle, M/omega
     scale_atom = frequency_sample_rate_hz*scale_frame_T_s / (2. * np.pi)  # Canonical Gabor atom scale
     nominal_points = np.floor(scale_frame_T_s*frequency_sample_rate_hz)
 
@@ -493,18 +489,14 @@ def cqt_frequency_bands_g2f1(scale_order_input: float,
 
     hann_bandwidth = 1.50018310546875
     _, q_gabor = wavelet_MQ_from_N(order_Nth)
-    # From Librosa/filters: threshold =  freq[-1] * (1 + 0.5 * window_bandwidth(window) / Q)
-    # > frequency_sample_rate_hz / 2.0:
     threshold = frequency_hz_center * (1 + 0.5 * hann_bandwidth / q_gabor)  # > frequency_sample_rate_hz / 2.0:
-    # print('threshold:', threshold)
-    # print(scale_number_bins_0)
+
     # Remember frequency order is inverted because solution is in periods.
     idn = np.argmax(threshold < 0.9*frequency_sample_rate_input/2.0)
     scale_number_bins = int(len(frequency_hz_center[idn:]))
 
     frequency_hz_center_min = np.min(frequency_hz_center)
     cqt_points_hop_min = int(2**(np.floor(scale_number_bins/order_Nth)-1.))
-    # cqt_points_hop_min = int(2**(np.ceil(scale_number_bins/order_Nth)))
     cqt_points_per_seg_max, _, _ = wavelet_support(order_Nth,
                                                    frequency_hz_center_min,
                                                    frequency_sample_rate_input,

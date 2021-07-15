@@ -242,9 +242,6 @@ def doppler_forward(tau_source_s: np.array,
     receiver_velocity_mx_mps = _get_velocity_mps(receiver_speed_mps, receiver_trajectory_m, tau_number_samples,
                                                  receiver_position_vector_initial_xyz_m,
                                                  receiver_position_vector_final_xyz_m)
-
-    # compute range and terms
-
     # Observation time
     return _get_final_vals(tau_mx_s, receiver_velocity_mx_mps, source_velocity_mx_mps, tau_source_s,
                            receiver_position_vector_initial_xyz_m, source_position_vector_initial_xyz_m,
@@ -354,6 +351,6 @@ def image_doppler_inverse(inv_time_receiver_s: np.array,
     image_source_position_vector_final_xyz_m = source_position_vector_final_xyz_m*np.array([1., 1., -1.])
 
     return doppler_inverse(inv_time_receiver_s, signal_speed_mps, source_speed_mps, receiver_speed_mps,
-                                 space_dimensions, image_source_position_vector_initial_xyz_m,
-                                 image_source_position_vector_final_xyz_m, receiver_position_vector_initial_xyz_m,
-                                 receiver_position_vector_final_xyz_m)
+                           space_dimensions, image_source_position_vector_initial_xyz_m,
+                           image_source_position_vector_final_xyz_m, receiver_position_vector_initial_xyz_m,
+                           receiver_position_vector_final_xyz_m)

@@ -5,7 +5,7 @@ This module constructs synthetic signals
 import numpy as np
 import scipy.signal as signal
 from scipy.integrate import cumulative_trapezoid
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 # libquantum modules
 from libquantum import utils, scales, atoms
@@ -293,5 +293,3 @@ def integrate_cumtrapz(timestamps_s: np.ndarray,
                                            y=sensor_wf,
                                            initial=initial_value)
     return integrated_data
-
-

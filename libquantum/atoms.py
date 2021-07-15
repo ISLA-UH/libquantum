@@ -45,8 +45,6 @@ def chirp_complex(band_order_Nth: float,
     p_complex = chirp_p_complex(scale_atom, gamma, index_shift)
     amp_dict_0, amp_dict_1 = chirp_amplitude(scale_atom, gamma, index_shift)
 
-    # time_std = scale_atom/np.sqr(2)
-    # time_std_s = time_std/frequency_sample_rate_hz
     wavelet_gauss = np.exp(-p_complex * xtime_shifted**2)
     wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_M*xtime_shifted/scale_atom)
 
@@ -106,7 +104,6 @@ def chirp_MQG_from_N(band_order_Nth: float,
     :return: cycles M, quality factor Q, gamma
     """
     if band_order_Nth < 0.7:
-        # raise TypeError('N<0.7 specified, using N = {}.'.format(str(3)))
         print('N<0.7 specified, using N = ', 3)
         band_order_Nth = 3.
     order_bandedge = scale_base ** (1. / 2. / band_order_Nth)  # kN in Garces 2013
@@ -321,6 +318,7 @@ def chirp_centered_4cwt(band_order_Nth: float,
     return wavelet_chirp, time_centered_s
 
 
+# TODO MAG: the TODOS in here
 def cwt_chirp_complex(band_order_Nth: float,
                       sig_wf: np.ndarray,
                       frequency_low_hz: float,
@@ -354,7 +352,6 @@ def cwt_chirp_complex(band_order_Nth: float,
         index_shift = 0
 
     # Planck frequency is absolute upper limit
-    # print(frequency_high_hz, frequency_sample_rate_hz/2.)
     if frequency_high_hz > frequency_sample_rate_hz/2.:
         frequency_high_hz = frequency_sample_rate_hz/2.
 
@@ -367,8 +364,6 @@ def cwt_chirp_complex(band_order_Nth: float,
                               index_shift=index_shift,
                               frequency_ref=frequency_ref,
                               scale_base=scale_base)
-
-    # frequency_cwt_hz_plot = np.append(frequency_start, frequency_end[-1])
 
     scale_points = len(frequency_cwt_hz_flipped)
 

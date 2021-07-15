@@ -1,3 +1,6 @@
+"""
+This module contains plotting functions for Time Frequency Representations
+"""
 import enum
 from typing import List, Tuple
 import math
