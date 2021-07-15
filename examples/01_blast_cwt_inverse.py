@@ -1,9 +1,12 @@
+# TODO MAG: clean definitions and then import from libquantum modules
+# TODO MAG: either implement TODOS scattered in code or put them in redvox/issues
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
-import milton.hellborne.hellborne_wavelet as hell
+# import milton.hellborne.hellborne_wavelet as hell
 import scipy.signal as signal
-import analysis_beta.synthetics.synth_beta as synth
+from libquantum import synthetics as synth
+from libquantum import blast_pulse as kaboom
 # Placing it here for later copypaste into main
 EPSILON = np.finfo(np.float128).eps
 
@@ -19,6 +22,7 @@ def just_tile(array1d_in: np.ndarray, shape_out) -> np.ndarray:
 
     return tiled_matrix
 
+
 def white_noise(synth, snr_bits):
     synth_max = np.max(np.abs(synth))
     synth_std = np.std(synth)
@@ -29,6 +33,7 @@ def white_noise(synth, snr_bits):
     synth_noise = np.random.normal(0, std_from_bits, size=synth.size)
     # TODO: Error correction for bandedges
     return synth_noise
+
 
 def cwt_complex(sig, frequency_center_hz, sample_rate_hz, order_Nth):
 
@@ -135,6 +140,7 @@ def noise_snr(cwcoeff, sort_array_complex, sort_threshold):
 
     return snr_power, noise_power
 
+
 def hell_M_from_N(band_order_Nth):
 
     order_bandedge = 2 ** (1. / 2. / band_order_Nth)  # kN in Garces 2013
@@ -143,12 +149,14 @@ def hell_M_from_N(band_order_Nth):
     cycles_M = quality_factor_Q*2*np.sqrt(np.log(2))  # Exact, from -3dB points
     return cycles_M, quality_factor_Q
 
+
 def morl2_reconstruct(band_order_Nth, frequency_center_hz, sample_rate_hz):
 
     cycles_M, quality_factor_Q = hell_M_from_N(band_order_Nth)
     morl2_scale = cycles_M*sample_rate_hz/frequency_center_hz/(2. * np.pi)
     reconstruct = np.pi**0.25/2/np.sqrt(morl2_scale)
     return morl2_scale, reconstruct
+
 
 def inv_morl2_prep(band_order_Nth, time_s, offset_time_s, frequency_center_hz, sample_rate_hz):
 
@@ -157,6 +165,7 @@ def inv_morl2_prep(band_order_Nth, time_s, offset_time_s, frequency_center_hz, s
     xtime_shifted = sample_rate_hz*(time_s-offset_time_s)
 
     return xtime_shifted, morl2_scale, cycles_M, reconstruct
+
 
 def inv_morl2_real(order_Nth, time_s, offset_time_s, frequency_center_hz, cwt_amp_real, sample_rate_hz):
 
@@ -316,8 +325,8 @@ if __name__ == "__main__":
     time_scaled = time_shifted_s*frequency_main_hz
 
     # Select signal
-    sig_gt = hell.gt_blast_period_center(time_shifted_s, pseudo_period_s)
-    sig_gt_hilbert = hell.gt_hilbert_blast_period_center(time_shifted_s, pseudo_period_s)
+    sig_gt = kaboom.gt_blast_period_center(time_shifted_s, pseudo_period_s)
+    sig_gt_hilbert = kaboom.gt_hilbert_blast_period_center(time_shifted_s, pseudo_period_s)
     sig_complex = sig_gt + sig_gt_hilbert*1j
     # Add white noise
     # Variance computed from transient

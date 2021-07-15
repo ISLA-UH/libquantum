@@ -6,7 +6,7 @@ from libquantum import export, scales
 if __name__ == "__main__":
     """
     In this example: Planck band, Scale Period up to Nyquist, Scale Frequency up to Nyquist (G3),
-     Scale Frequency up to Nyquist (G2), and Equal tempered scale re A4 = 440 Hz
+    Scale Frequency up to Nyquist (G2), and Equal tempered scale re A4 = 440 Hz
     """
 
     print('First Planck band, with minimum pseudo-period bandwidth = ', scales.Slice.T0S)
@@ -14,8 +14,6 @@ if __name__ == "__main__":
         planck_center, planck_low, planck_high, quality_Q = scales.planck_scale_s(scale_order)
         print('\nOrder_N:', scale_order)
         print('Number of Oscillations, Q:', quality_Q)
-        # print('%1s%12s%12s' % ('Scaled Center', 'Lower', 'Upper'))
-        # print('%12.4e%12.4e%12.4e' % (planck_center/Slice.T0S, planck_low/Slice.T0S, planck_high/Slice.T0S))
         print('%1s%12s%12s' % ('Time_s Center', 'Lower', 'Upper'))
         print('%12.4e%12.4e%12.4e' % (planck_center, planck_low, planck_high))
         print('Scaled bandwidth:', (planck_high-planck_low)/scales.Slice.T0S)

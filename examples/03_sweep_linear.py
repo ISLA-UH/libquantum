@@ -8,6 +8,7 @@ import libquantum.plot_templates.plot_time_frequency_reps as pltq
 
 if __name__ == "__main__":
     # TODO MAG: change description to explicitly explain what the code does
+    # TODO MAG: make input dir obvious so that poeple know what they need to change to make it run
     """
     # The primary goal of standardization is to permit multimodal sensor analysis for different sample rates
     # For a specified signal duration, there is only one key parameter: Order
