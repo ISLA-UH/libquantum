@@ -1,6 +1,7 @@
 """
 This module facilitates the rapid construction of the GT blast pulse synthetic,
 its integral and derivatives, and its spectrum
+References:
 - Garcés, M. A. (2019). Explosion Source Models,
 Chapter in Infrasound Monitoring for Atmospheric Studies,
 Second Edition, Springer, Switzerland, DOI 10.1007/978-3-319-75140_5, p. 273-345.
@@ -10,22 +11,22 @@ Seism. Res. Lett.
 - Kim, K, A. R. Rodgers, M. A. Garces, and S. C. Myers (2021).
 Empirical Acoustic Source Model for Chemical Explosions in Air.
 Bulletin of the Seismological Society of America
-
 """
 
 import numpy as np
-from typing import Optional
+from typing import Optional, Tuple, Union
 from libquantum.synthetics import white_noise_fbits, antialias_halfNyquist
 from libquantum.scales import EPSILON
 
 
-def gt_blast_period_center(time_center_s, pseudo_period_s):
+def gt_blast_period_center(time_center_s: np.ndarray,
+                           pseudo_period_s: float) -> np.ndarray:
     """
     GT blast pulse
 
-    :param time_center_s:
-    :param pseudo_period_s:
-    :return:
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy array with GT blast pulse
     """
     # With the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
     # time_start = time_zero - time_pos
@@ -42,13 +43,14 @@ def gt_blast_period_center(time_center_s, pseudo_period_s):
     return p_GT
 
 
-def gt_hilbert_blast_period_center(time_center_s, pseudo_period_s):
+def gt_hilbert_blast_period_center(time_center_s: np.ndarray,
+                                   pseudo_period_s: float) -> np.ndarray:
     """
     Hilbert transform of the GT blast pulse
 
-    :param time_center_s:
-    :param pseudo_period_s:
-    :return:
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy array with Hilbert transform of the GT blast pulse
     """
     # With the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
     # time_start = time_zero - time_pos
@@ -74,7 +76,7 @@ def gt_hilbert_blast_period_center(time_center_s, pseudo_period_s):
 
 def gt_blast_center_fast(frequency_peak_hz: float = 6.3,
                          sample_rate_hz: float = 100.,
-                         noise_std_loss_bits: float = 16):
+                         noise_std_loss_bits: float = 16) -> Tuple[np.ndarray, np.ndarray]:
     """
     Fast computation of GT pulse with noise
 
@@ -100,7 +102,7 @@ def gt_blast_center_fast(frequency_peak_hz: float = 6.3,
 def gt_blast_center_noise(duration_s: float = 16,
                           frequency_peak_hz: float = 6.3,
                           sample_rate_hz: float = 100,
-                          noise_std_loss_bits: float = 16):
+                          noise_std_loss_bits: float = 16) -> Tuple[np.ndarray, np.ndarray]:
     """
     Fast computation of GT pulse with noise for a specified duration in seconds
 
@@ -124,16 +126,16 @@ def gt_blast_center_noise(duration_s: float = 16,
 
 def gt_blast_center_noise_uneven(sensor_epoch_s: np.array,
                                  noise_std_loss_bits: float = 2,
-                                 frequency_center_hz: Optional[float] = None):
+                                 frequency_center_hz: Optional[float] = None) -> np.ndarray:
     """
     Construct the GT explosion pulse of Garces (2019) for even or uneven sensor time
     in Gaussion noise with SNR in bits re signal STD.
     This is a very flexible variation.
 
-    :param sensor_epoch_s:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
+    :param sensor_epoch_s: array with timestamps for signal in epoch seconds
+    :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 2
+    :param frequency_center_hz: center frequency in Hz. Optional
+    :return: numpy array with anti-aliased GT explosion pulse with Gaussian noise
     """
 
     time_duration_s = sensor_epoch_s[-1]-sensor_epoch_s[0]
@@ -155,13 +157,14 @@ def gt_blast_center_noise_uneven(sensor_epoch_s: np.array,
 
 
 # Integrals and derivatives, with delta function estimate and discontinuity boundary conditions
-def gt_blast_derivative_period_center(time_center_s, pseudo_period_s):
+def gt_blast_derivative_period_center(time_center_s: np.ndarray,
+                                      pseudo_period_s: float) -> np.ndarray:
     """
     Derivative of the GT blast with delta function approximation
 
-    :param time_center_s:
-    :param pseudo_period_s:
-    :return:
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy ndarray with derivative of the GT blast with delta function approximation
     """
     # Garces (2019) ground truth GT blast pulse
     # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
@@ -179,13 +182,14 @@ def gt_blast_derivative_period_center(time_center_s, pseudo_period_s):
     return p_GTd
 
 
-def gt_blast_integral_period_center(time_center_s, pseudo_period_s):
+def gt_blast_integral_period_center(time_center_s: np.ndarray,
+                                    pseudo_period_s: float) -> np.ndarray:
     """
     Integral of the GT blast with initial condition at zero crossing
 
-    :param time_center_s:
-    :param pseudo_period_s:
-    :return:
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy ndarray with integral of GT blast pulse
     """
     # Garces (2019) ground truth GT blast pulse
     # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
@@ -209,13 +213,15 @@ def gt_blast_integral_period_center(time_center_s, pseudo_period_s):
     return p_GTi
 
 
-def gt_blast_center_integral_and_derivative(frequency_peak_hz, sample_rate_hz):
+def gt_blast_center_integral_and_derivative(frequency_peak_hz,
+                                            sample_rate_hz: float) -> Tuple[float, np.ndarray, np.ndarray, np.ndarray]:
     """
     Integral and derivative of GT pulse relative to tau (NOT time_s)
 
-    :param frequency_peak_hz:
-    :param sample_rate_hz:
-    :return:
+    :param frequency_peak_hz: peak frequency in Hz
+    :param sample_rate_hz: sample rate in Hz
+    :return: tau center, numpy ndarray with GT blast pulse, numpy ndarray with integral of GT blast pulse, numpy array
+        with derivative of GT blast pulse
     """
 
     duration_s = 2/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
@@ -235,13 +241,14 @@ def gt_blast_center_integral_and_derivative(frequency_peak_hz, sample_rate_hz):
     return tau_center, sig_gt, sig_gt_i, sig_gt_d
 
 
-def gt_blast_ft(frequency_peak_hz, frequency_hz):
+def gt_blast_ft(frequency_peak_hz: float,
+                frequency_hz: Union[float, np.ndarray]) -> Union[float, complex, np.ndarray]:
     """
     Fourier transform of the GT blast pulse
 
-    :param frequency_peak_hz:
-    :param frequency_hz:
-    :return:
+    :param frequency_peak_hz: peak frequency in Hz
+    :param frequency_hz: frequency in Hz, float or np.ndarray
+    :return: Fourier transform of the GT blast pulse
     """
     w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
     ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
@@ -252,16 +259,16 @@ def gt_blast_ft(frequency_peak_hz, frequency_hz):
     return ft_G17
 
 
-def gt_blast_spectral_density(frequency_peak_hz, frequency_hz):
+def gt_blast_spectral_density(frequency_peak_hz: float,
+                              frequency_hz: Union[float, np.ndarray]) -> Tuple[Union[float, np.ndarray], float]:
     """
     Spectral density of the GT blast pulse
 
-    :param frequency_peak_hz:
-    :param frequency_hz:
-    :return:
+    :param frequency_peak_hz: peak frequency in Hz
+    :param frequency_hz: frequency in Hz, float or np.ndarray
+    :return: spectral_density, spectral_density_peak
     """
     fourier_tx = gt_blast_ft(frequency_peak_hz, frequency_hz)
     spectral_density = 2*np.abs(fourier_tx*np.conj(fourier_tx))
     spectral_density_peak = np.max(spectral_density)
-    # Theoretical spectral_density_peak = np.pi/(2*np.pi*frequency_center_hz)
     return spectral_density, spectral_density_peak

@@ -1,31 +1,30 @@
 """
 This module constructs synthetic signals
-Last updated: 8 July 2021
 """
 
 import numpy as np
 import scipy.signal as signal
 from scipy.integrate import cumulative_trapezoid
-from typing import Optional
+from typing import Optional, Tuple, Union
+
+# libquantum modules
 from libquantum import utils, scales, atoms
-from libquantum.scales import EPSILON
 
 
-# Synthetics for rdvxm testing
 def gabor_tight_grain(band_order_Nth: float,
                       scale_frequency_center_hz: float,
                       frequency_sample_rate_hz: float,
                       index_shift: float = 0,
-                      frequency_base_input: float = scales.Slice.G2):
+                      frequency_base_input: float = scales.Slice.G2) -> np.ndarray:
     """
     Gabor grain with tight Tukey wrap to ensure zero at edges
 
-    :param band_order_Nth:
-    :param scale_frequency_center_hz:
-    :param frequency_sample_rate_hz:
-    :param index_shift:
-    :param frequency_base_input:
-    :return:
+    :param band_order_Nth: Nth order of constant Q bands
+    :param scale_frequency_center_hz: center frequency fc in Hz
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param index_shift: index of shift
+    :param frequency_base_input: G2 or G3. Default is G2
+    :return: numpy array with Tukey grain
     """
 
     # Fundamental chirp parameters
@@ -51,18 +50,20 @@ def gabor_tight_grain(band_order_Nth: float,
 def tukey_tight_grain(band_order_Nth: float,
                       scale_frequency_center_hz: float,
                       frequency_sample_rate_hz: float,
-                      fraction_cosine: float=0.5,
+                      fraction_cosine: float = 0.5,
                       index_shift: float = 0,
-                      frequency_base_input: float = scales.Slice.G2):
+                      frequency_base_input: float = scales.Slice.G2) -> np.ndarray:
     """
     Tukey grain with same support as Gabor atom
 
-    :param band_order_Nth:
-    :param scale_frequency_center_hz:
-    :param frequency_sample_rate_hz:
-    :param index_shift:
-    :param frequency_base_input:
-    :return:
+    :param band_order_Nth: Nth order of constant Q bands
+    :param scale_frequency_center_hz: center frequency fc in Hz
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail.
+        Default is 0.5
+    :param index_shift: index of shift
+    :param frequency_base_input: G2 or G3. Default is G2
+    :return: numpy array with Tukey grain
     """
 
     # Fundamental chirp parameters
@@ -91,17 +92,17 @@ def gabor_grain_frequencies(frequency_order_input: float,
                             frequency_high_input: float,
                             frequency_sample_rate_input: float,
                             frequency_base_input: float = scales.Slice.G2,
-                            frequency_ref_input: float = 1.0) -> (np.ndarray, np.ndarray):
+                            frequency_ref_input: float = 1.0) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Frequencies for g-chirps
 
-    :param frequency_order_input:
-    :param frequency_low_input:
-    :param frequency_high_input:
-    :param frequency_sample_rate_input:
-    :param frequency_base_input:
-    :param frequency_ref_input:
-    :return:
+    :param frequency_order_input: Nth order
+    :param frequency_low_input: lowest frequency of interest
+    :param frequency_high_input: highest frequency of interest
+    :param frequency_sample_rate_input: sample rate
+    :param frequency_base_input: G2 or G3. Default is G2
+    :param frequency_ref_input: reference frequency. Default is 1.0
+    :return: three numpy arrays with center frequency, start frequency and end frequency
     """
 
     scale_order, scale_base, _, frequency_ref, frequency_center_algebraic, \
@@ -115,16 +116,18 @@ def gabor_grain_frequencies(frequency_order_input: float,
     return frequency_center, frequency_start, frequency_end
 
 
-def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
-                            noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+def chirp_rdvxm_noise_16bit(duration_points: int = 2**12,
+                            sample_rate_hz: float = 80.,
+                            noise_std_loss_bits: float = 4.,
+                            frequency_center_hz: Optional[float] = None):
     """
+    Construct chirp with linear frequency sweep, white noise added, anti-aliased filter applied
 
-
-    :param duration_points:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
+    :param duration_points: number of points, length of signal. Default is 2 ** 12
+    :param sample_rate_hz: sample rate in Hz. Default is 80.0
+    :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+    :param frequency_center_hz: center frequency fc in Hz. Optional
+    :return: numpy ndarray with anti-aliased chirp with white noise
     """
 
     duration_s = duration_points/sample_rate_hz
@@ -148,16 +151,18 @@ def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float 
     return chirp_white_aa
 
 
-def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
-                               noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12,
+                               sample_rate_hz: float = 80.,
+                               noise_std_loss_bits: float = 4.,
+                               frequency_center_hz: Optional[float] = None) -> np.ndarray:
     """
+    Construct a anti-aliased sawtooth waveform with white noise
 
-
-    :param duration_points:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
+    :param duration_points: number of points, length of signal. Default is 2 ** 12
+    :param sample_rate_hz: sample rate in Hz. Default is 80.0
+    :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+    :param frequency_center_hz: center frequency fc in Hz. Optional
+    :return: numpy ndarray with anti-aliased sawtooth signal with white noise
     """
 
     duration_s = duration_points/sample_rate_hz
@@ -178,20 +183,24 @@ def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: flo
     return saw_white_aa
 
 
-def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
-                          frequency_start_hz, frequency_end_hz,
-                          intro_s, outro_s,):
+def chirp_linear_in_noise(snr_bits: float,
+                          sample_rate_hz: float,
+                          duration_s: float,
+                          frequency_start_hz: float,
+                          frequency_end_hz: float,
+                          intro_s: int,
+                          outro_s: int) -> Tuple[np.ndarray, np.ndarray]:
     """
+    Construct chirp with linear frequency sweep, white noise added.
 
-
-    :param snr_bits:
-    :param sample_rate_hz:
-    :param duration_s:
-    :param frequency_start_hz:
-    :param frequency_end_hz:
-    :param intro_s:
-    :param outro_s:
-    :return:
+    :param snr_bits: number of bits below signal standard deviation
+    :param sample_rate_hz: sample rate in Hz
+    :param duration_s: duration of chirp in seconds
+    :param frequency_start_hz: start frequency in Hz
+    :param frequency_end_hz: end frequency in Hz
+    :param intro_s: number of seconds before chirp
+    :param outro_s: number of seconds after chirp
+    :return: numpy ndarray with waveform, numpy ndarray with time in seconds
     """
 
     sig_time_s = np.arange(int(sample_rate_hz*duration_s))/sample_rate_hz
@@ -207,7 +216,8 @@ def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
     return synth_wf, synth_time_s
 
 
-def white_noise_fbits(sig: np.ndarray, std_bit_loss: float) -> np.ndarray:
+def white_noise_fbits(sig: np.ndarray,
+                      std_bit_loss: float) -> np.ndarray:
     """
     Compute white noise with zero mean and standard deviation that is snr_bits below the input signal
 
@@ -224,7 +234,8 @@ def white_noise_fbits(sig: np.ndarray, std_bit_loss: float) -> np.ndarray:
     return sig_noise
 
 
-def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -> np.ndarray:
+def taper_tukey(sig_or_time: np.ndarray,
+                fraction_cosine: float) -> np.ndarray:
     """
     Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
     fraction_cosine = 0 is a rectangular window, 1 is a Hann window
@@ -234,16 +245,16 @@ def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -> np.ndarray:
     :return: tukey taper window amplitude
     """
     number_points = np.size(sig_or_time)
-    amplitude = signal.tukey(M=number_points, alpha=fraction_cosine, sym=True)
+    amplitude = signal.windows.tukey(M=number_points, alpha=fraction_cosine, sym=True)
     return amplitude
 
 
-def antialias_halfNyquist(synth):
+def antialias_halfNyquist(synth: np.ndarray) -> np.ndarray:
     """
+    Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
 
-
-    :param synth:
-    :return:
+    :param synth: array with signal data
+    :return: numpy array with anti-aliased signal
     """
     # Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
     # Signal frequencies are scaled by Nyquist
@@ -254,7 +265,15 @@ def antialias_halfNyquist(synth):
     return synth_anti_aliased
 
 
-def frequency_algebraic_Nth(frequency_geometric, band_order_Nth):
+def frequency_algebraic_Nth(frequency_geometric: np.ndarray,
+                            band_order_Nth: float) -> np.ndarray:
+    """
+    Compute algebraic frequencies in band order
+
+    :param frequency_geometric: geometric frequencies
+    :param band_order_Nth:  Nth order of constant Q bands
+    :return:
+    """
     frequency_algebra = frequency_geometric*(np.sqrt(1+1/(8*band_order_Nth**2)))
     return frequency_algebra
 
@@ -263,7 +282,7 @@ def integrate_cumtrapz(timestamps_s: np.ndarray,
                        sensor_wf: np.ndarray,
                        initial_value: float = 0) -> np.ndarray:
     """
-    cumulative trapazoid integration using scipy.integrate.cumulative_trapezoid
+    cumulative trapezoid integration using scipy.integrate.cumulative_trapezoid
 
     :param timestamps_s: timestamps corresponding to the data in seconds
     :param sensor_wf: data to integrate using cumulative trapezoid

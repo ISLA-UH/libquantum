@@ -107,9 +107,9 @@ def band_periods_nyquist(scale_order_input: float,
     scale_band_number: numpy ndarray
         Band number n
     scale_center_algebraic: numpy ndarray
-        Algebraic center band scale
+        Algebraic center of band scale
     scale_center_geometric: numpy ndarray
-        Geometric center band scale
+        Geometric center of band scale
     scale_start: numpy ndarray
         Lower band edge scale
     scale_end: numpy ndarray
