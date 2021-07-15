@@ -91,7 +91,7 @@ def inv_morlet2_imag(band_order_Nth: float,
     """
     Inverse part of the inverse Morlet
 
-    :param band_order_Nth:
+    :param band_order_Nth: Nth order of constant Q bands
     :param time_s: time in seconds
     :param offset_time_s: offset time in seconds, should be between min and max of time_s
     :param scale_frequency_center_hz: center frequency fc in Hz

@@ -235,6 +235,7 @@ def fft_real_dB(sig: np.ndarray,
                 sample_interval_s: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     FFT, real frequencies only, magnitude in dB
+
     :param sig: array with input signal
     :param sample_interval_s: sample interval in seconds
     :return: four numpy ndarrays with fft_frequency_pos, fft_sig_pos, fft_spectral_power_pos_dB,
