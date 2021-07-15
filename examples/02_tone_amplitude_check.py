@@ -1,8 +1,10 @@
+"""
+libquantum example 2: 02_tone_amplitude_check.py
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from libquantum import atoms, entropy, scales, spectra, utils, synthetics
 import libquantum.plot_templates.plot_time_frequency_reps as pltq
-
 import libwwz
 
 if __name__ == "__main__":
@@ -27,16 +29,14 @@ if __name__ == "__main__":
     mic_sig = np.sin(2*np.pi*sig_frequency_hz*mic_sig_epoch_s)
     mic_sig += synthetics.white_noise_fbits(sig=mic_sig, std_bit_loss=4.)
 
-    # Taper
-    mic_sig *= utils.taper_tukey(mic_sig_epoch_s, fraction_cosine=0.1)
-    # Antialias filter synthetic
-    synthetics.antialias_halfNyquist(mic_sig)
+    mic_sig *= utils.taper_tukey(mic_sig_epoch_s, fraction_cosine=0.1)  # add taper
+    synthetics.antialias_halfNyquist(mic_sig)  # Antialias filter synthetic
 
     # Frame to mic start and end and plot
     event_reference_time_epoch_s = mic_sig_epoch_s[0]
-    # print('\nExtraction start time for mic: ', event_reference_time_epoch_s)
 
-    max_time_s, min_frequency_hz = scales.from_duration(order_number_input, sig_duration_s)
+    max_time_s, min_frequency_hz = scales.from_duration(band_order_Nth=order_number_input,
+                                                        sig_duration_s=sig_duration_s)
     print('\nRequest Order N=', order_number_input)
     print('Lowest frequency in hz that can support this order for this signal duration is ', min_frequency_hz)
     print('Scale with signal duration and to Nyquist, default G2 base re F1')
@@ -46,14 +46,14 @@ if __name__ == "__main__":
     fmax = 400
 
     # TFR SECTION
-    # This could be placed in a loop
     # Compute complex wavelet transform (cwt) from signal duration
     mic_cwt, mic_cwt_bits, mic_cwt_time_s, mic_cwt_frequency_hz = \
         atoms.cwt_chirp_from_sig(sig_wf=mic_sig,
                                  frequency_sample_rate_hz=mic_sig_sample_rate_hz,
                                  band_order_Nth=order_number_input,
                                  dictionary_type="tone")
-    mic_cwt_snr, mic_cwt_snr_bits, mic_cwt_snr_entropy = entropy.snr_mean_max(mic_cwt)
+
+    mic_cwt_snr, mic_cwt_snr_bits, mic_cwt_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_cwt)
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=mic_sig,
                                 wf_panel_2_time=mic_sig_epoch_s,
@@ -76,7 +76,8 @@ if __name__ == "__main__":
                              frequency_sample_rate_hz=mic_sig_sample_rate_hz,
                              band_order_Nth=order_number_input,
                              dictionary_type="tone")
-    mic_cqt_snr, mic_cqt_snr_bits, mic_cqt_snr_entropy = entropy.snr_mean_max(mic_cqt)
+
+    mic_cqt_snr, mic_cqt_snr_bits, mic_cqt_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_cqt)
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=mic_sig,
                                 wf_panel_2_time=mic_sig_epoch_s,
@@ -93,14 +94,14 @@ if __name__ == "__main__":
                                 frequency_hz_ymax=fmax)
 
     # Compute constant Q transform (CQT) from segmented signal duration using Gaussian window
-    # TODO: Verify the math
     mic_cqtg, mic_cqtg_bits, mic_cqt_time_s, mic_cqt_frequency_hz = \
         spectra.cqt_from_sig(sig_wf=mic_sig,
                              frequency_sample_rate_hz=mic_sig_sample_rate_hz,
                              band_order_Nth=order_number_input,
                              cqt_window="cqt_gauss",
                              dictionary_type="tone")
-    mic_cqtg_snr, mic_cqtg_snr_bits, mic_cqtg_snr_entropy = entropy.snr_mean_max(mic_cqt)
+
+    mic_cqtg_snr, mic_cqtg_snr_bits, mic_cqtg_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_cqt)
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=mic_sig,
                                 wf_panel_2_time=mic_sig_epoch_s,
@@ -121,7 +122,9 @@ if __name__ == "__main__":
         spectra.stft_from_sig(sig_wf=mic_sig,
                               frequency_sample_rate_hz=mic_sig_sample_rate_hz,
                               band_order_Nth=order_number_input)
-    mic_stft_snr, mic_stft_snr_bits, mic_stft_snr_entropy = entropy.snr_mean_max(mic_stft)
+
+    mic_stft_snr, mic_stft_snr_bits, mic_stft_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_stft)
+
     # Log frequency is the default
     pltq.plot_wf_mesh_mesh_vert(frequency_scaling="log",
                                 redvox_id=station_id_str,
@@ -138,6 +141,7 @@ if __name__ == "__main__":
                                 figure_title="STFT for " + EVENT_NAME,
                                 frequency_hz_ymin=fmin,
                                 frequency_hz_ymax=fmax)
+
     # Linear frequency scale must be specified
     pltq.plot_wf_mesh_mesh_vert(frequency_scaling="linear",
                                 redvox_id=station_id_str,
@@ -156,8 +160,6 @@ if __name__ == "__main__":
                                 frequency_hz_ymax=fmax)
 
     # Compute the WWZ
-    # TODO: Should this be the signal frequency?
-    # freq_target = sig_frequency_hz  # This bombs
     freq_target = scales.Slice.F1
     freq_low = mic_cqt_frequency_hz.min()
     freq_high = mic_cqt_frequency_hz.max()
@@ -179,7 +181,7 @@ if __name__ == "__main__":
 
     mic_wwz = wwz[3].T
     mic_wwz_bits = utils.log2epsilon(mic_wwz)
-    mic_wwz_snr, mic_wwz_snr_bits, mic_wwz_snr_entropy = entropy.snr_mean_max(mic_wwz)
+    mic_wwz_snr, mic_wwz_snr_bits, mic_wwz_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_wwz)
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=mic_sig,
                                 wf_panel_2_time=mic_sig_epoch_s,

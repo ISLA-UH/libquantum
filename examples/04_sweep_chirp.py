@@ -1,3 +1,7 @@
+"""
+libquantum example 4: 04_sweep_chirp.py
+"""
+
 import os
 import numpy as np
 import scipy.io.wavfile
@@ -24,14 +28,13 @@ if __name__ == "__main__":
     glide_direction = -1
     # glide_direction = -1.5
 
-    #grain_type_str = 'tukey'
-    grain_type_str = 'gauss'
+    grain_type_str = 'gauss'  # 'tukey' or 'gauss'
 
     EVENT_NAME = "q-glide_aud800_N" + str(order_number_input)
     print("Event Name: " + EVENT_NAME)
     wav_filename = EVENT_NAME
 
-    do_save_wave = True
+    do_save_wave = False
     do_reassignment = False
     input_directory = "/Users/mgarces/Documents/DATA_API_M/synthetics"
     output_wav_directory = os.path.join(input_directory, "wav")
@@ -98,10 +101,6 @@ if __name__ == "__main__":
 
     # Add head and tail
     sig_wf_red = np.concatenate([np.zeros(head_points), sig_wf_red, np.zeros(head_points)])
-    #
-    # # Add noise
-    # noise_wf = synthetics.white_noise_fbits(sig=sig_wf_red, std_bit_loss=8)
-    # sig_wf_red = sig_wf_red + noise_wf
 
     sig_time_s = np.arange(len(sig_wf_red))/sig_wf_sample_rate_hz
     sig_duration_s = np.max(sig_time_s)
@@ -114,7 +113,7 @@ if __name__ == "__main__":
     sig_wf = np.copy(np.imag(sig_wf_red))
 
     # Antialias filter synthetic
-    synthetics.antialias_halfNyquist(sig_wf)
+    synthetics.antialias_halfNyquist(synth=sig_wf)
 
     # Export to wav directory
     if do_save_wave:
@@ -125,10 +124,10 @@ if __name__ == "__main__":
 
     # Frame to mic start and end and plot
     event_reference_time_epoch_s = sig_wf_epoch_s[0]
-    # print('\nExtraction start time for mic: ', event_reference_time_epoch_s)
 
     # The min_frequency_hz is needed for STFT
-    max_time_s, min_frequency_hz = scales.from_duration(order_number_input, sig_duration_s)
+    max_time_s, min_frequency_hz = scales.from_duration(band_order_Nth=order_number_input,
+                                                        sig_duration_s=sig_duration_s)
     print('\nRequest Order N=', order_number_input)
     print('Sweep duration, s:', sig_duration_s)
     print('Lowest frequency in hz that can support this order for this signal duration is ', min_frequency_hz)
@@ -154,7 +153,7 @@ if __name__ == "__main__":
                                 dictionary_type="tone",
                                 index_shift=glide_direction)
 
-    mic_cwt_snr, mic_cwt_snr_bits, mic_cwt_snr_entropy = entropy.snr_mean_max(mic_cwt)
+    mic_cwt_snr, mic_cwt_snr_bits, mic_cwt_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_cwt)
 
     print('Highest computed CWT center frequency, Hz:', np.max(mic_cwt_frequency_hz))
     print('Lowest  computed CWT center frequency, Hz:', np.min(mic_cwt_frequency_hz))
@@ -171,7 +170,7 @@ if __name__ == "__main__":
                                 dictionary_type="tone",
                                 index_shift=0)
 
-    mic_cwt_snr0, mic_cwt_snr_bits0, mic_cwt_snr_entropy0 = entropy.snr_mean_max(mic_cwt0)
+    mic_cwt_snr0, mic_cwt_snr_bits0, mic_cwt_snr_entropy0 = entropy.snr_mean_max(tfr_coeff_complex=mic_cwt0)
 
     print("Blueshift CWT")
     mic_cwt1, mic_cwt_bits1, mic_cwt_time_s1, mic_cwt_frequency_hz1 = \
@@ -185,7 +184,7 @@ if __name__ == "__main__":
                                 dictionary_type="tone",
                                 index_shift=-glide_direction)
 
-    mic_cwt_snr1, mic_cwt_snr_bits1, mic_cwt_snr_entropy1 = entropy.snr_mean_max(mic_cwt1)
+    mic_cwt_snr1, mic_cwt_snr_bits1, mic_cwt_snr_entropy1 = entropy.snr_mean_max(tfr_coeff_complex=mic_cwt1)
 
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=sig_wf,
@@ -250,7 +249,7 @@ if __name__ == "__main__":
         spectra.stft_from_sig(sig_wf=sig_wf,
                               frequency_sample_rate_hz=sig_wf_sample_rate_hz,
                               band_order_Nth=order_number_input)
-    mic_stft_snr, mic_stft_snr_bits, mic_stft_snr_entropy = entropy.snr_mean_max(mic_stft)
+    mic_stft_snr, mic_stft_snr_bits, mic_stft_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_stft)
 
     # Plot STFT
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
@@ -276,7 +275,9 @@ if __name__ == "__main__":
             spectra.stft_reassign_from_sig(sig_wf=sig_wf,
                                            frequency_sample_rate_hz=sig_wf_sample_rate_hz,
                                            band_order_Nth=order_number_input)
-        mic_stft_rsg_snr, mic_stft_rsg_snr_bits, mic_stft_rsg_snr_entropy = entropy.snr_mean_max(mic_stft_rsg)
+
+        mic_stft_rsg_snr, mic_stft_rsg_snr_bits, mic_stft_rsg_snr_entropy = \
+            entropy.snr_mean_max(tfr_coeff_complex=mic_stft_rsg)
 
         pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                     wf_panel_2_sig=sig_wf,

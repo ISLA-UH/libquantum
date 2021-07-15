@@ -1,38 +1,18 @@
-# TODO MAG: clean definitions and then import from libquantum modules
-# TODO MAG: either implement TODOS scattered in code or put them in redvox/issues
+"""
+libquantum example 1: 01_blast_cwt_inverse.py
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
-# import milton.hellborne.hellborne_wavelet as hell
 import scipy.signal as signal
 from libquantum import synthetics as synth
 from libquantum import blast_pulse as kaboom
-# Placing it here for later copypaste into main
-EPSILON = np.finfo(np.float128).eps
+from libquantum import utils
+from libquantum import atoms_inverse as atoms_inv
+from libquantum.scales import EPSILON
 
-
-def just_tile(array1d_in: np.ndarray, shape_out) -> np.ndarray:
-
-    if len(shape_out) == 1:
-        tiled_matrix = np.tile(array1d_in, (shape_out[0]))
-    elif len(shape_out) == 2:
-        tiled_matrix = np.tile(array1d_in, (shape_out[1], 1)).T
-    else:
-        raise TypeError('Cannot handle an array of shape {}.'.format(str(array1d_in.shape)))
-
-    return tiled_matrix
-
-
-def white_noise(synth, snr_bits):
-    synth_max = np.max(np.abs(synth))
-    synth_std = np.std(synth)
-    # TODO: selection criteria for SNR
-    synth_snr_bits = 2.**snr_bits
-    std_from_bits = synth_std/synth_snr_bits
-    # White noise, zero mean
-    synth_noise = np.random.normal(0, std_from_bits, size=synth.size)
-    # TODO: Error correction for bandedges
-    return synth_noise
+# TODO MAG: the function here are no where in libquantum, decide if they should be and if so, where.
+# TODO MAG: either implement TODOS scattered in code or put them in redvox/issues
 
 
 def cwt_complex(sig, frequency_center_hz, sample_rate_hz, order_Nth):
@@ -58,19 +38,6 @@ def cwt_complex(sig, frequency_center_hz, sample_rate_hz, order_Nth):
 
     return cwtm, frequency_hz, frequency_hz_plot, sample_rate_hz, \
            order_Nth, cycles_M, quality_factor_Q
-
-
-def d1tile_x_d2(d1: np.ndarray, d2: np.ndarray) -> np.ndarray:
-    shape_out = d2.shape
-    # create array of repeated values of PSD with dimensions that match those of energy array
-    if len(shape_out) == 1:
-        d1_matrix = np.tile(d1, (shape_out[0]))
-    elif len(shape_out) == 2:
-        d1_matrix = np.tile(d1, (shape_out[1], 1)).T
-    else:
-        raise TypeError('Cannot handle an array of shape {}.'.format(str(d1.shape)))
-    d1_x_d2 = d1_matrix*d2
-    return d1_x_d2
 
 
 def energy_pdf_entropy(cwcoeff_complex):
@@ -150,59 +117,9 @@ def hell_M_from_N(band_order_Nth):
     return cycles_M, quality_factor_Q
 
 
-def morl2_reconstruct(band_order_Nth, frequency_center_hz, sample_rate_hz):
-
-    cycles_M, quality_factor_Q = hell_M_from_N(band_order_Nth)
-    morl2_scale = cycles_M*sample_rate_hz/frequency_center_hz/(2. * np.pi)
-    reconstruct = np.pi**0.25/2/np.sqrt(morl2_scale)
-    return morl2_scale, reconstruct
-
-
-def inv_morl2_prep(band_order_Nth, time_s, offset_time_s, frequency_center_hz, sample_rate_hz):
-
-    cycles_M, quality_factor_Q = hell_M_from_N(band_order_Nth)
-    morl2_scale, reconstruct = morl2_reconstruct(order_Nth, frequency_center_hz, sample_rate_hz)
-    xtime_shifted = sample_rate_hz*(time_s-offset_time_s)
-
-    return xtime_shifted, morl2_scale, cycles_M, reconstruct
-
-
-def inv_morl2_real(order_Nth, time_s, offset_time_s, frequency_center_hz, cwt_amp_real, sample_rate_hz):
-
-    xtime_shifted, xscale, cycles_M, rescale = \
-        inv_morl2_prep(order_Nth, time_s, offset_time_s, frequency_center_hz, sample_rate_hz)
-    wavelet_gauss =  np.exp(-0.5 * (xtime_shifted / xscale) ** 2)
-    wavelet_gabor_real = wavelet_gauss * np.cos(cycles_M*(xtime_shifted / xscale))
-
-    # Rescale to Morlet wavelet and take the conjugate for imag
-    morl2_inv_real = cwt_amp_real*wavelet_gabor_real
-    morl2_inv_real *= rescale
-
-    return morl2_inv_real
-
-
-def inv_morl2_imag(order_Nth, time_s, offset_time_s, frequency_center_hz, cwt_amp_imag, sample_rate_hz):
-    # TODO: Explain why pi/2 shift has to be removed!
-    xtime_shifted, xscale, cycles_M, rescale = \
-        inv_morl2_prep(order_Nth, time_s, offset_time_s, frequency_center_hz, sample_rate_hz)
-
-    wavelet_gauss =  np.exp(-0.5 * (xtime_shifted / xscale) ** 2)
-    wavelet_gabor_imag = wavelet_gauss * np.sin(cycles_M*(xtime_shifted / xscale))
-
-    # Rescale to Morlet wavelet and take the conjugate for imag
-    morl2_inv_imag = -cwt_amp_imag*wavelet_gabor_imag
-    morl2_inv_imag *= rescale
-
-    return morl2_inv_imag
-
-
 # Standalone plots
 def plot_parameters():
     # Aspect ratio of 1920 x 1080 (1080p), 16:9
-    # scale = 1/3 => 640 x 360 (360p)
-    # scale = 2/3 =>  1280 x 720 (720p)
-    # scale = 4/3 =>  2560 x 1440 (1440p)
-    # scale = 2 => 3840 x 2160 (2160p)
     scale = 1.25*1080/8
     figure_size_x = int(1920/scale)
     figure_size_y = int(1080/scale)
@@ -217,7 +134,7 @@ def plot_complex(figure_number, synth_type, title, scaled_time, x_multiplier, y_
 
     figure_size_x, figure_size_y, text_size = plot_parameters()
     # x_multiplier = number of periods
-    figure_name = './figures/'+ synth_type +'.png'
+    figure_name = './figures/' + synth_type + '.png'
     fig = plt.figure(figure_number, figsize=(figure_size_x, figure_size_y))
     ax1 = plt.subplot(121)
     ax1.plot(scaled_time, synth1.real, symbol1, label=label1)
@@ -238,12 +155,10 @@ def plot_complex(figure_number, synth_type, title, scaled_time, x_multiplier, y_
     ax2.grid(True)
     ax2.set_ylim(-y_max, y_max)
     ax2.set_xlim(-x_multiplier, x_multiplier)
-    # ax2.set_xlabel(r'$t/t_{main}$', size = text_size)
     ax2.set_xlabel('Scaled time', size=text_size)
     ax2.tick_params(axis='both', which='both', labelsize=text_size)
     fig.tight_layout()
-    # if save_fig:
-    #     fig.savefig(figure_name, dpi=300)
+
     return fig
 
 
@@ -257,7 +172,6 @@ def plot_wiggles_complex_label(figure_number, xarray, wf_array, wf_label, xlim_m
     wiggle_offset = np.arange(0, wiggle_num)*offset_scaling
     wiggle_yticks = wiggle_offset
     wiggle_yticklabel = wf_label
-    # print(wiggle_yticklabel)
 
     ax1 = plt.subplot(121)
     ax1.set_yticks(wiggle_yticks)
@@ -279,14 +193,12 @@ def plot_wiggles_complex_label(figure_number, xarray, wf_array, wf_label, xlim_m
     ax2 = plt.subplot(122)
     ax2.set_yticks(wiggle_yticks)
     ax2.set_yticklabels([])
-    # ax2.set_yticklabels(wiggle_yticklabel)
-    # ax2.set_yticklabels('{:.2f}'.format(a) for a in wiggle_yticklabel)
     ax2.set_ylim(wiggle_offset[0]-2*offset_scaling, wiggle_offset[-1]+offset_scaling)
     ax2.set_xlim(-xlim_max, xlim_max)
     ax2.tick_params(axis='both', which='both', labelsize=text_size)
 
     for j in np.arange(wiggle_num):
-        if j==0:
+        if j == 0:
             ax2.plot(xarray, wf_array[j, :].imag+wiggle_offset[j], color=y0_color, label=y0_label+', Imag')
         else:
             ax2.plot(xarray, wf_array[j, :].imag+wiggle_offset[j], color=y_color)
@@ -305,7 +217,6 @@ if __name__ == "__main__":
     order_Nth_main = 3
 
     frequency_sample_rate_hz = 200.
-    # frequency_center_hz = frequency_sample_rate_hz/64.
     # Target frequency
     frequency_main_hz = 6.3
     pseudo_period_main_s = 1/frequency_main_hz
@@ -325,30 +236,37 @@ if __name__ == "__main__":
     time_scaled = time_shifted_s*frequency_main_hz
 
     # Select signal
-    sig_gt = kaboom.gt_blast_period_center(time_shifted_s, pseudo_period_s)
-    sig_gt_hilbert = kaboom.gt_hilbert_blast_period_center(time_shifted_s, pseudo_period_s)
+    sig_gt = kaboom.gt_blast_period_center(time_center_s=time_shifted_s,
+                                           pseudo_period_s=pseudo_period_s)
+    sig_gt_hilbert = kaboom.gt_hilbert_blast_period_center(time_center_s=time_shifted_s,
+                                                           pseudo_period_s=pseudo_period_s)
     sig_complex = sig_gt + sig_gt_hilbert*1j
     # Add white noise
     # Variance computed from transient
     bit_loss = 1
-    sig_noise = white_noise(sig_gt, bit_loss)
+    sig_noise = synth.white_noise_fbits(sig=sig_gt,
+                                        std_bit_loss=bit_loss)
     gt_white = sig_gt + sig_noise
     gt_white_hilbert = sig_gt_hilbert + sig_noise
     # AA filter
-    noise = synth.antialias_halfNyquist(sig_noise)
-    sig_n = synth.antialias_halfNyquist(gt_white)
-    sig_n_hilbert = synth.antialias_halfNyquist(gt_white_hilbert)
+    noise = synth.antialias_halfNyquist(synth=sig_noise)
+    sig_n = synth.antialias_halfNyquist(synth=gt_white)
+    sig_n_hilbert = synth.antialias_halfNyquist(synth=gt_white_hilbert)
     # Analytic record
     sig_n_complex = sig_n + sig_n_hilbert*1j
 
     # Compute complex wavelet transform
     cwtm, frequency_hz, frequency_hz_plot, sample_rate_hz, order_Nth, cycles_M, quality_factor_Q = \
-        cwt_complex(sig=sig_n, frequency_center_hz=frequency_sig_hz,
-                    sample_rate_hz=frequency_sample_rate_hz, order_Nth=order_Nth_main)
+        cwt_complex(sig=sig_n,
+                    frequency_center_hz=frequency_sig_hz,
+                    sample_rate_hz=frequency_sample_rate_hz,
+                    order_Nth=order_Nth_main)
     # For noise
     cwtm_noise, fn, sn, sn, Nn, Mn, Qn = \
-        cwt_complex(sig=noise, frequency_center_hz=frequency_sig_hz,
-                    sample_rate_hz=frequency_sample_rate_hz, order_Nth=order_Nth_main)
+        cwt_complex(sig=noise,
+                    frequency_center_hz=frequency_sig_hz,
+                    sample_rate_hz=frequency_sample_rate_hz,
+                    order_Nth=order_Nth_main)
 
     frequency_scaled = frequency_hz/frequency_main_hz
 
@@ -357,13 +275,13 @@ if __name__ == "__main__":
     print('CWT shape:', cwtm.shape)
     # Keep tabs on center frequency
     index_frequency_center = np.argmin(np.abs(frequency_hz-frequency_sig_hz))
-    # Print tuning frequency
-    # print(frequency_hz[index_frequency_center], '{:0.2f}'.format)
 
-    # TODO: One function return
-    morl2_scale, reconstruct = morl2_reconstruct(order_Nth, frequency_hz, frequency_sample_rate_hz)
+    morl2_scale, reconstruct = atoms_inv.morlet2_reconstruct(band_order_Nth=order_Nth,
+                                                             scale_frequency_center_hz=frequency_hz,
+                                                             frequency_sample_rate_hz=frequency_sample_rate_hz)
     # Scaled wavelet coefficients
-    f_x_cwtm = d1tile_x_d2(reconstruct, cwtm)
+    f_x_cwtm = utils.d1tile_x_d2(d1=reconstruct,
+                                 d2=cwtm)
 
     # Reference functions
     sig_inv = np.sum(f_x_cwtm, 0)
@@ -371,17 +289,14 @@ if __name__ == "__main__":
     sig_theory = 1.*sig_complex
     noise_hilbert = signal.hilbert(noise)
 
-    # # Entropy
-    # energy_pdf, entropy_LEE, entropy_SE = energy_pdf_entropy(f_x_cwtm)
-    energy_pdf, entropy_LEE, entropy_SE = energy_pdf_entropy(cwtm)
+    # Entropy
+    energy_pdf, entropy_LEE, entropy_SE = energy_pdf_entropy(cwcoeff_complex=cwtm)
 
     # Compute SNR from noise directly - still oscillates
     # Creates instability due to variability, specifically at low frequencies
     # Real and imaginary part of noise are the same
     # Fast approach, less vulnerable
-    noise_power = np.mean(cwtm_noise.real**2) \
-                  *np.ones(len(frequency_hz)) \
-                  *(1 + 1j)
+    noise_power = np.mean(cwtm_noise.real**2) * np.ones(len(frequency_hz)) * (1 + 1j)
 
     # noise_p2 = np.mean(cwtm_noise.real**2, axis=1) + \
     #            np.mean(cwtm_noise.imag**2, axis=1)*1j
@@ -396,14 +311,14 @@ if __name__ == "__main__":
     # exit()
 
     # TODO: Explain 'Flatten' the noise
-    cwtm_noise_power_tile = just_tile(noise_power.real, cwtm_noise.shape) + \
-                            just_tile(noise_power.imag, cwtm_noise.shape)*1j
+    cwtm_noise_power_tile = utils.just_tile(array1d_in=noise_power.real, shape_out=cwtm_noise.shape) + \
+                            utils.just_tile(array1d_in=noise_power.imag, shape_out=cwtm_noise.shape)*1j
 
     snr = cwtm.real**2/cwtm_noise_power_tile.real + \
           cwtm.imag**2/cwtm_noise_power_tile.imag*1j
 
     # Build a PDF and entropy of the traditional SNR
-    snr_pdf, snr_LEE, snr_SE = snr_pdf_entropy(snr)
+    snr_pdf, snr_LEE, snr_SE = snr_pdf_entropy(snr_complex=snr)
 
     # Modal superposition from largest contributions
     morl2_inv_real2 = np.zeros((len(frequency_hz), len(sig_n)))
@@ -422,8 +337,6 @@ if __name__ == "__main__":
         t_m_off_s = time_s[m_cw_real] + \
                     time_s[m_cw_imag]*1j
 
-        # print(m_cw_real, m_cw_imag)
-        # print(t_m_off_s)
         condition1 = super_array[j, m_cw_real] >= cutoff*super_array_max.real
         condition2 = super_array[j, m_cw_imag] >= cutoff*super_array_max.imag
         if condition1 and condition2:
@@ -433,22 +346,26 @@ if __name__ == "__main__":
             c_m_amp = 0*(1 + 1j)
 
         morl2_inv_real2[j, :] = \
-            inv_morl2_real(order_Nth, time_s, t_m_off_s.real,
-                           f_j_hz, c_m_amp.real, frequency_sample_rate_hz)
-
-        # TODO: Remarkable, explain why must use cosine
+            atoms_inv.inv_morlet2_real(band_order_Nth=order_Nth,
+                                       time_s=time_s,
+                                       offset_time_s=t_m_off_s.real,
+                                       scale_frequency_center_hz=f_j_hz,
+                                       cwt_amp_real=c_m_amp.real,
+                                       frequency_sample_rate_hz=frequency_sample_rate_hz)
+        # must use cosine
         morl2_inv_imag2[j, :] = \
-            inv_morl2_real(order_Nth, time_s, t_m_off_s.imag,
-                           f_j_hz, c_m_amp.imag, frequency_sample_rate_hz)
-
+            atoms_inv.inv_morlet2_real(band_order_Nth=order_Nth,
+                                       time_s=time_s,
+                                       offset_time_s=t_m_off_s.imag,
+                                       scale_frequency_center_hz=f_j_hz,
+                                       cwt_amp_real=c_m_amp.imag,
+                                       frequency_sample_rate_hz=frequency_sample_rate_hz)
 
     print("Number of bands:", len(frequency_hz))
     print("Number of modes in the superposition:", mode_counter)
-    sig_superpose = np.sum(morl2_inv_real2, axis=0) + \
-                    np.sum(morl2_inv_imag2, axis=0)*1j
+    sig_superpose = np.sum(morl2_inv_real2, axis=0) + np.sum(morl2_inv_imag2, axis=0) * 1j
 
-
-    # #### PLOTS
+    # PLOTS
     fig_number = 1
     fig_description = 'Reconstruction, Hilbert comparisons'
     fig_title = ''  # for publication
@@ -509,8 +426,3 @@ if __name__ == "__main__":
                                y0_color="C0", y0_label="SNR RbR", y_color="C0")
 
     plt.show()
-
-
-
-
-

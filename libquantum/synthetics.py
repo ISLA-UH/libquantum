@@ -5,7 +5,7 @@ This module constructs synthetic signals
 import numpy as np
 import scipy.signal as signal
 from scipy.integrate import cumulative_trapezoid
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 # libquantum modules
 from libquantum import utils, scales, atoms
@@ -188,8 +188,8 @@ def chirp_linear_in_noise(snr_bits: float,
                           duration_s: float,
                           frequency_start_hz: float,
                           frequency_end_hz: float,
-                          intro_s: int,
-                          outro_s: int) -> Tuple[np.ndarray, np.ndarray]:
+                          intro_s: Union[int, float],
+                          outro_s: Union[int, float]) -> Tuple[np.ndarray, np.ndarray]:
     """
     Construct chirp with linear frequency sweep, white noise added.
 

@@ -1,3 +1,7 @@
+"""
+libquantum example 3: 03_sweep_linear.py
+"""
+
 import os
 import numpy as np
 import scipy.io.wavfile
@@ -7,21 +11,20 @@ import libquantum.plot_templates.plot_time_frequency_reps as pltq
 
 
 if __name__ == "__main__":
-    # TODO MAG: change description to explicitly explain what the code does
-    # TODO MAG: make input dir obvious so that poeple know what they need to change to make it run
+    # TODO MAG: change description to explicitly explain what the code does, mention the WAV file
+    # TODO MAG: make input dir/other options obvious so that poeple know what they need to change to make it run
     """
     # The primary goal of standardization is to permit multimodal sensor analysis for different sample rates
     # For a specified signal duration, there is only one key parameter: Order
     # TODO: INFERNO Rewrite
     """
 
-    EVENT_NAME = "redshift_linear_sweep"
-    print("Event Name: " + EVENT_NAME)
-    wav_filename = EVENT_NAME
-
     input_directory = "/Users/mgarces/Documents/DATA_API_M/synthetics"
     output_wav_directory = os.path.join(input_directory, "wav")
 
+    EVENT_NAME = "redshift_linear_sweep"
+    print("Event Name: " + EVENT_NAME)
+    wav_filename = EVENT_NAME
     order_number_input = 3
 
     station_id_str = 'synth'
@@ -34,7 +37,6 @@ if __name__ == "__main__":
     sig_frequency_hz_start = 40.
     sig_frequency_hz_end = 400.
     sig_duration_s = 13.19675
-    # head_s = 0.2*sig_duration_s
     head_s = 0.5
 
     # Blueshift sweep
@@ -43,7 +45,8 @@ if __name__ == "__main__":
                                                                   duration_s=sig_duration_s,
                                                                   frequency_start_hz=sig_frequency_hz_start,
                                                                   frequency_end_hz=sig_frequency_hz_end,
-                                                                  intro_s=head_s, outro_s=head_s)
+                                                                  intro_s=head_s,
+                                                                  outro_s=head_s)
     sig_wf_red = np.flipud(sig_wf_blu)
 
     # Choose origin and red/blue shift
@@ -51,13 +54,13 @@ if __name__ == "__main__":
     sig_wf = np.copy(sig_wf_red)
 
     # Antialias filter synthetic
-    synthetics.antialias_halfNyquist(sig_wf)
+    synthetics.antialias_halfNyquist(synth=sig_wf)
 
     # Frame to mic start and end and plot
     event_reference_time_epoch_s = sig_wf_epoch_s[0]
-    # print('\nExtraction start time for mic: ', event_reference_time_epoch_s)
 
-    max_time_s, min_frequency_hz = scales.from_duration(order_number_input, sig_duration_s)
+    max_time_s, min_frequency_hz = scales.from_duration(band_order_Nth=order_number_input,
+                                                        sig_duration_s=sig_duration_s)
     print('\nRequest Order N=', order_number_input)
     print('Lowest frequency in hz that can support this order for this signal duration is ', min_frequency_hz)
     print('Scale with signal duration and to Nyquist, default G2 base re F1')
@@ -83,7 +86,7 @@ if __name__ == "__main__":
                                      band_order_Nth=order_number_input,
                                      dictionary_type="tone")
 
-    mic_cwt_snr, mic_cwt_snr_bits, mic_cwt_snr_entropy = entropy.snr_mean_max(mic_cwt)
+    mic_cwt_snr, mic_cwt_snr_bits, mic_cwt_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_cwt)
 
     pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
                                 wf_panel_2_sig=sig_wf,
@@ -106,7 +109,9 @@ if __name__ == "__main__":
         spectra.stft_from_sig(sig_wf=sig_wf,
                               frequency_sample_rate_hz=sig_wf_sample_rate_hz,
                               band_order_Nth=order_number_input)
-    mic_stft_snr, mic_stft_snr_bits, mic_stft_snr_entropy = entropy.snr_mean_max(mic_stft)
+
+    mic_stft_snr, mic_stft_snr_bits, mic_stft_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_stft)
+
     # Log frequency is the default, for linear use frequency_scaling="linear",
     pltq.plot_wf_mesh_mesh_vert(frequency_scaling="log",
                                 redvox_id=station_id_str,
@@ -124,7 +129,6 @@ if __name__ == "__main__":
                                 frequency_hz_ymin=fmin,
                                 frequency_hz_ymax=fmax)
     plt.show()
-
 
     # Export to wav directory
     wav_sample_rate_hz = 8000.

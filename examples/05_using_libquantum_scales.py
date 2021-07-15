@@ -1,5 +1,5 @@
 """
-Example using libquantum scales and export modules
+libquanutm example 5: Example using libquantum scales and export modules
 """
 from libquantum import export, scales
 
@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     print('First Planck band, with minimum pseudo-period bandwidth = ', scales.Slice.T0S)
     for scale_order in [0.75, 1, 1.5, 3, 6, 12]:
-        planck_center, planck_low, planck_high, quality_Q = scales.planck_scale_s(scale_order)
+        planck_center, planck_low, planck_high, quality_Q = scales.planck_scale_s(scale_order=scale_order)
         print('\nOrder_N:', scale_order)
         print('Number of Oscillations, Q:', quality_Q)
         print('%1s%12s%12s' % ('Time_s Center', 'Lower', 'Upper'))

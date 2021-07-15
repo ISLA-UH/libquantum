@@ -11,7 +11,8 @@ from typing import Tuple, Union
 """
 The purpose of this code is to construct quantized, standardized information packets
 using binary metrics. Based on Garces (2020). 
-Cleaned up and compartmentalized for debugging"""
+Cleaned up and compartmentalized for debugging
+"""
 
 
 def chirp_complex(band_order_Nth: float,

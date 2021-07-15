@@ -3,7 +3,7 @@ This module contains general utilities that can work with values containing nans
 """
 
 from enum import Enum
-from typing import Tuple
+from typing import Tuple, Union
 
 import numpy as np
 from scipy import signal
@@ -367,7 +367,7 @@ def mean_columns(sxx: np.ndarray) -> np.ndarray:
     return sum_c
 
 
-def just_tile(array1d_in: np.ndarray,
+def just_tile(array1d_in: Union[float, np.ndarray],
               shape_out: tuple) -> np.ndarray:
     """
     Constructs tiled array from 1D array to the shape specified by shape_out
@@ -428,7 +428,7 @@ def mean_tile(sxx: np.ndarray,
     return sum_c_matrix
 
 
-def d1tile_x_d2(d1: np.ndarray,
+def d1tile_x_d2(d1: Union[float, np.ndarray],
                 d2: np.ndarray) -> np.ndarray:
     """
     Create array of repeated values with dimensions that match those of energy array
