@@ -302,7 +302,7 @@ def plot_wf_mesh_scatter_vert(redvox_id: str,
         plt.subplots(3, 1,
                      figsize=(params_tfr.figure_parameters.figure_size_x,
                               params_tfr.figure_parameters.figure_size_y),
-                     sharex=True)
+                     sharex='col')
     fig: plt.Figure = fig_ax_tuple[0]
     axes: List[plt.Axes] = fig_ax_tuple[1]
     mesh_panel_0: plt.Axes = axes[0]
@@ -517,7 +517,7 @@ def plot_wf_scatter_vert(redvox_id: str,
         plt.subplots(2, 1,
                      figsize=(params_tfr.figure_parameters.figure_size_x,
                               params_tfr.figure_parameters.figure_size_y),
-                     sharex=True)
+                     sharex='col')
     fig: plt.Figure = fig_ax_tuple[0]
     axes: List[plt.Axes] = fig_ax_tuple[1]
     mesh_panel_0: plt.Axes = axes[0]

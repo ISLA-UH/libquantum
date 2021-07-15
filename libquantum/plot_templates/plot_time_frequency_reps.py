@@ -146,7 +146,6 @@ def mesh_time_frequency_edges(frequency: np.ndarray,
     :return: min and max frequency for plot, time and frequency edges
     """
 
-    # TODO: Stress test. All these need recovery/override paths
     if frequency_ymin > frequency_ymax:
         print("Higher frequency must be greater than lower frequency")
     if frequency[2] < frequency[1]:
@@ -420,7 +419,6 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     time_label, wf_panel_2_elapsed_time = \
         origin_time_correction(wf_panel_2_time, start_time_epoch, units_time)
 
-    # TODO: Test extensively
     # Time is in the center of the window, frequency is in the fft coefficient center.
     # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
     # frequency and time must be increasing!
@@ -580,8 +578,6 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     wf_panel_2.set_ylabel(wf_panel_2_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_2.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     wf_panel_2.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
-    # TODO: Left this in here for next plot set
-    # bottom_panel_wf.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
     wf_panel_2.grid(True)
     wf_panel_2.tick_params(axis='y', labelsize='large')
     wf_panel_2.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
@@ -660,7 +656,6 @@ def plot_wf_mesh_vert(redvox_id: str,
     time_label, wf_panel_2_elapsed_time = \
         origin_time_correction(wf_panel_2_time, start_time_epoch, units_time)
 
-    # TODO: Test extensively
     # Time is in the center of the window, frequency is in the fft coefficient center.
     # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
     # frequency and time must be increasing!
@@ -762,8 +757,6 @@ def plot_wf_mesh_vert(redvox_id: str,
     wf_panel_2.set_ylabel(wf_panel_2_units, size=params_tfr.figure_parameters.text_size)
     wf_panel_2.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
     wf_panel_2.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
-    # TODO: Left this in here for next plot set
-    # bottom_panel_wf.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
     wf_panel_2.grid(True)
     wf_panel_2.tick_params(axis='y', labelsize='large')
     wf_panel_2.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
