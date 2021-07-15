@@ -1,5 +1,5 @@
 # libquantum installation
-This section covers the basic on how to install and upgrade the libquntum library.
+This section covers the basics on how to install and upgrade the libquntum library.
 
 ### Installing and upgrading liquantum with pip
 

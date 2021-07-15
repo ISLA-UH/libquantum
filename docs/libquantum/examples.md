@@ -1,5 +1,5 @@
 # Examples using libquantum
-This section showcases [] examples using various libquantum modules.
+This section showcases examples using various libquantum modules.
 
 ## Table of Contents
 
@@ -28,7 +28,8 @@ In this example,...
 **To run blast amplitude check example:**
 
 In libquantum, inside examples folder: ```00_blast_amplitude_check.py```.
-A copy of the code can be found [here]().
+A copy of the code can be found
+ [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/00_blast_amplitude_check.py).
 
 **libquantum modules used**: atoms, entropy, scales, spectra, utils, blast_pulse (as kaboom), 
 plot_templates.plot_time_frequency_reps (as pltq).
@@ -44,9 +45,10 @@ In this example,...
 **To run blast cwt inverse example:**
 
 In libquantum, inside examples folder: ```01_blast_cwt_inverse.py```.
-A copy of the code can be found [here]().
+A copy of the code can be found 
+[here](https://github.com/RedVoxInc/libquantum/blob/master/examples/01_blast_cwt_inverse.py).
 
-**libquantum modules used**: [].
+**libquantum modules used**: synthetics (as synch), blast_pulse (as kaboom), utils, atoms_inverse (as atoms_inv).
 
 ### Tone amplitude check
 
@@ -57,7 +59,8 @@ In this example,...
 **To run tone amplitude check example:**
 
 In libquantum, inside examples folder: ```02_tone_amplitude_check.py```.
-A copy of the code can be found [here]().
+A copy of the code can be found 
+[here](https://github.com/RedVoxInc/libquantum/blob/master/examples/02_tone_amplitude_check.py).
 
 **libquantum modules used**: atoms, entropy, scales, spectra, utils, synthetics, 
 plot_templates.plot_time_frequency_reps (as pltq).
@@ -72,18 +75,24 @@ In this example,...
 **To run sweep linear example:**
 
 In libquantum, inside examples folder: ```03_sweep_linear.py```.
-A copy of the code can be found [here]().
+A copy of the code can be found 
+[here](https://github.com/RedVoxInc/libquantum/blob/master/examples/03_sweep_linear.py).
 
 **libquantum modules used**: atoms, entropy, scales, spectra, utils, synthetics,
 plot_templates.plot_time_frequency_reps (as pltq).
 
+
 ### Sweep chirp
 
+In this example,...
+
+![](img/example4.png)
 
 **To run sweep chirp example:**
 
 In libquantum, inside examples folder: ```04_sweep_chirp.py```.
-A copy of the code can be found [here]().
+A copy of the code can be found
+ [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/04_sweep_chirp.py).
 
 **libquantum modules used**: atoms, entropy, scales, spectra, utils, synthetics,
 plot_templates.plot_time_frequency_reps (as pltq), plot_templates.plot_time_frequency_picks (as pltpk).
@@ -97,6 +106,7 @@ The export module exports time scales and frequencies to screen. This example sh
 **To run libquantum scales and export example:**
 
 In libquantum, inside examples folder: ```05_using_libquantum_scales.py```.
-A copy of the code can be found [here]().
+A copy of the code can be found 
+[here](https://github.com/RedVoxInc/libquantum/blob/master/examples/05_using_libquantum_scales.py).
 
 **libquantum modules used**: export, scales.
