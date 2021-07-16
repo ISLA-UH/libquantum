@@ -18,10 +18,9 @@ This section showcases examples using various libquantum modules.
 
 ### Blast amplitude check
 
-
-
-In this example,...
-
+An explosive detonation is the closest acoustic signal we can get to a 
+delta function, and in the zeroth (00) example we use the GT pulse to construct a synthetic 
+and its time-frequency representations (TFRs).
 
 ![](img/example0.png)
 
@@ -34,9 +33,12 @@ A copy of the code can be found
 **libquantum modules used**: atoms, entropy, scales, spectra, utils, blast_pulse (as kaboom), 
 plot_templates.plot_time_frequency_reps (as pltq).
 
+
 ### Blast CWT inverse
 
-In this example,...
+The complex part of the continuous wavelet transform (CWT) 
+constructs the Hilbert transform of a real signal, as demonstrated 
+in the inverse reconstruction.
 
 ![](img/example1_1.png)
 
@@ -50,9 +52,13 @@ A copy of the code can be found
 
 **libquantum modules used**: synthetics (as synch), blast_pulse (as kaboom), utils, atoms_inverse (as atoms_inv).
 
+
 ### Tone amplitude check
 
-In this example,...
+In the opposite end of delta-type transients, 
+we have continuous wave (CW) signals, which include tones.
+This example constructs TFR's for a tone.
+
 
 ![](img/example2.png)
 
@@ -68,7 +74,8 @@ plot_templates.plot_time_frequency_reps (as pltq).
 
 ### Sweep linear
 
-In this example,...
+Many signals fall between transients and CWs. Sweeps are a recurring type, 
+and this example constructs a classic linear sweep and some TFRs.
 
 ![](img/example3.png)
 
@@ -84,7 +91,8 @@ plot_templates.plot_time_frequency_reps (as pltq).
 
 ### Sweep chirp
 
-In this example,...
+The q-chirp is constructed from sequential constant-Q chirps to build a sweep.
+They have interesting properties that highlight chirp applicability.
 
 ![](img/example4.png)
 
@@ -100,9 +108,10 @@ plot_templates.plot_time_frequency_reps (as pltq), plot_templates.plot_time_freq
 ### libquantum scales and export modules
 
 The scales module constructs standardized scales, such as frequency band scales, that libquantum relies on. 
-The export module exports time scales and frequencies to screen. This example showcases 
+The export module exports time scales and frequencies to screen. 
+We provide some examples that can be easily modified to any time scales
+in the known universe.
   
-
 **To run libquantum scales and export example:**
 
 In libquantum, inside examples folder: ```05_using_libquantum_scales.py```.
