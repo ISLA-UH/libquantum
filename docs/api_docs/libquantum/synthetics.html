@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>libquantum.synthetics API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="This module constructs synthetic signals" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,78 +22,140 @@
 <h1 class="title">Module <code>libquantum.synthetics</code></h1>
 </header>
 <section id="section-intro">
+<p>This module constructs synthetic signals</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import numpy as np
+<pre><code class="python">&#34;&#34;&#34;
+This module constructs synthetic signals
+&#34;&#34;&#34;
+
+import numpy as np
 import scipy.signal as signal
-from typing import Optional
+from scipy.integrate import cumulative_trapezoid
+from typing import Optional, Tuple, Union
+from libquantum import utils, scales, atoms
 
 
-# Synthetics for rdvxm testing
-def gt_rdvxm_center_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
-                                noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
+def gabor_tight_grain(band_order_Nth: float,
+                      scale_frequency_center_hz: float,
+                      frequency_sample_rate_hz: float,
+                      index_shift: float = 0,
+                      frequency_base_input: float = scales.Slice.G2) -&gt; np.ndarray:
     &#34;&#34;&#34;
-    Construct the GT explosion pulse of Garces (2019) in Gaussion noise with SNR in bits re signal STD
-    :param duration_points:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
-    &#34;&#34;&#34;
+    Gabor grain with tight Tukey wrap to ensure zero at edges
 
-    if frequency_center_hz:
-        pseudo_period_s = 1/frequency_center_hz
-    else:
-        pseudo_period_s = duration_points/sample_rate_hz/4.
-
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-    gt_white_aa.astype(np.float16)
-
-    return gt_white_aa
-
-
-def gt_rdvxm_center_noise_uneven(sensor_epoch_micros: np.array, start_epoch_micros: float,
-                                 duration_points: int = 2**12, sample_rate_hz: float = 80,
-                                 noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
-    &#34;&#34;&#34;
-    Construct the GT explosion pulse of Garces (2019) for uneven sensor time
-    in Gaussion noise with SNR in bits re signal STD
-    :param sensor_epoch_micros:
-    :param start_epoch_micros:
-    :param duration_points:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
+    :param band_order_Nth: Nth order of constant Q bands
+    :param scale_frequency_center_hz: center frequency fc in Hz
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param index_shift: index of shift
+    :param frequency_base_input: G2 or G3. Default is G2
+    :return: numpy array with Tukey grain
     &#34;&#34;&#34;
 
-    if frequency_center_hz:
-        pseudo_period_s = 1/frequency_center_hz
-    else:
-        pseudo_period_s = duration_points/sample_rate_hz/4.
+    # Fundamental chirp parameters
+    cycles_M, quality_factor_Q, gamma = \
+        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, frequency_base_input)
+    scale_atom = atoms.chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
+    p_complex = atoms.chirp_p_complex(scale_atom, gamma, index_shift)
 
-    # Convert to seconds
-    time_duration_s = duration_points/sample_rate_hz
-    time_center_s = (sensor_epoch_micros - start_epoch_micros)/1E6 - time_duration_s/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
+    # Time from nominal duration
+    grain_duration_s = cycles_M/scale_frequency_center_hz
+    time_s = np.arange(int(np.round(grain_duration_s*frequency_sample_rate_hz)))/frequency_sample_rate_hz
+    offset_time_s = np.max(time_s)/2.
 
-    return gt_white_aa
+    xtime_shifted = atoms.chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
+    wavelet_gauss = np.exp(-p_complex * xtime_shifted**2)
+    wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_M*xtime_shifted/scale_atom)
+    tight_grain_taper = utils.taper_tukey(wavelet_gabor, 0.1)
+    tight_grain = np.copy(wavelet_gabor)*tight_grain_taper
+
+    return tight_grain
 
 
-def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
-                            noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+def tukey_tight_grain(band_order_Nth: float,
+                      scale_frequency_center_hz: float,
+                      frequency_sample_rate_hz: float,
+                      fraction_cosine: float = 0.5,
+                      index_shift: float = 0,
+                      frequency_base_input: float = scales.Slice.G2) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Tukey grain with same support as Gabor atom
+
+    :param band_order_Nth: Nth order of constant Q bands
+    :param scale_frequency_center_hz: center frequency fc in Hz
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail.
+        Default is 0.5
+    :param index_shift: index of shift
+    :param frequency_base_input: G2 or G3. Default is G2
+    :return: numpy array with Tukey grain
+    &#34;&#34;&#34;
+
+    # Fundamental chirp parameters
+    cycles_M, quality_factor_Q, gamma = \
+        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, frequency_base_input)
+    scale_atom = atoms.chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
+    p_complex = atoms.chirp_p_complex(scale_atom, gamma, index_shift)
+
+    # Time from nominal duration
+    grain_duration_s = cycles_M/scale_frequency_center_hz
+    time_s = np.arange(int(np.round(grain_duration_s*frequency_sample_rate_hz)))/frequency_sample_rate_hz
+    offset_time_s = np.max(time_s)/2.
+
+    xtime_shifted = atoms.chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
+    # Pull out phase component from gaussian envelope
+    wavelet_gauss_phase = np.imag(-p_complex * xtime_shifted**2)
+    wavelet_gabor = np.exp(1j * cycles_M*xtime_shifted/scale_atom + 1j * wavelet_gauss_phase)
+    tight_grain_taper = utils.taper_tukey(wavelet_gabor, fraction_cosine)
+    tight_grain = np.copy(wavelet_gabor)*tight_grain_taper
+
+    return tight_grain
+
+
+def gabor_grain_frequencies(frequency_order_input: float,
+                            frequency_low_input: float,
+                            frequency_high_input: float,
+                            frequency_sample_rate_input: float,
+                            frequency_base_input: float = scales.Slice.G2,
+                            frequency_ref_input: float = 1.0) -&gt; Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Frequencies for g-chirps
+
+    :param frequency_order_input: Nth order
+    :param frequency_low_input: lowest frequency of interest
+    :param frequency_high_input: highest frequency of interest
+    :param frequency_sample_rate_input: sample rate
+    :param frequency_base_input: G2 or G3. Default is G2
+    :param frequency_ref_input: reference frequency. Default is 1.0
+    :return: three numpy arrays with center frequency, start frequency and end frequency
+    &#34;&#34;&#34;
+
+    scale_order, scale_base, _, frequency_ref, frequency_center_algebraic, \
+    frequency_center, frequency_start, frequency_end = \
+        scales.band_frequencies_low_high(frequency_order_input, frequency_base_input,
+                                         frequency_ref_input,
+                                         frequency_low_input,
+                                         frequency_high_input,
+                                         frequency_sample_rate_input)
+
+    return frequency_center, frequency_start, frequency_end
+
+
+def chirp_rdvxm_noise_16bit(duration_points: int = 2**12,
+                            sample_rate_hz: float = 80.,
+                            noise_std_loss_bits: float = 4.,
+                            frequency_center_hz: Optional[float] = None):
+    &#34;&#34;&#34;
+    Construct chirp with linear frequency sweep, white noise added, anti-aliased filter applied
+
+    :param duration_points: number of points, length of signal. Default is 2 ** 12
+    :param sample_rate_hz: sample rate in Hz. Default is 80.0
+    :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+    :param frequency_center_hz: center frequency fc in Hz. Optional
+    :return: numpy ndarray with anti-aliased chirp with white noise
+    &#34;&#34;&#34;
 
     duration_s = duration_points/sample_rate_hz
     if frequency_center_hz:
@@ -116,8 +178,19 @@ def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float 
     return chirp_white_aa
 
 
-def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
-                               noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12,
+                               sample_rate_hz: float = 80.,
+                               noise_std_loss_bits: float = 4.,
+                               frequency_center_hz: Optional[float] = None) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Construct a anti-aliased sawtooth waveform with white noise
+
+    :param duration_points: number of points, length of signal. Default is 2 ** 12
+    :param sample_rate_hz: sample rate in Hz. Default is 80.0
+    :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+    :param frequency_center_hz: center frequency fc in Hz. Optional
+    :return: numpy ndarray with anti-aliased sawtooth signal with white noise
+    &#34;&#34;&#34;
 
     duration_s = duration_points/sample_rate_hz
     if frequency_center_hz:
@@ -137,89 +210,25 @@ def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: flo
     return saw_white_aa
 
 
-# GT Test Pulse
-def gt_blast_center_fast(frequency_peak_hz, sample_rate_hz):
+def chirp_linear_in_noise(snr_bits: float,
+                          sample_rate_hz: float,
+                          duration_s: float,
+                          frequency_start_hz: float,
+                          frequency_end_hz: float,
+                          intro_s: Union[int, float],
+                          outro_s: Union[int, float]) -&gt; Tuple[np.ndarray, np.ndarray]:
     &#34;&#34;&#34;
-    TODO: Set default of 16 bits for std_loss_bits
-    :param duration_s:
-    :param frequency_peak_hz:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :return:
+    Construct chirp with linear frequency sweep, white noise added.
+
+    :param snr_bits: number of bits below signal standard deviation
+    :param sample_rate_hz: sample rate in Hz
+    :param duration_s: duration of chirp in seconds
+    :param frequency_start_hz: start frequency in Hz
+    :param frequency_end_hz: end frequency in Hz
+    :param intro_s: number of seconds before chirp
+    :param outro_s: number of seconds after chirp
+    :return: numpy ndarray with waveform, numpy ndarray with time in seconds
     &#34;&#34;&#34;
-
-    duration_s = 16/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
-    noise_std_loss_bits = 16                # 16 bit record, system noise
-    pseudo_period_s = 1/frequency_peak_hz
-    duration_points = int(duration_s*sample_rate_hz)
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-    return time_center_s, gt_white_aa
-
-
-def gt_blast_center_noise(duration_s, frequency_peak_hz, sample_rate_hz, noise_std_loss_bits):
-    &#34;&#34;&#34;
-    TODO: Set default of 16 bits for std_loss_bits
-    :param duration_s:
-    :param frequency_peak_hz:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :return:
-    &#34;&#34;&#34;
-    pseudo_period_s = 1/frequency_peak_hz
-    duration_points = int(duration_s*sample_rate_hz)
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-    return time_center_s, gt_white_aa
-
-
-def gt_blast_period_center(time_center_s, pseudo_period_s):
-    # Garces (2019) ground truth GT blast pulse
-    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
-    time_pos_s = pseudo_period_s/4.
-    tau = time_center_s/time_pos_s + 1.
-    # Initialize GT
-    p_GT = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
-    # Initialize time ranges
-    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
-    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
-    p_GT[sigint1] = (1. - tau[sigint1])
-    p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
-    return p_GT
-
-
-def gt_blast_ft(frequency_peak_hz, frequency_hz):
-    w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
-    ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
-    ft_G17_negative = np.exp(-1j*w_scaled*(1+np.sqrt(6.)))/(3.*w_scaled**4.) * \
-                      (1j*w_scaled*np.sqrt(6.) + 3. +
-                       np.exp(1j*w_scaled*np.sqrt(6.))*(3.*w_scaled**2. + 1j*w_scaled*2.*np.sqrt(6.)-3.))
-    ft_G17 = (ft_G17_positive + ft_G17_negative)*np.pi/(2*np.pi*frequency_peak_hz)
-    return ft_G17
-
-
-def gt_blast_spectral_density(frequency_peak_hz, frequency_hz):
-    fourier_tx = gt_blast_ft(frequency_peak_hz, frequency_hz)
-    spectral_density = 2*np.abs(fourier_tx*np.conj(fourier_tx))
-    spectral_density_peak = np.max(spectral_density)
-    # spectral_density_peak = np.pi/(2*np.pi*frequency_center_hz)
-    return spectral_density, spectral_density_peak
-
-
-def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
-                          frequency_start_hz, frequency_end_hz,
-                          intro_s, outro_s,):
 
     sig_time_s = np.arange(int(sample_rate_hz*duration_s))/sample_rate_hz
     chirp_wf = signal.chirp(sig_time_s, frequency_start_hz, sig_time_s[-1],
@@ -234,9 +243,11 @@ def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
     return synth_wf, synth_time_s
 
 
-def white_noise_fbits(sig: np.ndarray, std_bit_loss: float) -&gt; np.ndarray:
+def white_noise_fbits(sig: np.ndarray,
+                      std_bit_loss: float) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Compute white noise with zero mean and standard deviation that is snr_bits below the input signal
+
     :param sig: input signal, detrended
     :param std_bit_loss: number of bits below signal standard deviation
     :return: gaussian noise with zero mean
@@ -250,32 +261,65 @@ def white_noise_fbits(sig: np.ndarray, std_bit_loss: float) -&gt; np.ndarray:
     return sig_noise
 
 
-def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -&gt; np.ndarray:
+def taper_tukey(sig_or_time: np.ndarray,
+                fraction_cosine: float) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
     fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+
     :param sig_or_time: input signal or time
     :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
     :return: tukey taper window amplitude
     &#34;&#34;&#34;
     number_points = np.size(sig_or_time)
-    amplitude = signal.tukey(M=number_points, alpha=fraction_cosine, sym=True)
+    amplitude = signal.windows.tukey(M=number_points, alpha=fraction_cosine, sym=True)
     return amplitude
 
 
-def antialias_halfNyquist(synth):
+def antialias_halfNyquist(synth: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
+
+    :param synth: array with signal data
+    :return: numpy array with anti-aliased signal
+    &#34;&#34;&#34;
     # Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
     # Signal frequencies are scaled by Nyquist
     filter_order = 2
     edge_high = 0.5
-    b, a = signal.butter(filter_order, edge_high, btype=&#39;lowpass&#39;)
-    synth_anti_aliased = signal.filtfilt(b, a, synth)
+    [b, a] = signal.butter(filter_order, edge_high, btype=&#39;lowpass&#39;)
+    synth_anti_aliased = signal.filtfilt(b, a, np.copy(synth))
     return synth_anti_aliased
 
 
-def frequency_algebraic_Nth(frequency_geometric, band_order_Nth):
+def frequency_algebraic_Nth(frequency_geometric: np.ndarray,
+                            band_order_Nth: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute algebraic frequencies in band order
+
+    :param frequency_geometric: geometric frequencies
+    :param band_order_Nth:  Nth order of constant Q bands
+    :return:
+    &#34;&#34;&#34;
     frequency_algebra = frequency_geometric*(np.sqrt(1+1/(8*band_order_Nth**2)))
-    return frequency_algebra</code></pre>
+    return frequency_algebra
+
+
+def integrate_cumtrapz(timestamps_s: np.ndarray,
+                       sensor_wf: np.ndarray,
+                       initial_value: float = 0) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    cumulative trapezoid integration using scipy.integrate.cumulative_trapezoid
+
+    :param timestamps_s: timestamps corresponding to the data in seconds
+    :param sensor_wf: data to integrate using cumulative trapezoid
+    :param initial_value: the value to add in the initial of the integrated data to match length of input (default is 0)
+    :return: integrated data with the same length as the input
+    &#34;&#34;&#34;
+    integrated_data = cumulative_trapezoid(x=timestamps_s,
+                                           y=sensor_wf,
+                                           initial=initial_value)
+    return integrated_data</code></pre>
 </details>
 </section>
 <section>
@@ -286,36 +330,68 @@ def frequency_algebraic_Nth(frequency_geometric, band_order_Nth):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="libquantum.synthetics.antialias_halfNyquist"><code class="name flex">
-<span>def <span class="ident">antialias_halfNyquist</span></span>(<span>synth)</span>
+<span>def <span class="ident">antialias_halfNyquist</span></span>(<span>synth: numpy.ndarray) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist</p>
+<p>:param synth: array with signal data
+:return: numpy array with anti-aliased signal</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def antialias_halfNyquist(synth):
+<pre><code class="python">def antialias_halfNyquist(synth: np.ndarray) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
+
+    :param synth: array with signal data
+    :return: numpy array with anti-aliased signal
+    &#34;&#34;&#34;
     # Anti-aliasing filter with -3dB at 1/4 of sample rate, 1/2 of Nyquist
     # Signal frequencies are scaled by Nyquist
     filter_order = 2
     edge_high = 0.5
-    b, a = signal.butter(filter_order, edge_high, btype=&#39;lowpass&#39;)
-    synth_anti_aliased = signal.filtfilt(b, a, synth)
+    [b, a] = signal.butter(filter_order, edge_high, btype=&#39;lowpass&#39;)
+    synth_anti_aliased = signal.filtfilt(b, a, np.copy(synth))
     return synth_anti_aliased</code></pre>
 </details>
 </dd>
 <dt id="libquantum.synthetics.chirp_linear_in_noise"><code class="name flex">
-<span>def <span class="ident">chirp_linear_in_noise</span></span>(<span>snr_bits, sample_rate_hz, duration_s, frequency_start_hz, frequency_end_hz, intro_s, outro_s)</span>
+<span>def <span class="ident">chirp_linear_in_noise</span></span>(<span>snr_bits: float, sample_rate_hz: float, duration_s: float, frequency_start_hz: float, frequency_end_hz: float, intro_s: Union[int, float], outro_s: Union[int, float]) ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Construct chirp with linear frequency sweep, white noise added.</p>
+<p>:param snr_bits: number of bits below signal standard deviation
+:param sample_rate_hz: sample rate in Hz
+:param duration_s: duration of chirp in seconds
+:param frequency_start_hz: start frequency in Hz
+:param frequency_end_hz: end frequency in Hz
+:param intro_s: number of seconds before chirp
+:param outro_s: number of seconds after chirp
+:return: numpy ndarray with waveform, numpy ndarray with time in seconds</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def chirp_linear_in_noise(snr_bits, sample_rate_hz, duration_s,
-                          frequency_start_hz, frequency_end_hz,
-                          intro_s, outro_s,):
+<pre><code class="python">def chirp_linear_in_noise(snr_bits: float,
+                          sample_rate_hz: float,
+                          duration_s: float,
+                          frequency_start_hz: float,
+                          frequency_end_hz: float,
+                          intro_s: Union[int, float],
+                          outro_s: Union[int, float]) -&gt; Tuple[np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Construct chirp with linear frequency sweep, white noise added.
+
+    :param snr_bits: number of bits below signal standard deviation
+    :param sample_rate_hz: sample rate in Hz
+    :param duration_s: duration of chirp in seconds
+    :param frequency_start_hz: start frequency in Hz
+    :param frequency_end_hz: end frequency in Hz
+    :param intro_s: number of seconds before chirp
+    :param outro_s: number of seconds after chirp
+    :return: numpy ndarray with waveform, numpy ndarray with time in seconds
+    &#34;&#34;&#34;
 
     sig_time_s = np.arange(int(sample_rate_hz*duration_s))/sample_rate_hz
     chirp_wf = signal.chirp(sig_time_s, frequency_start_hz, sig_time_s[-1],
@@ -331,16 +407,32 @@ def frequency_algebraic_Nth(frequency_geometric, band_order_Nth):
 </details>
 </dd>
 <dt id="libquantum.synthetics.chirp_rdvxm_noise_16bit"><code class="name flex">
-<span>def <span class="ident">chirp_rdvxm_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80, noise_std_loss_bits: float = 4, frequency_center_hz: typing.Union[float, NoneType] = None)</span>
+<span>def <span class="ident">chirp_rdvxm_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80.0, noise_std_loss_bits: float = 4.0, frequency_center_hz: Union[float, NoneType] = None)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Construct chirp with linear frequency sweep, white noise added, anti-aliased filter applied</p>
+<p>:param duration_points: number of points, length of signal. Default is 2 ** 12
+:param sample_rate_hz: sample rate in Hz. Default is 80.0
+:param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+:param frequency_center_hz: center frequency fc in Hz. Optional
+:return: numpy ndarray with anti-aliased chirp with white noise</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def chirp_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
-                            noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+<pre><code class="python">def chirp_rdvxm_noise_16bit(duration_points: int = 2**12,
+                            sample_rate_hz: float = 80.,
+                            noise_std_loss_bits: float = 4.,
+                            frequency_center_hz: Optional[float] = None):
+    &#34;&#34;&#34;
+    Construct chirp with linear frequency sweep, white noise added, anti-aliased filter applied
+
+    :param duration_points: number of points, length of signal. Default is 2 ** 12
+    :param sample_rate_hz: sample rate in Hz. Default is 80.0
+    :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+    :param frequency_center_hz: center frequency fc in Hz. Optional
+    :return: numpy ndarray with anti-aliased chirp with white noise
+    &#34;&#34;&#34;
 
     duration_s = duration_points/sample_rate_hz
     if frequency_center_hz:
@@ -364,255 +456,184 @@ def frequency_algebraic_Nth(frequency_geometric, band_order_Nth):
 </details>
 </dd>
 <dt id="libquantum.synthetics.frequency_algebraic_Nth"><code class="name flex">
-<span>def <span class="ident">frequency_algebraic_Nth</span></span>(<span>frequency_geometric, band_order_Nth)</span>
+<span>def <span class="ident">frequency_algebraic_Nth</span></span>(<span>frequency_geometric: numpy.ndarray, band_order_Nth: float) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Compute algebraic frequencies in band order</p>
+<p>:param frequency_geometric: geometric frequencies
+:param band_order_Nth:
+Nth order of constant Q bands
+:return:</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def frequency_algebraic_Nth(frequency_geometric, band_order_Nth):
+<pre><code class="python">def frequency_algebraic_Nth(frequency_geometric: np.ndarray,
+                            band_order_Nth: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Compute algebraic frequencies in band order
+
+    :param frequency_geometric: geometric frequencies
+    :param band_order_Nth:  Nth order of constant Q bands
+    :return:
+    &#34;&#34;&#34;
     frequency_algebra = frequency_geometric*(np.sqrt(1+1/(8*band_order_Nth**2)))
     return frequency_algebra</code></pre>
 </details>
 </dd>
-<dt id="libquantum.synthetics.gt_blast_center_fast"><code class="name flex">
-<span>def <span class="ident">gt_blast_center_fast</span></span>(<span>frequency_peak_hz, sample_rate_hz)</span>
+<dt id="libquantum.synthetics.gabor_grain_frequencies"><code class="name flex">
+<span>def <span class="ident">gabor_grain_frequencies</span></span>(<span>frequency_order_input: float, frequency_low_input: float, frequency_high_input: float, frequency_sample_rate_input: float, frequency_base_input: float = 2.0, frequency_ref_input: float = 1.0) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>TODO: Set default of 16 bits for std_loss_bits
-:param duration_s:
-:param frequency_peak_hz:
-:param sample_rate_hz:
-:param noise_std_loss_bits:
-:return:</p></div>
+<div class="desc"><p>Frequencies for g-chirps</p>
+<p>:param frequency_order_input: Nth order
+:param frequency_low_input: lowest frequency of interest
+:param frequency_high_input: highest frequency of interest
+:param frequency_sample_rate_input: sample rate
+:param frequency_base_input: G2 or G3. Default is G2
+:param frequency_ref_input: reference frequency. Default is 1.0
+:return: three numpy arrays with center frequency, start frequency and end frequency</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def gt_blast_center_fast(frequency_peak_hz, sample_rate_hz):
+<pre><code class="python">def gabor_grain_frequencies(frequency_order_input: float,
+                            frequency_low_input: float,
+                            frequency_high_input: float,
+                            frequency_sample_rate_input: float,
+                            frequency_base_input: float = scales.Slice.G2,
+                            frequency_ref_input: float = 1.0) -&gt; Tuple[np.ndarray, np.ndarray, np.ndarray]:
     &#34;&#34;&#34;
-    TODO: Set default of 16 bits for std_loss_bits
-    :param duration_s:
-    :param frequency_peak_hz:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :return:
+    Frequencies for g-chirps
+
+    :param frequency_order_input: Nth order
+    :param frequency_low_input: lowest frequency of interest
+    :param frequency_high_input: highest frequency of interest
+    :param frequency_sample_rate_input: sample rate
+    :param frequency_base_input: G2 or G3. Default is G2
+    :param frequency_ref_input: reference frequency. Default is 1.0
+    :return: three numpy arrays with center frequency, start frequency and end frequency
     &#34;&#34;&#34;
 
-    duration_s = 16/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
-    noise_std_loss_bits = 16                # 16 bit record, system noise
-    pseudo_period_s = 1/frequency_peak_hz
-    duration_points = int(duration_s*sample_rate_hz)
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-    return time_center_s, gt_white_aa</code></pre>
+    scale_order, scale_base, _, frequency_ref, frequency_center_algebraic, \
+    frequency_center, frequency_start, frequency_end = \
+        scales.band_frequencies_low_high(frequency_order_input, frequency_base_input,
+                                         frequency_ref_input,
+                                         frequency_low_input,
+                                         frequency_high_input,
+                                         frequency_sample_rate_input)
+
+    return frequency_center, frequency_start, frequency_end</code></pre>
 </details>
 </dd>
-<dt id="libquantum.synthetics.gt_blast_center_noise"><code class="name flex">
-<span>def <span class="ident">gt_blast_center_noise</span></span>(<span>duration_s, frequency_peak_hz, sample_rate_hz, noise_std_loss_bits)</span>
+<dt id="libquantum.synthetics.gabor_tight_grain"><code class="name flex">
+<span>def <span class="ident">gabor_tight_grain</span></span>(<span>band_order_Nth: float, scale_frequency_center_hz: float, frequency_sample_rate_hz: float, index_shift: float = 0, frequency_base_input: float = 2.0) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>TODO: Set default of 16 bits for std_loss_bits
-:param duration_s:
-:param frequency_peak_hz:
-:param sample_rate_hz:
-:param noise_std_loss_bits:
-:return:</p></div>
+<div class="desc"><p>Gabor grain with tight Tukey wrap to ensure zero at edges</p>
+<p>:param band_order_Nth: Nth order of constant Q bands
+:param scale_frequency_center_hz: center frequency fc in Hz
+:param frequency_sample_rate_hz: sample rate of frequency in Hz
+:param index_shift: index of shift
+:param frequency_base_input: G2 or G3. Default is G2
+:return: numpy array with Tukey grain</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def gt_blast_center_noise(duration_s, frequency_peak_hz, sample_rate_hz, noise_std_loss_bits):
+<pre><code class="python">def gabor_tight_grain(band_order_Nth: float,
+                      scale_frequency_center_hz: float,
+                      frequency_sample_rate_hz: float,
+                      index_shift: float = 0,
+                      frequency_base_input: float = scales.Slice.G2) -&gt; np.ndarray:
     &#34;&#34;&#34;
-    TODO: Set default of 16 bits for std_loss_bits
-    :param duration_s:
-    :param frequency_peak_hz:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :return:
+    Gabor grain with tight Tukey wrap to ensure zero at edges
+
+    :param band_order_Nth: Nth order of constant Q bands
+    :param scale_frequency_center_hz: center frequency fc in Hz
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param index_shift: index of shift
+    :param frequency_base_input: G2 or G3. Default is G2
+    :return: numpy array with Tukey grain
     &#34;&#34;&#34;
-    pseudo_period_s = 1/frequency_peak_hz
-    duration_points = int(duration_s*sample_rate_hz)
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-    return time_center_s, gt_white_aa</code></pre>
+
+    # Fundamental chirp parameters
+    cycles_M, quality_factor_Q, gamma = \
+        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, frequency_base_input)
+    scale_atom = atoms.chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
+    p_complex = atoms.chirp_p_complex(scale_atom, gamma, index_shift)
+
+    # Time from nominal duration
+    grain_duration_s = cycles_M/scale_frequency_center_hz
+    time_s = np.arange(int(np.round(grain_duration_s*frequency_sample_rate_hz)))/frequency_sample_rate_hz
+    offset_time_s = np.max(time_s)/2.
+
+    xtime_shifted = atoms.chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
+    wavelet_gauss = np.exp(-p_complex * xtime_shifted**2)
+    wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_M*xtime_shifted/scale_atom)
+    tight_grain_taper = utils.taper_tukey(wavelet_gabor, 0.1)
+    tight_grain = np.copy(wavelet_gabor)*tight_grain_taper
+
+    return tight_grain</code></pre>
 </details>
 </dd>
-<dt id="libquantum.synthetics.gt_blast_ft"><code class="name flex">
-<span>def <span class="ident">gt_blast_ft</span></span>(<span>frequency_peak_hz, frequency_hz)</span>
+<dt id="libquantum.synthetics.integrate_cumtrapz"><code class="name flex">
+<span>def <span class="ident">integrate_cumtrapz</span></span>(<span>timestamps_s: numpy.ndarray, sensor_wf: numpy.ndarray, initial_value: float = 0) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>cumulative trapezoid integration using scipy.integrate.cumulative_trapezoid</p>
+<p>:param timestamps_s: timestamps corresponding to the data in seconds
+:param sensor_wf: data to integrate using cumulative trapezoid
+:param initial_value: the value to add in the initial of the integrated data to match length of input (default is 0)
+:return: integrated data with the same length as the input</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def gt_blast_ft(frequency_peak_hz, frequency_hz):
-    w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
-    ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
-    ft_G17_negative = np.exp(-1j*w_scaled*(1+np.sqrt(6.)))/(3.*w_scaled**4.) * \
-                      (1j*w_scaled*np.sqrt(6.) + 3. +
-                       np.exp(1j*w_scaled*np.sqrt(6.))*(3.*w_scaled**2. + 1j*w_scaled*2.*np.sqrt(6.)-3.))
-    ft_G17 = (ft_G17_positive + ft_G17_negative)*np.pi/(2*np.pi*frequency_peak_hz)
-    return ft_G17</code></pre>
-</details>
-</dd>
-<dt id="libquantum.synthetics.gt_blast_period_center"><code class="name flex">
-<span>def <span class="ident">gt_blast_period_center</span></span>(<span>time_center_s, pseudo_period_s)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def gt_blast_period_center(time_center_s, pseudo_period_s):
-    # Garces (2019) ground truth GT blast pulse
-    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
-    # time_start = time_zero - time_pos
-    time_pos_s = pseudo_period_s/4.
-    tau = time_center_s/time_pos_s + 1.
-    # Initialize GT
-    p_GT = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
-    # Initialize time ranges
-    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
-    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
-    p_GT[sigint1] = (1. - tau[sigint1])
-    p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
-    return p_GT</code></pre>
-</details>
-</dd>
-<dt id="libquantum.synthetics.gt_blast_spectral_density"><code class="name flex">
-<span>def <span class="ident">gt_blast_spectral_density</span></span>(<span>frequency_peak_hz, frequency_hz)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def gt_blast_spectral_density(frequency_peak_hz, frequency_hz):
-    fourier_tx = gt_blast_ft(frequency_peak_hz, frequency_hz)
-    spectral_density = 2*np.abs(fourier_tx*np.conj(fourier_tx))
-    spectral_density_peak = np.max(spectral_density)
-    # spectral_density_peak = np.pi/(2*np.pi*frequency_center_hz)
-    return spectral_density, spectral_density_peak</code></pre>
-</details>
-</dd>
-<dt id="libquantum.synthetics.gt_rdvxm_center_noise_16bit"><code class="name flex">
-<span>def <span class="ident">gt_rdvxm_center_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80, noise_std_loss_bits: float = 2, frequency_center_hz: typing.Union[float, NoneType] = None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Construct the GT explosion pulse of Garces (2019) in Gaussion noise with SNR in bits re signal STD
-:param duration_points:
-:param sample_rate_hz:
-:param noise_std_loss_bits:
-:param frequency_center_hz:
-:return:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def gt_rdvxm_center_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
-                                noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
+<pre><code class="python">def integrate_cumtrapz(timestamps_s: np.ndarray,
+                       sensor_wf: np.ndarray,
+                       initial_value: float = 0) -&gt; np.ndarray:
     &#34;&#34;&#34;
-    Construct the GT explosion pulse of Garces (2019) in Gaussion noise with SNR in bits re signal STD
-    :param duration_points:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
+    cumulative trapezoid integration using scipy.integrate.cumulative_trapezoid
+
+    :param timestamps_s: timestamps corresponding to the data in seconds
+    :param sensor_wf: data to integrate using cumulative trapezoid
+    :param initial_value: the value to add in the initial of the integrated data to match length of input (default is 0)
+    :return: integrated data with the same length as the input
     &#34;&#34;&#34;
-
-    if frequency_center_hz:
-        pseudo_period_s = 1/frequency_center_hz
-    else:
-        pseudo_period_s = duration_points/sample_rate_hz/4.
-
-    time_center_s = np.arange(duration_points)/sample_rate_hz
-    time_center_s -= time_center_s[-1]/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-    gt_white_aa.astype(np.float16)
-
-    return gt_white_aa</code></pre>
-</details>
-</dd>
-<dt id="libquantum.synthetics.gt_rdvxm_center_noise_uneven"><code class="name flex">
-<span>def <span class="ident">gt_rdvxm_center_noise_uneven</span></span>(<span>sensor_epoch_micros: <built-in function array>, start_epoch_micros: float, duration_points: int = 4096, sample_rate_hz: float = 80, noise_std_loss_bits: float = 2, frequency_center_hz: typing.Union[float, NoneType] = None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Construct the GT explosion pulse of Garces (2019) for uneven sensor time
-in Gaussion noise with SNR in bits re signal STD
-:param sensor_epoch_micros:
-:param start_epoch_micros:
-:param duration_points:
-:param sample_rate_hz:
-:param noise_std_loss_bits:
-:param frequency_center_hz:
-:return:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def gt_rdvxm_center_noise_uneven(sensor_epoch_micros: np.array, start_epoch_micros: float,
-                                 duration_points: int = 2**12, sample_rate_hz: float = 80,
-                                 noise_std_loss_bits: float = 2, frequency_center_hz: Optional[float] = None):
-    &#34;&#34;&#34;
-    Construct the GT explosion pulse of Garces (2019) for uneven sensor time
-    in Gaussion noise with SNR in bits re signal STD
-    :param sensor_epoch_micros:
-    :param start_epoch_micros:
-    :param duration_points:
-    :param sample_rate_hz:
-    :param noise_std_loss_bits:
-    :param frequency_center_hz:
-    :return:
-    &#34;&#34;&#34;
-
-    if frequency_center_hz:
-        pseudo_period_s = 1/frequency_center_hz
-    else:
-        pseudo_period_s = duration_points/sample_rate_hz/4.
-
-    # Convert to seconds
-    time_duration_s = duration_points/sample_rate_hz
-    time_center_s = (sensor_epoch_micros - start_epoch_micros)/1E6 - time_duration_s/2.
-    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
-    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
-    gt_white = sig_gt + sig_noise
-    # AA filter
-    gt_white_aa = antialias_halfNyquist(gt_white)
-
-    return gt_white_aa</code></pre>
+    integrated_data = cumulative_trapezoid(x=timestamps_s,
+                                           y=sensor_wf,
+                                           initial=initial_value)
+    return integrated_data</code></pre>
 </details>
 </dd>
 <dt id="libquantum.synthetics.sawtooth_rdvxm_noise_16bit"><code class="name flex">
-<span>def <span class="ident">sawtooth_rdvxm_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80, noise_std_loss_bits: float = 4, frequency_center_hz: typing.Union[float, NoneType] = None)</span>
+<span>def <span class="ident">sawtooth_rdvxm_noise_16bit</span></span>(<span>duration_points: int = 4096, sample_rate_hz: float = 80.0, noise_std_loss_bits: float = 4.0, frequency_center_hz: Union[float, NoneType] = None) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Construct a anti-aliased sawtooth waveform with white noise</p>
+<p>:param duration_points: number of points, length of signal. Default is 2 ** 12
+:param sample_rate_hz: sample rate in Hz. Default is 80.0
+:param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+:param frequency_center_hz: center frequency fc in Hz. Optional
+:return: numpy ndarray with anti-aliased sawtooth signal with white noise</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12, sample_rate_hz: float = 80,
-                               noise_std_loss_bits: float = 4, frequency_center_hz: Optional[float] = None):
+<pre><code class="python">def sawtooth_rdvxm_noise_16bit(duration_points: int = 2**12,
+                               sample_rate_hz: float = 80.,
+                               noise_std_loss_bits: float = 4.,
+                               frequency_center_hz: Optional[float] = None) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Construct a anti-aliased sawtooth waveform with white noise
+
+    :param duration_points: number of points, length of signal. Default is 2 ** 12
+    :param sample_rate_hz: sample rate in Hz. Default is 80.0
+    :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 4.0
+    :param frequency_center_hz: center frequency fc in Hz. Optional
+    :return: numpy ndarray with anti-aliased sawtooth signal with white noise
+    &#34;&#34;&#34;
 
     duration_s = duration_points/sample_rate_hz
     if frequency_center_hz:
@@ -637,42 +658,103 @@ in Gaussion noise with SNR in bits re signal STD
 </code></dt>
 <dd>
 <div class="desc"><p>Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
-fraction_cosine = 0 is a rectangular window, 1 is a Hann window
-:param sig_or_time: input signal or time
+fraction_cosine = 0 is a rectangular window, 1 is a Hann window</p>
+<p>:param sig_or_time: input signal or time
 :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
 :return: tukey taper window amplitude</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def taper_tukey(sig_or_time: np.ndarray, fraction_cosine: float) -&gt; np.ndarray:
+<pre><code class="python">def taper_tukey(sig_or_time: np.ndarray,
+                fraction_cosine: float) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Constructs a symmetric Tukey window with the same dimensions as a time or signal numpy array.
     fraction_cosine = 0 is a rectangular window, 1 is a Hann window
+
     :param sig_or_time: input signal or time
     :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail
     :return: tukey taper window amplitude
     &#34;&#34;&#34;
     number_points = np.size(sig_or_time)
-    amplitude = signal.tukey(M=number_points, alpha=fraction_cosine, sym=True)
+    amplitude = signal.windows.tukey(M=number_points, alpha=fraction_cosine, sym=True)
     return amplitude</code></pre>
+</details>
+</dd>
+<dt id="libquantum.synthetics.tukey_tight_grain"><code class="name flex">
+<span>def <span class="ident">tukey_tight_grain</span></span>(<span>band_order_Nth: float, scale_frequency_center_hz: float, frequency_sample_rate_hz: float, fraction_cosine: float = 0.5, index_shift: float = 0, frequency_base_input: float = 2.0) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tukey grain with same support as Gabor atom</p>
+<p>:param band_order_Nth: Nth order of constant Q bands
+:param scale_frequency_center_hz: center frequency fc in Hz
+:param frequency_sample_rate_hz: sample rate of frequency in Hz
+:param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail.
+Default is 0.5
+:param index_shift: index of shift
+:param frequency_base_input: G2 or G3. Default is G2
+:return: numpy array with Tukey grain</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tukey_tight_grain(band_order_Nth: float,
+                      scale_frequency_center_hz: float,
+                      frequency_sample_rate_hz: float,
+                      fraction_cosine: float = 0.5,
+                      index_shift: float = 0,
+                      frequency_base_input: float = scales.Slice.G2) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Tukey grain with same support as Gabor atom
+
+    :param band_order_Nth: Nth order of constant Q bands
+    :param scale_frequency_center_hz: center frequency fc in Hz
+    :param frequency_sample_rate_hz: sample rate of frequency in Hz
+    :param fraction_cosine: fraction of the window inside the cosine tapered window, shared between the head and tail.
+        Default is 0.5
+    :param index_shift: index of shift
+    :param frequency_base_input: G2 or G3. Default is G2
+    :return: numpy array with Tukey grain
+    &#34;&#34;&#34;
+
+    # Fundamental chirp parameters
+    cycles_M, quality_factor_Q, gamma = \
+        atoms.chirp_MQG_from_N(band_order_Nth, index_shift, frequency_base_input)
+    scale_atom = atoms.chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
+    p_complex = atoms.chirp_p_complex(scale_atom, gamma, index_shift)
+
+    # Time from nominal duration
+    grain_duration_s = cycles_M/scale_frequency_center_hz
+    time_s = np.arange(int(np.round(grain_duration_s*frequency_sample_rate_hz)))/frequency_sample_rate_hz
+    offset_time_s = np.max(time_s)/2.
+
+    xtime_shifted = atoms.chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
+    # Pull out phase component from gaussian envelope
+    wavelet_gauss_phase = np.imag(-p_complex * xtime_shifted**2)
+    wavelet_gabor = np.exp(1j * cycles_M*xtime_shifted/scale_atom + 1j * wavelet_gauss_phase)
+    tight_grain_taper = utils.taper_tukey(wavelet_gabor, fraction_cosine)
+    tight_grain = np.copy(wavelet_gabor)*tight_grain_taper
+
+    return tight_grain</code></pre>
 </details>
 </dd>
 <dt id="libquantum.synthetics.white_noise_fbits"><code class="name flex">
 <span>def <span class="ident">white_noise_fbits</span></span>(<span>sig: numpy.ndarray, std_bit_loss: float) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Compute white noise with zero mean and standard deviation that is snr_bits below the input signal
-:param sig: input signal, detrended
+<div class="desc"><p>Compute white noise with zero mean and standard deviation that is snr_bits below the input signal</p>
+<p>:param sig: input signal, detrended
 :param std_bit_loss: number of bits below signal standard deviation
 :return: gaussian noise with zero mean</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def white_noise_fbits(sig: np.ndarray, std_bit_loss: float) -&gt; np.ndarray:
+<pre><code class="python">def white_noise_fbits(sig: np.ndarray,
+                      std_bit_loss: float) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Compute white noise with zero mean and standard deviation that is snr_bits below the input signal
+
     :param sig: input signal, detrended
     :param std_bit_loss: number of bits below signal standard deviation
     :return: gaussian noise with zero mean
@@ -708,15 +790,12 @@ fraction_cosine = 0 is a rectangular window, 1 is a Hann window
 <li><code><a title="libquantum.synthetics.chirp_linear_in_noise" href="#libquantum.synthetics.chirp_linear_in_noise">chirp_linear_in_noise</a></code></li>
 <li><code><a title="libquantum.synthetics.chirp_rdvxm_noise_16bit" href="#libquantum.synthetics.chirp_rdvxm_noise_16bit">chirp_rdvxm_noise_16bit</a></code></li>
 <li><code><a title="libquantum.synthetics.frequency_algebraic_Nth" href="#libquantum.synthetics.frequency_algebraic_Nth">frequency_algebraic_Nth</a></code></li>
-<li><code><a title="libquantum.synthetics.gt_blast_center_fast" href="#libquantum.synthetics.gt_blast_center_fast">gt_blast_center_fast</a></code></li>
-<li><code><a title="libquantum.synthetics.gt_blast_center_noise" href="#libquantum.synthetics.gt_blast_center_noise">gt_blast_center_noise</a></code></li>
-<li><code><a title="libquantum.synthetics.gt_blast_ft" href="#libquantum.synthetics.gt_blast_ft">gt_blast_ft</a></code></li>
-<li><code><a title="libquantum.synthetics.gt_blast_period_center" href="#libquantum.synthetics.gt_blast_period_center">gt_blast_period_center</a></code></li>
-<li><code><a title="libquantum.synthetics.gt_blast_spectral_density" href="#libquantum.synthetics.gt_blast_spectral_density">gt_blast_spectral_density</a></code></li>
-<li><code><a title="libquantum.synthetics.gt_rdvxm_center_noise_16bit" href="#libquantum.synthetics.gt_rdvxm_center_noise_16bit">gt_rdvxm_center_noise_16bit</a></code></li>
-<li><code><a title="libquantum.synthetics.gt_rdvxm_center_noise_uneven" href="#libquantum.synthetics.gt_rdvxm_center_noise_uneven">gt_rdvxm_center_noise_uneven</a></code></li>
+<li><code><a title="libquantum.synthetics.gabor_grain_frequencies" href="#libquantum.synthetics.gabor_grain_frequencies">gabor_grain_frequencies</a></code></li>
+<li><code><a title="libquantum.synthetics.gabor_tight_grain" href="#libquantum.synthetics.gabor_tight_grain">gabor_tight_grain</a></code></li>
+<li><code><a title="libquantum.synthetics.integrate_cumtrapz" href="#libquantum.synthetics.integrate_cumtrapz">integrate_cumtrapz</a></code></li>
 <li><code><a title="libquantum.synthetics.sawtooth_rdvxm_noise_16bit" href="#libquantum.synthetics.sawtooth_rdvxm_noise_16bit">sawtooth_rdvxm_noise_16bit</a></code></li>
 <li><code><a title="libquantum.synthetics.taper_tukey" href="#libquantum.synthetics.taper_tukey">taper_tukey</a></code></li>
+<li><code><a title="libquantum.synthetics.tukey_tight_grain" href="#libquantum.synthetics.tukey_tight_grain">tukey_tight_grain</a></code></li>
 <li><code><a title="libquantum.synthetics.white_noise_fbits" href="#libquantum.synthetics.white_noise_fbits">white_noise_fbits</a></code></li>
 </ul>
 </li>
