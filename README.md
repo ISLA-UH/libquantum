@@ -44,5 +44,6 @@ Check the [API Documentation](https://redvoxinc.github.io/libquantum).
 
 ### Resources
 
-Found an issue? Submit a [bug report](https://github.com/RedVoxInc/libquantum/issues).
+- Found an issue? Submit a [bug report](https://github.com/RedVoxInc/libquantum/issues).
 
+- [License](https://github.com/RedVoxInc/libquantum/blob/master/LICENSE)
