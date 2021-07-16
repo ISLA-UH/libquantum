@@ -298,19 +298,7 @@ if __name__ == "__main__":
     # Fast approach, less vulnerable
     noise_power = np.mean(cwtm_noise.real**2) * np.ones(len(frequency_hz)) * (1 + 1j)
 
-    # noise_p2 = np.mean(cwtm_noise.real**2, axis=1) + \
-    #            np.mean(cwtm_noise.imag**2, axis=1)*1j
-    # noise_p2_mean = np.mean(noise_p2)*np.ones(len(frequency_hz))
-    # plt.plot(frequency_hz, noise_p2.real, 'r*',
-    #          frequency_hz, noise_p2_mean.real, 'ro',
-    #          frequency_hz, noise_power.real, 'k--')
-    # plt.plot(frequency_hz, noise_p2.imag, 'b*',
-    #          frequency_hz, noise_p2_mean.imag, 'bx',
-    #          frequency_hz, noise_power.real, 'ko')
-    # plt.show()
-    # exit()
-
-    # TODO: Explain 'Flatten' the noise
+    # Flatten the noise
     cwtm_noise_power_tile = utils.just_tile(array1d_in=noise_power.real, shape_out=cwtm_noise.shape) + \
                             utils.just_tile(array1d_in=noise_power.imag, shape_out=cwtm_noise.shape)*1j
 
@@ -385,7 +373,7 @@ if __name__ == "__main__":
                  synth3=sig_superpose, symbol3="-", label3=fig_description)
 
     fig_number += 1
-    fig_description = 'Wiggle plots, scaled coefficients'
+    # 'Wiggle plots, scaled coefficients'
     sig_arr = sig_hilbert.reshape(1, sig_hilbert.shape[0])
     y_array = np.concatenate((sig_arr, f_x_cwtm))
     y_label = np.append(np.array(0), frequency_scaled)
@@ -394,7 +382,7 @@ if __name__ == "__main__":
                                y0_color="C0", y0_label="Input", y_color="black")
 
     fig_number += 1
-    fig_description = 'Wiggle plots, unscaled sig coefficients'
+    # 'Wiggle plots, unscaled sig coefficients'
     sig_arr = sig_hilbert.reshape(1, sig_hilbert.shape[0])
     y_array = np.concatenate((sig_arr, cwtm))
     y_label = np.append(np.array(0), frequency_scaled)
@@ -403,7 +391,7 @@ if __name__ == "__main__":
                                y0_color="C0", y0_label="Input", y_color="C0")
 
     fig_number += 1
-    fig_description = 'Wiggle plots, unscaled noise coefficients'
+    # 'Wiggle plots, unscaled noise coefficients'
     sig_arr = noise_hilbert.reshape(1, noise_hilbert.shape[0])
     y_array = np.concatenate((sig_arr, cwtm_noise))
     y_label = np.append(np.array(0), frequency_scaled)
@@ -412,14 +400,14 @@ if __name__ == "__main__":
                                y0_color="C0", y0_label="Noise", y_color="C0")
 
     fig_number += 1
-    fig_description = 'Wiggle plots, scaled entropy'
+    # 'Wiggle plots, scaled entropy'
     xY = 3*order_Nth
     plot_wiggles_complex_label(fig_number, xarray=time_scaled,
                                wf_array=xY*entropy_SE, wf_label=frequency_scaled, xlim_max=order_Nth,
                                y0_color="C0", y0_label="Shannon Entropy", y_color="C0")
 
     fig_number += 1
-    fig_description = 'Wiggle plots, SNR entropy, noise re cw'
+    # 'Wiggle plots, SNR entropy, noise re cw'
     xY = 3*order_Nth
     plot_wiggles_complex_label(fig_number, xarray=time_scaled,
                                wf_array=xY*snr_SE, wf_label=frequency_scaled, xlim_max=order_Nth,
