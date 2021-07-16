@@ -237,9 +237,10 @@ if __name__ == "__main__":
     # Keep tabs on center frequency
     index_frequency_center = np.argmin(np.abs(frequency_hz-frequency_sig_hz))
 
-    morl2_scale, reconstruct = atoms_inverse.morlet2_reconstruct(band_order_Nth=order_Nth,
-                                                             scale_frequency_center_hz=frequency_hz,
-                                                             frequency_sample_rate_hz=frequency_sample_rate_hz)
+    morl2_scale, reconstruct = \
+        atoms_inverse.morlet2_reconstruct(band_order_Nth=order_Nth,
+                                          scale_frequency_center_hz=frequency_hz,
+                                          frequency_sample_rate_hz=frequency_sample_rate_hz)
     # Scaled wavelet coefficients
     f_x_cwtm = utils.d1tile_x_d2(d1=reconstruct,
                                  d2=cwtm)
@@ -295,19 +296,19 @@ if __name__ == "__main__":
 
         morl2_inv_real2[j, :] = \
             atoms_inverse.inv_morlet2_real(band_order_Nth=order_Nth,
-                                       time_s=time_s,
-                                       offset_time_s=t_m_off_s.real,
-                                       scale_frequency_center_hz=f_j_hz,
-                                       cwt_amp_real=c_m_amp.real,
-                                       frequency_sample_rate_hz=frequency_sample_rate_hz)
+                                           time_s=time_s,
+                                           offset_time_s=t_m_off_s.real,
+                                           scale_frequency_center_hz=f_j_hz,
+                                           cwt_amp_real=c_m_amp.real,
+                                           frequency_sample_rate_hz=frequency_sample_rate_hz)
         # must use cosine
         morl2_inv_imag2[j, :] = \
             atoms_inverse.inv_morlet2_real(band_order_Nth=order_Nth,
-                                       time_s=time_s,
-                                       offset_time_s=t_m_off_s.imag,
-                                       scale_frequency_center_hz=f_j_hz,
-                                       cwt_amp_real=c_m_amp.imag,
-                                       frequency_sample_rate_hz=frequency_sample_rate_hz)
+                                           time_s=time_s,
+                                           offset_time_s=t_m_off_s.imag,
+                                           scale_frequency_center_hz=f_j_hz,
+                                           cwt_amp_real=c_m_amp.imag,
+                                           frequency_sample_rate_hz=frequency_sample_rate_hz)
 
     print("Number of bands:", len(frequency_hz))
     print("Number of modes in the superposition:", mode_counter)

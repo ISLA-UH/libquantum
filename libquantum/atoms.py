@@ -118,7 +118,7 @@ def chirp_MQG_from_N(band_order_Nth: float,
 
 
 def chirp_scale(cycles_M: float,
-                scale_frequency_center_hz: float,
+                scale_frequency_center_hz: Union[np.ndarray, float],
                 frequency_sample_rate_hz: float) -> float:
     """
     Nondimensional scale for canonical Morlet wavelet
@@ -338,6 +338,7 @@ def cwt_chirp_complex(band_order_Nth: float,
     :param frequency_sample_rate_hz: sample rate in Hz
     :param frequency_high_hz: highest frequency in Hz
     :param cwt_type: one of "conv", "fft", or "morlet2". Default is "fft"
+           Address ghost folding in "fft", compared to "conv"
     :param index_shift: index of shift. Default is 0.0
     :param frequency_ref: reference frequency in Hz. Default is F1
     :param scale_base: G2 or G3. Default is G2
@@ -367,15 +368,13 @@ def cwt_chirp_complex(band_order_Nth: float,
 
     scale_points = len(frequency_cwt_hz_flipped)
 
-    # TODO: cwt_flipped is not always set.  Flow of control needs to be updated to account for this.
     if cwt_type == "morlet2":
         scale_atom = chirp_scale(cycles_M, frequency_cwt_hz_flipped, frequency_sample_rate_hz)
-        cwt = signal.cwt(sig_wf, signal.morlet2, scale_atom, w=cycles_M)
-
-        # TODO: Optimize this as in signal.cwt. Conv can take matrices.
-
+        cwt_flipped = signal.cwt(data=sig_wf, wavelet=signal.morlet2,
+                                 widths=scale_atom,
+                                 w=cycles_M,
+                                 dtype=np.complex128)
     elif cwt_type == "fft":
-        # TODO: Can see "ghost" folding in fft, compared to "conv"
         sig_fft = np.fft.fft(sig_wf)
         cwt_flipped = np.empty((scale_points, wavelet_points), dtype=np.complex128)
         for ii in range(scale_points):
@@ -404,7 +403,6 @@ def cwt_chirp_complex(band_order_Nth: float,
     else:
         print("Incorrect cwt_type specification in cwt_chirp_complex")
 
-    # TODO: re above: cwt_flipped is not always set; must make sure this run if that's the case.
     # Time scales are increasing, which is the opposite of what is expected for the frequency. Flip.
     frequency_cwt_hz = np.flip(frequency_cwt_hz_flipped)
     cwt = np.flipud(cwt_flipped)
