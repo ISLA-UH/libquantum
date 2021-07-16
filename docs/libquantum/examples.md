@@ -38,6 +38,7 @@ A copy of the code can be found
 [blast_pulse](https://redvoxinc.github.io/libquantum/blast_pulse.html) (as kaboom), 
 [plot_templates.plot_time_frequency_reps](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_reps.html) (as pltq).
 
+Return to _[Table of Contents](#table-of-contents)_.
 
 ### Blast CWT inverse
 
@@ -60,6 +61,7 @@ A copy of the code can be found
 [atoms](https://redvoxinc.github.io/libquantum/atoms.html),
 [atoms_inverse](https://redvoxinc.github.io/libquantum/atoms_inverse.html).
 
+Return to _[Table of Contents](#table-of-contents)_.
 
 ### Tone amplitude check
 
@@ -71,7 +73,6 @@ This example constructs TFR's for a tone.
 ![](img/example2.png)
 
 **To run tone amplitude check example:**
-
 In libquantum, inside examples folder: ```02_tone_amplitude_check.py```.
 A copy of the code can be found 
 [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/02_tone_amplitude_check.py).
@@ -84,6 +85,7 @@ A copy of the code can be found
 [synthetics](https://redvoxinc.github.io/libquantum/synthetics.html), 
 [plot_templates.plot_time_frequency_reps](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_reps.html) (as pltq).
 
+Return to _[Table of Contents](#table-of-contents)_.
 
 ### Sweep linear
 
@@ -93,7 +95,6 @@ and this example constructs a classic linear sweep and some TFRs.
 ![](img/example3.png)
 
 **To run sweep linear example:**
-
 In libquantum, inside examples folder: ```03_sweep_linear.py```.
 A copy of the code can be found 
 [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/03_sweep_linear.py).
@@ -107,6 +108,7 @@ A copy of the code can be found
 [synthetics](https://redvoxinc.github.io/libquantum/synthetics.html),
 [plot_templates.plot_time_frequency_reps](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_reps.html) (as pltq).
 
+Return to _[Table of Contents](#table-of-contents)_.
 
 ### Sweep chirp
 
@@ -116,7 +118,6 @@ They have interesting properties that highlight chirp applicability.
 ![](img/example4.png)
 
 **To run sweep chirp example:**
-
 In libquantum, inside examples folder: ```04_sweep_chirp.py```.
 A copy of the code can be found
  [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/04_sweep_chirp.py).
@@ -131,6 +132,8 @@ A copy of the code can be found
 [plot_templates.plot_time_frequency_reps](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_reps.html) (as pltq), 
 [plot_templates.plot_time_frequency_picks](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_picks.html) (as pltpk).
 
+Return to _[Table of Contents](#table-of-contents)_.
+
 ### libquantum scales and export modules
 
 The scales module constructs standardized scales, such as frequency band scales, that libquantum relies on. 
@@ -139,7 +142,6 @@ We provide some examples that can be easily modified to any time scales
 in the known universe.
   
 **To run libquantum scales and export example:**
-
 In libquantum, inside examples folder: ```05_using_libquantum_scales.py```.
 A copy of the code can be found 
 [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/05_using_libquantum_scales.py).
@@ -147,3 +149,5 @@ A copy of the code can be found
 **libquantum modules used**: 
 [export](https://redvoxinc.github.io/libquantum/export.html),
 [scales](https://redvoxinc.github.io/libquantum/scales.html).
+
+Return to _[Table of Contents](#table-of-contents)_.
