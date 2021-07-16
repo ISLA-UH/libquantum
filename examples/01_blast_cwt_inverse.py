@@ -1,5 +1,7 @@
 """
 libquantum example 1: 01_blast_cwt_inverse.py
+Perform inverse CWT reconstruction as in Garces, 2020.
+
 """
 
 import numpy as np
@@ -7,42 +9,13 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 from libquantum import synthetics as synth
 from libquantum import blast_pulse as kaboom
-from libquantum import utils
-from libquantum import atoms_inverse as atoms_inv
+from libquantum import utils, atoms, atoms_inverse
 from libquantum.scales import EPSILON
-
-# TODO MAG: the function here are no where in libquantum, decide if they should be and if so, where.
-# TODO MAG: either implement TODOS scattered in code or put them in redvox/issues
-
-
-def cwt_complex(sig, frequency_center_hz, sample_rate_hz, order_Nth):
-
-    # Pick wavelet order and 2^n points
-    order_bandedge = 2 ** (1. / 2. / order_Nth)  # kN in Garces 2013
-    order_scaled_bandwidth = order_bandedge - 1. / order_bandedge
-    quality_factor_Q = 1./order_scaled_bandwidth  # Exact for Nth octave bands
-    cycles_M = quality_factor_Q*2*np.sqrt(np.log(2))
-    sig_duration_s = len(sig)/sample_rate_hz
-
-    # TODO: Turn into a function, look at slice
-    n_min = np.ceil(order_Nth*np.log2(2/(frequency_center_hz*sig_duration_s)))
-    n_max = np.floor(order_Nth*np.log2(sample_rate_hz/(2*frequency_center_hz)))
-    n = np.arange(n_min, n_max+1)
-    frequency_hz = frequency_center_hz*2**(n/order_Nth)
-    frequency_hz_plot = np.append(frequency_hz*2**(-1/(2*order_Nth)), frequency_hz[-1]*2**(1/(2*order_Nth)))
-    # widths is scales s in scipy.morlet2
-    scales = sample_rate_hz*cycles_M/(2*np.pi*frequency_hz)
-    w = cycles_M  # Default is 5 for morlet2
-    # Signal Scipy
-    cwtm = signal.cwt(sig, signal.morlet2, scales, w=w)
-
-    return cwtm, frequency_hz, frequency_hz_plot, sample_rate_hz, \
-           order_Nth, cycles_M, quality_factor_Q
 
 
 def energy_pdf_entropy(cwcoeff_complex):
     # Evaluate Log energy entropy (LEE) = log(p) and Shannon Entropy (SE) = -p*log(p)
-    # Assumes linear spectral coefficien ts (not power), takes the square
+    # Assumes linear spectral coefficients (not power), takes the square
     energy_pdf_real = cwcoeff_complex.real**2/np.sum(np.abs(cwcoeff_complex*np.conj(cwcoeff_complex)))
     energy_pdf_imag = cwcoeff_complex.imag**2/np.sum(np.abs(cwcoeff_complex*np.conj(cwcoeff_complex)))
 
@@ -100,21 +73,12 @@ def noise_snr(cwcoeff, sort_array_complex, sort_threshold):
         noise_power_real[j] = np.mean(cwcoeff[j, index_real].real**2)
         index_imag = np.where(sort_array_complex[j, :].imag < sort_threshold.imag)
         noise_power_imag[j] = np.mean(cwcoeff[j, index_imag].imag**2)
-    # Mean across the whole band to avoid punishing the main peak
+    # Mean across the whole band to avoid penalizing the main peak
     noise_power = np.mean(noise_power_real)*np.ones(cwcoeff.shape) + \
                   np.mean(noise_power_imag)*np.ones(cwcoeff.shape)*1j
     snr_power = cwcoeff.real**2/noise_power.real + cwcoeff.imag**2/noise_power.imag*1j
 
     return snr_power, noise_power
-
-
-def hell_M_from_N(band_order_Nth):
-
-    order_bandedge = 2 ** (1. / 2. / band_order_Nth)  # kN in Garces 2013
-    order_scaled_bandwidth = order_bandedge - 1. / order_bandedge
-    quality_factor_Q = 1./order_scaled_bandwidth  # Exact for Nth octave bands
-    cycles_M = quality_factor_Q*2*np.sqrt(np.log(2))  # Exact, from -3dB points
-    return cycles_M, quality_factor_Q
 
 
 # Standalone plots
@@ -209,16 +173,16 @@ def plot_wiggles_complex_label(figure_number, xarray, wf_array, wf_label, xlim_m
 
 
 if __name__ == "__main__":
-    # TODO MAG: change description to explicitly explain what the code does
     """
-    Do it all, clean it up, press-ready figures
+    Performs inverse CWT on GP pulse as in Garces (2021)
+    
     """
-    ###### BEGIN #######
-    order_Nth_main = 3
+    # Set Order
+    order_Nth = 3
 
     frequency_sample_rate_hz = 200.
     # Target frequency
-    frequency_main_hz = 6.3
+    frequency_main_hz = 5  # Nominal 1 ton, after Kim et al. 2021
     pseudo_period_main_s = 1/frequency_main_hz
     # Pulse frequency
     frequency_sig_hz = 1.*frequency_main_hz  # *np.sqrt(2)
@@ -226,7 +190,7 @@ if __name__ == "__main__":
 
     # GT pulse
     # Number of cycles
-    window_cycles = 16
+    window_cycles = 64
     window_duration_s = window_cycles*pseudo_period_main_s
     # This will be the time to use 2^n
     time_points = int(window_duration_s*frequency_sample_rate_hz)
@@ -256,17 +220,15 @@ if __name__ == "__main__":
     sig_n_complex = sig_n + sig_n_hilbert*1j
 
     # Compute complex wavelet transform
-    cwtm, frequency_hz, frequency_hz_plot, sample_rate_hz, order_Nth, cycles_M, quality_factor_Q = \
-        cwt_complex(sig=sig_n,
-                    frequency_center_hz=frequency_sig_hz,
-                    sample_rate_hz=frequency_sample_rate_hz,
-                    order_Nth=order_Nth_main)
+    cwtm, _, _, frequency_hz = \
+        atoms.cwt_chirp_from_sig(sig_wf=sig_n,
+                                 frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                 band_order_Nth=order_Nth)
     # For noise
-    cwtm_noise, fn, sn, sn, Nn, Mn, Qn = \
-        cwt_complex(sig=noise,
-                    frequency_center_hz=frequency_sig_hz,
-                    sample_rate_hz=frequency_sample_rate_hz,
-                    order_Nth=order_Nth_main)
+    cwtm_noise, _, _, _ = \
+        atoms.cwt_chirp_from_sig(sig_wf=noise,
+                                 frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                 band_order_Nth=order_Nth)
 
     frequency_scaled = frequency_hz/frequency_main_hz
 
@@ -276,7 +238,7 @@ if __name__ == "__main__":
     # Keep tabs on center frequency
     index_frequency_center = np.argmin(np.abs(frequency_hz-frequency_sig_hz))
 
-    morl2_scale, reconstruct = atoms_inv.morlet2_reconstruct(band_order_Nth=order_Nth,
+    morl2_scale, reconstruct = atoms_inverse.morlet2_reconstruct(band_order_Nth=order_Nth,
                                                              scale_frequency_center_hz=frequency_hz,
                                                              frequency_sample_rate_hz=frequency_sample_rate_hz)
     # Scaled wavelet coefficients
@@ -312,15 +274,14 @@ if __name__ == "__main__":
     morl2_inv_real2 = np.zeros((len(frequency_hz), len(sig_n)))
     morl2_inv_imag2 = np.zeros((len(frequency_hz), len(sig_n)))
 
-    # super_array = 1.*entropy_SE
-    super_array = 1.*snr_SE
+    super_array = np.copy(snr_SE.real) + 1j*np.copy(snr_SE.imag)
     super_array_max = np.max(super_array)
     cutoff = 0*1./2**6
     mode_counter = 0
     print('Max:', super_array_max)
     for j in np.arange(len(frequency_hz)):
-        m_cw_real = np.argmax((super_array[j, :].real))
-        m_cw_imag = np.argmax((super_array[j, :].imag))
+        m_cw_real = np.argmax(super_array[j, :].real)
+        m_cw_imag = np.argmax(super_array[j, :].imag)
         f_j_hz = frequency_hz[j]
         t_m_off_s = time_s[m_cw_real] + \
                     time_s[m_cw_imag]*1j
@@ -328,13 +289,13 @@ if __name__ == "__main__":
         condition1 = super_array[j, m_cw_real] >= cutoff*super_array_max.real
         condition2 = super_array[j, m_cw_imag] >= cutoff*super_array_max.imag
         if condition1 and condition2:
-            c_m_amp = cwtm[j, m_cw_real].real + cwtm[j, m_cw_imag].imag*1j
+            c_m_amp = cwtm[j, m_cw_real].real + 1j*cwtm[j, m_cw_imag].imag
             mode_counter += 1
         else:
             c_m_amp = 0*(1 + 1j)
 
         morl2_inv_real2[j, :] = \
-            atoms_inv.inv_morlet2_real(band_order_Nth=order_Nth,
+            atoms_inverse.inv_morlet2_real(band_order_Nth=order_Nth,
                                        time_s=time_s,
                                        offset_time_s=t_m_off_s.real,
                                        scale_frequency_center_hz=f_j_hz,
@@ -342,7 +303,7 @@ if __name__ == "__main__":
                                        frequency_sample_rate_hz=frequency_sample_rate_hz)
         # must use cosine
         morl2_inv_imag2[j, :] = \
-            atoms_inv.inv_morlet2_real(band_order_Nth=order_Nth,
+            atoms_inverse.inv_morlet2_real(band_order_Nth=order_Nth,
                                        time_s=time_s,
                                        offset_time_s=t_m_off_s.imag,
                                        scale_frequency_center_hz=f_j_hz,

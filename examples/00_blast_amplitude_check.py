@@ -1,5 +1,7 @@
 """
-libquantum example 0: 00_blast_ampplitude_check.py
+libquantum example 0: 00_blast_amplitude_check.py
+GT blast pulse for TFR amplitude comparisons
+
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,7 +16,6 @@ if __name__ == "__main__":
     """
     # The primary goal of standardization is to permit multimodal sensor analysis for different sample rates
     # For a specified signal duration, there is only one key parameter: Order
-    # TODO: INFERNO Rewrite
     """
 
     print('Tone synthetic')
