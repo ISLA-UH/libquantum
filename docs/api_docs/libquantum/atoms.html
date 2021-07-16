@@ -147,7 +147,7 @@ def chirp_MQG_from_N(band_order_Nth: float,
 
 
 def chirp_scale(cycles_M: float,
-                scale_frequency_center_hz: float,
+                scale_frequency_center_hz: Union[np.ndarray, float],
                 frequency_sample_rate_hz: float) -&gt; float:
     &#34;&#34;&#34;
     Nondimensional scale for canonical Morlet wavelet
@@ -367,6 +367,7 @@ def cwt_chirp_complex(band_order_Nth: float,
     :param frequency_sample_rate_hz: sample rate in Hz
     :param frequency_high_hz: highest frequency in Hz
     :param cwt_type: one of &#34;conv&#34;, &#34;fft&#34;, or &#34;morlet2&#34;. Default is &#34;fft&#34;
+           Address ghost folding in &#34;fft&#34;, compared to &#34;conv&#34;
     :param index_shift: index of shift. Default is 0.0
     :param frequency_ref: reference frequency in Hz. Default is F1
     :param scale_base: G2 or G3. Default is G2
@@ -396,15 +397,13 @@ def cwt_chirp_complex(band_order_Nth: float,
 
     scale_points = len(frequency_cwt_hz_flipped)
 
-    # TODO: cwt_flipped is not always set.  Flow of control needs to be updated to account for this.
     if cwt_type == &#34;morlet2&#34;:
         scale_atom = chirp_scale(cycles_M, frequency_cwt_hz_flipped, frequency_sample_rate_hz)
-        cwt = signal.cwt(sig_wf, signal.morlet2, scale_atom, w=cycles_M)
-
-        # TODO: Optimize this as in signal.cwt. Conv can take matrices.
-
+        cwt_flipped = signal.cwt(data=sig_wf, wavelet=signal.morlet2,
+                                 widths=scale_atom,
+                                 w=cycles_M,
+                                 dtype=np.complex128)
     elif cwt_type == &#34;fft&#34;:
-        # TODO: Can see &#34;ghost&#34; folding in fft, compared to &#34;conv&#34;
         sig_fft = np.fft.fft(sig_wf)
         cwt_flipped = np.empty((scale_points, wavelet_points), dtype=np.complex128)
         for ii in range(scale_points):
@@ -433,7 +432,6 @@ def cwt_chirp_complex(band_order_Nth: float,
     else:
         print(&#34;Incorrect cwt_type specification in cwt_chirp_complex&#34;)
 
-    # TODO: re above: cwt_flipped is not always set; must make sure this run if that&#39;s the case.
     # Time scales are increasing, which is the opposite of what is expected for the frequency. Flip.
     frequency_cwt_hz = np.flip(frequency_cwt_hz_flipped)
     cwt = np.flipud(cwt_flipped)
@@ -757,7 +755,7 @@ end frequency</p></div>
 </details>
 </dd>
 <dt id="libquantum.atoms.chirp_scale"><code class="name flex">
-<span>def <span class="ident">chirp_scale</span></span>(<span>cycles_M: float, scale_frequency_center_hz: float, frequency_sample_rate_hz: float) ‑> float</span>
+<span>def <span class="ident">chirp_scale</span></span>(<span>cycles_M: float, scale_frequency_center_hz: Union[numpy.ndarray, float], frequency_sample_rate_hz: float) ‑> float</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Nondimensional scale for canonical Morlet wavelet</p>
@@ -770,7 +768,7 @@ end frequency</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def chirp_scale(cycles_M: float,
-                scale_frequency_center_hz: float,
+                scale_frequency_center_hz: Union[np.ndarray, float],
                 frequency_sample_rate_hz: float) -&gt; float:
     &#34;&#34;&#34;
     Nondimensional scale for canonical Morlet wavelet
@@ -988,6 +986,7 @@ end frequency</p></div>
 :param frequency_sample_rate_hz: sample rate in Hz
 :param frequency_high_hz: highest frequency in Hz
 :param cwt_type: one of "conv", "fft", or "morlet2". Default is "fft"
+Address ghost folding in "fft", compared to "conv"
 :param index_shift: index of shift. Default is 0.0
 :param frequency_ref: reference frequency in Hz. Default is F1
 :param scale_base: G2 or G3. Default is G2
@@ -1016,6 +1015,7 @@ end frequency</p></div>
     :param frequency_sample_rate_hz: sample rate in Hz
     :param frequency_high_hz: highest frequency in Hz
     :param cwt_type: one of &#34;conv&#34;, &#34;fft&#34;, or &#34;morlet2&#34;. Default is &#34;fft&#34;
+           Address ghost folding in &#34;fft&#34;, compared to &#34;conv&#34;
     :param index_shift: index of shift. Default is 0.0
     :param frequency_ref: reference frequency in Hz. Default is F1
     :param scale_base: G2 or G3. Default is G2
@@ -1045,15 +1045,13 @@ end frequency</p></div>
 
     scale_points = len(frequency_cwt_hz_flipped)
 
-    # TODO: cwt_flipped is not always set.  Flow of control needs to be updated to account for this.
     if cwt_type == &#34;morlet2&#34;:
         scale_atom = chirp_scale(cycles_M, frequency_cwt_hz_flipped, frequency_sample_rate_hz)
-        cwt = signal.cwt(sig_wf, signal.morlet2, scale_atom, w=cycles_M)
-
-        # TODO: Optimize this as in signal.cwt. Conv can take matrices.
-
+        cwt_flipped = signal.cwt(data=sig_wf, wavelet=signal.morlet2,
+                                 widths=scale_atom,
+                                 w=cycles_M,
+                                 dtype=np.complex128)
     elif cwt_type == &#34;fft&#34;:
-        # TODO: Can see &#34;ghost&#34; folding in fft, compared to &#34;conv&#34;
         sig_fft = np.fft.fft(sig_wf)
         cwt_flipped = np.empty((scale_points, wavelet_points), dtype=np.complex128)
         for ii in range(scale_points):
@@ -1082,7 +1080,6 @@ end frequency</p></div>
     else:
         print(&#34;Incorrect cwt_type specification in cwt_chirp_complex&#34;)
 
-    # TODO: re above: cwt_flipped is not always set; must make sure this run if that&#39;s the case.
     # Time scales are increasing, which is the opposite of what is expected for the frequency. Flip.
     frequency_cwt_hz = np.flip(frequency_cwt_hz_flipped)
     cwt = np.flipud(cwt_flipped)
