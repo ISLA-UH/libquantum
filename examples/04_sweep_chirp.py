@@ -1,8 +1,12 @@
 """
 libquantum example 4: 04_sweep_chirp.py
+Constructs the q-chirp; exploratory code
+Caveat emptor (20210716)
+
 """
 
 import os
+from pathlib import Path
 import numpy as np
 import scipy.io.wavfile
 import matplotlib.pyplot as plt
@@ -11,12 +15,21 @@ import libquantum.plot_templates.plot_time_frequency_reps as pltq
 import libquantum.plot_templates.plot_time_frequency_picks as pltpk
 
 if __name__ == "__main__":
-    # TODO MAG: change description to explicitly explain what the code does
-    # TODO MAG: make input dir obvious so that poeple know what they need to change to make it run
     """
-    # The primary goal of standardization is to permit multimodal sensor analysis for different sample rates
-    # For a specified signal duration, there is only one key parameter: Order
+    Constructs a sweep from sequential, constant-Q chirps
+    Option of exporting to wav and librosa reassignment (beta)
+    
     """
+
+    # Do you want to perform the frequency reassignment? True or False
+    do_reassignment = False
+    # Do you want to export a wav file? True or False
+    do_save_wave = False
+    # If True, saves to home directory
+    home_dir: str = str(Path.home())
+    # Or can specify a preferred wav file directory
+    # home_dir: str = "/Users/mgarces/Documents/DATA_API_M/synthetics"
+    output_wav_directory = os.path.join(home_dir, "wav")
 
     # "Ideal" wavelet chirp type
     order_number_input = 3
@@ -24,9 +37,9 @@ if __name__ == "__main__":
     scale_edge = scale_base ** (1.0 / (2.0 * order_number_input))
 
     overlap_fraction = 0.
-    # overlap_fraction = 0.25
-    glide_direction = -1
-    # glide_direction = -1.5
+    # overlap_fraction = 0.25  # Can explore overlap
+    glide_direction = -1  # 1 = blueshift, 0 = atom, -1 = redshift
+    # glide_direction = -1.5  # For exploration, will break if too large
 
     grain_type_str = 'gauss'  # 'tukey' or 'gauss'
 
@@ -34,25 +47,16 @@ if __name__ == "__main__":
     print("Event Name: " + EVENT_NAME)
     wav_filename = EVENT_NAME
 
-    do_save_wave = False
-    do_reassignment = False
-    input_directory = "/Users/mgarces/Documents/DATA_API_M/synthetics"
-    output_wav_directory = os.path.join(input_directory, "wav")
     station_id_str = 'Synth'
     run_time_epoch_s = utils.datetime_now_epoch_s()
 
-    # sig_wf_sample_rate_hz = 8000.
-    # sig_frequency_low_hz = 100.
-    # sig_frequency_high_hz = 410.
-    # head_points = 4000
-
-    # These are the design (input/request) parameters
+    # Key design (input/request) parameters
     sig_wf_sample_rate_hz = 8000.
     sig_frequency_low_hz = 16.
     sig_frequency_high_hz = 400.
     head_points = 4000
 
-    # These are the standardized frequencies
+    # Standardized frequencies
     frequency_center_hz, frequency_start_hz, frequency_end_hz = \
         synthetics.gabor_grain_frequencies(frequency_order_input=order_number_input,
                                            frequency_low_input=sig_frequency_low_hz,

@@ -1,8 +1,12 @@
 """
 libquantum example 3: 03_sweep_linear.py
+Construct classic linear chirp and illustrate CWT and STFT TRFs.
+
+
 """
 
 import os
+from pathlib import Path
 import numpy as np
 import scipy.io.wavfile
 import matplotlib.pyplot as plt
@@ -11,23 +15,26 @@ import libquantum.plot_templates.plot_time_frequency_reps as pltq
 
 
 if __name__ == "__main__":
-    # TODO MAG: change description to explicitly explain what the code does, mention the WAV file
-    # TODO MAG: make input dir/other options obvious so that poeple know what they need to change to make it run
     """
-    # The primary goal of standardization is to permit multimodal sensor analysis for different sample rates
-    # For a specified signal duration, there is only one key parameter: Order
-    # TODO: INFERNO Rewrite
+    # Exercises with classic linear sweep
+    Option of exporting to wav
+    
     """
 
-    input_directory = "/Users/mgarces/Documents/DATA_API_M/synthetics"
-    output_wav_directory = os.path.join(input_directory, "wav")
+    # Do you want to export a wav file? True or False
+    do_save_wave = False
+    # If True, saves to home directory
+    home_dir: str = str(Path.home())
+    # Or can specify a preferred wav file directory
+    # home_dir: str = "/Users/mgarces/Documents/DATA_API_M/synthetics"
+    output_wav_directory = os.path.join(home_dir, "wav")
 
     EVENT_NAME = "redshift_linear_sweep"
     print("Event Name: " + EVENT_NAME)
     wav_filename = EVENT_NAME
     order_number_input = 3
 
-    station_id_str = 'synth'
+    station_id_str = 'Synth'
     run_time_epoch_s = utils.datetime_now_epoch_s()
 
     # Chirp type
@@ -55,6 +62,13 @@ if __name__ == "__main__":
 
     # Antialias filter synthetic
     synthetics.antialias_halfNyquist(synth=sig_wf)
+
+    # Export to wav directory
+    if do_save_wave:
+        wav_sample_rate_hz = 8000.
+        export_filename = os.path.join(output_wav_directory, wav_filename + "_8kz.wav")
+        synth_wav = 0.9 * np.real(sig_wf) / np.max(np.abs((np.real(sig_wf))))
+        scipy.io.wavfile.write(export_filename, int(wav_sample_rate_hz), synth_wav)
 
     # Frame to mic start and end and plot
     event_reference_time_epoch_s = sig_wf_epoch_s[0]
@@ -130,8 +144,3 @@ if __name__ == "__main__":
                                 frequency_hz_ymax=fmax)
     plt.show()
 
-    # Export to wav directory
-    wav_sample_rate_hz = 8000.
-    export_filename = os.path.join(output_wav_directory, wav_filename + "_8kz.wav")
-    synth_wav = 0.9 * np.real(sig_wf) / np.max(np.abs((np.real(sig_wf))))
-    scipy.io.wavfile.write(export_filename, int(wav_sample_rate_hz), synth_wav)
