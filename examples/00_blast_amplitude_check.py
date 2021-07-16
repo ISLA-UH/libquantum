@@ -12,10 +12,12 @@ import libwwz
 
 
 if __name__ == "__main__":
-    # TODO MAG: change description to explicitly explain what the code does
     """
-    # The primary goal of standardization is to permit multimodal sensor analysis for different sample rates
-    # For a specified signal duration, there is only one key parameter: Order
+    The primary goal of standardization is to permit multimodal sensor analysis for different sample rates.
+    For a specified signal duration, there is only one key parameter: Order.
+    Order quantization reduces the degrees of freedom.
+    The acoustic signal closest to a delta function is a detonation. Use the GT pulse to test and illustrate TFRs.
+    
     """
 
     print('Tone synthetic')
@@ -62,7 +64,6 @@ if __name__ == "__main__":
     fmax = 400
 
     # TFR SECTION
-    # This could be placed in a loop
     # Compute complex wavelet transform (cwt) from signal duration
     mic_cwt, mic_cwt_bits, mic_cwt_time_s, mic_cwt_frequency_hz = \
         atoms.cwt_chirp_from_sig(sig_wf=mic_sig,
