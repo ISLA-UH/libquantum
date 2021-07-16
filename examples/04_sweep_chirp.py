@@ -2,7 +2,6 @@
 libquantum example 4: 04_sweep_chirp.py
 Constructs the q-chirp; exploratory code
 Caveat emptor (20210716)
-
 """
 
 import os
@@ -18,7 +17,6 @@ if __name__ == "__main__":
     """
     Constructs a sweep from sequential, constant-Q chirps
     Option of exporting to wav and librosa reassignment (beta)
-    
     """
 
     # Do you want to perform the frequency reassignment? True or False

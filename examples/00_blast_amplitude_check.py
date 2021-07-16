@@ -1,8 +1,8 @@
 """
 libquantum example 0: 00_blast_amplitude_check.py
 GT blast pulse for TFR amplitude comparisons
-
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from libquantum import atoms, entropy, scales, spectra, utils
@@ -17,7 +17,6 @@ if __name__ == "__main__":
     For a specified signal duration, there is only one key parameter: Order.
     Order quantization reduces the degrees of freedom.
     The acoustic signal closest to a delta function is a detonation. Use the GT pulse to test and illustrate TFRs.
-    
     """
 
     print('Tone synthetic')

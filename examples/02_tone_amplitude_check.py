@@ -1,7 +1,6 @@
 """
 libquantum example 2: 02_tone_amplitude_check.py
 Illustrate TFRs on tones and compare amplitudes
-
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,8 +12,8 @@ if __name__ == "__main__":
     """
     # The primary goal of standardization is to permit multimodal sensor analysis for different sample rates
     # For a specified signal duration, there is only one key parameter: Order
-
     """
+
     print('Tone synthetic')
     order_number_input = 12
     EVENT_NAME = "Tone Test"

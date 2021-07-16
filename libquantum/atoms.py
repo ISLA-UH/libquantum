@@ -319,7 +319,6 @@ def chirp_centered_4cwt(band_order_Nth: float,
     return wavelet_chirp, time_centered_s
 
 
-# TODO MAG: the TODOS in here
 def cwt_chirp_complex(band_order_Nth: float,
                       sig_wf: np.ndarray,
                       frequency_low_hz: float,

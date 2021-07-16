@@ -1,7 +1,6 @@
 """
 libquantum example 1: 01_blast_cwt_inverse.py
 Perform inverse CWT reconstruction as in Garces, 2020.
-
 """
 
 import numpy as np
@@ -175,8 +174,8 @@ def plot_wiggles_complex_label(figure_number, xarray, wf_array, wf_label, xlim_m
 if __name__ == "__main__":
     """
     Performs inverse CWT on GP pulse as in Garces (2021)
-    
     """
+
     # Set Order
     order_Nth = 3
 

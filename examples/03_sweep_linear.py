@@ -1,8 +1,6 @@
 """
 libquantum example 3: 03_sweep_linear.py
 Construct classic linear chirp and illustrate CWT and STFT TRFs.
-
-
 """
 
 import os
@@ -16,9 +14,8 @@ import libquantum.plot_templates.plot_time_frequency_reps as pltq
 
 if __name__ == "__main__":
     """
-    # Exercises with classic linear sweep
+    Exercises with classic linear sweep
     Option of exporting to wav
-    
     """
 
     # Do you want to export a wav file? True or False
