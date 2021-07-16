@@ -30,8 +30,13 @@ In libquantum, inside examples folder: ```00_blast_amplitude_check.py```.
 A copy of the code can be found
  [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/00_blast_amplitude_check.py).
 
-**libquantum modules used**: atoms, entropy, scales, spectra, utils, blast_pulse (as kaboom), 
-plot_templates.plot_time_frequency_reps (as pltq).
+**libquantum modules used**: [atoms](https://redvoxinc.github.io/libquantum/atoms.html),
+[entropy](https://redvoxinc.github.io/libquantum/entropy.html),
+[scales](https://redvoxinc.github.io/libquantum/scales.html),
+[spectra](https://redvoxinc.github.io/libquantum/spectra.html), 
+[utils](https://redvoxinc.github.io/libquantum/utils.html), 
+[blast_pulse](https://redvoxinc.github.io/libquantum/blast_pulse.html) (as kaboom), 
+[plot_templates.plot_time_frequency_reps](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_reps.html) (as pltq).
 
 
 ### Blast CWT inverse
@@ -45,12 +50,15 @@ in the inverse reconstruction.
 ![](img/example1_2.png)
 
 **To run blast cwt inverse example:**
-
 In libquantum, inside examples folder: ```01_blast_cwt_inverse.py```.
 A copy of the code can be found 
 [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/01_blast_cwt_inverse.py).
 
-**libquantum modules used**: synthetics (as synch), blast_pulse (as kaboom), utils, atoms_inverse (as atoms_inv).
+**libquantum modules used**: [synthetics](https://redvoxinc.github.io/libquantum/synthetics.html) (as synch), 
+[blast_pulse](https://redvoxinc.github.io/libquantum/blast_pulse.html) (as kaboom), 
+[utils](https://redvoxinc.github.io/libquantum/utils.html), 
+[atoms](https://redvoxinc.github.io/libquantum/atoms.html),
+[atoms_inverse](https://redvoxinc.github.io/libquantum/atoms_inverse.html).
 
 
 ### Tone amplitude check
@@ -68,8 +76,13 @@ In libquantum, inside examples folder: ```02_tone_amplitude_check.py```.
 A copy of the code can be found 
 [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/02_tone_amplitude_check.py).
 
-**libquantum modules used**: atoms, entropy, scales, spectra, utils, synthetics, 
-plot_templates.plot_time_frequency_reps (as pltq).
+**libquantum modules used**: [atoms](https://redvoxinc.github.io/libquantum/atoms.html),
+[entropy](https://redvoxinc.github.io/libquantum/entropy.html), 
+[scales](https://redvoxinc.github.io/libquantum/scales.html), 
+[spectra](https://redvoxinc.github.io/libquantum/spectra.html), 
+[utils](https://redvoxinc.github.io/libquantum/utils.html),
+[synthetics](https://redvoxinc.github.io/libquantum/synthetics.html), 
+[plot_templates.plot_time_frequency_reps](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_reps.html) (as pltq).
 
 
 ### Sweep linear
@@ -85,8 +98,14 @@ In libquantum, inside examples folder: ```03_sweep_linear.py```.
 A copy of the code can be found 
 [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/03_sweep_linear.py).
 
-**libquantum modules used**: atoms, entropy, scales, spectra, utils, synthetics,
-plot_templates.plot_time_frequency_reps (as pltq).
+**libquantum modules used**: 
+[atoms](https://redvoxinc.github.io/libquantum/atoms.html), 
+[entropy](https://redvoxinc.github.io/libquantum/entropy.html),
+[scales](https://redvoxinc.github.io/libquantum/scales.html), 
+[spectra](https://redvoxinc.github.io/libquantum/spectra.html), 
+[utils](https://redvoxinc.github.io/libquantum/utils.html), 
+[synthetics](https://redvoxinc.github.io/libquantum/synthetics.html),
+[plot_templates.plot_time_frequency_reps](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_reps.html) (as pltq).
 
 
 ### Sweep chirp
@@ -102,8 +121,15 @@ In libquantum, inside examples folder: ```04_sweep_chirp.py```.
 A copy of the code can be found
  [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/04_sweep_chirp.py).
 
-**libquantum modules used**: atoms, entropy, scales, spectra, utils, synthetics,
-plot_templates.plot_time_frequency_reps (as pltq), plot_templates.plot_time_frequency_picks (as pltpk).
+**libquantum modules used**: 
+[atoms](https://redvoxinc.github.io/libquantum/atoms.html), 
+[entropy](https://redvoxinc.github.io/libquantum/entropy.html), 
+[scales](https://redvoxinc.github.io/libquantum/scales.html), 
+[spectra](https://redvoxinc.github.io/libquantum/spectra.html), 
+[utils](https://redvoxinc.github.io/libquantum/utils.html), 
+[synthetics](https://redvoxinc.github.io/libquantum/synthetics.html),
+[plot_templates.plot_time_frequency_reps](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_reps.html) (as pltq), 
+[plot_templates.plot_time_frequency_picks](https://redvoxinc.github.io/libquantum/plot_templates/plot_time_frequency_picks.html) (as pltpk).
 
 ### libquantum scales and export modules
 
@@ -118,4 +144,6 @@ In libquantum, inside examples folder: ```05_using_libquantum_scales.py```.
 A copy of the code can be found 
 [here](https://github.com/RedVoxInc/libquantum/blob/master/examples/05_using_libquantum_scales.py).
 
-**libquantum modules used**: export, scales.
+**libquantum modules used**: 
+[export](https://redvoxinc.github.io/libquantum/export.html),
+[scales](https://redvoxinc.github.io/libquantum/scales.html).

@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>libquantum.blast_pulse API documentation</title>
+<meta name="description" content="This module facilitates the rapid construction of the GT blast pulse synthetic,
+its integral and derivatives, and its spectrum
+References:
+- Garcés, …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>libquantum.blast_pulse</code></h1>
+</header>
+<section id="section-intro">
+<p>This module facilitates the rapid construction of the GT blast pulse synthetic,
+its integral and derivatives, and its spectrum
+References:
+- Garcés, M. A. (2019). Explosion Source Models,
+Chapter in Infrasound Monitoring for Atmospheric Studies,
+Second Edition, Springer, Switzerland, DOI 10.1007/978-3-319-75140_5, p. 273-345.
+- Schnurr, J. M., K. Kim, M. A. Garcés, A. Rodgers (2020).
+Improved parametric models for explosion pressure signals derived from large datasets,
+Seism. Res. Lett.
+- Kim, K, A. R. Rodgers, M. A. Garces, and S. C. Myers (2021).
+Empirical Acoustic Source Model for Chemical Explosions in Air.
+Bulletin of the Seismological Society of America</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+This module facilitates the rapid construction of the GT blast pulse synthetic,
+its integral and derivatives, and its spectrum
+References:
+- Garcés, M. A. (2019). Explosion Source Models,
+Chapter in Infrasound Monitoring for Atmospheric Studies,
+Second Edition, Springer, Switzerland, DOI 10.1007/978-3-319-75140_5, p. 273-345.
+- Schnurr, J. M., K. Kim, M. A. Garcés, A. Rodgers (2020).
+Improved parametric models for explosion pressure signals derived from large datasets,
+Seism. Res. Lett.
+- Kim, K, A. R. Rodgers, M. A. Garces, and S. C. Myers (2021).
+Empirical Acoustic Source Model for Chemical Explosions in Air.
+Bulletin of the Seismological Society of America
+&#34;&#34;&#34;
+
+import numpy as np
+from typing import Optional, Tuple, Union
+from libquantum.synthetics import white_noise_fbits, antialias_halfNyquist
+from libquantum.scales import EPSILON
+
+
+def gt_blast_period_center(time_center_s: np.ndarray,
+                           pseudo_period_s: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    GT blast pulse
+
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy array with GT blast pulse
+    &#34;&#34;&#34;
+    # With the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GT = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GT[sigint1] = (1. - tau[sigint1])
+    p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
+
+    return p_GT
+
+
+def gt_hilbert_blast_period_center(time_center_s: np.ndarray,
+                                   pseudo_period_s: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Hilbert transform of the GT blast pulse
+
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy array with Hilbert transform of the GT blast pulse
+    &#34;&#34;&#34;
+    # With the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    a = 1 + np.sqrt(6)
+    # Initialize GT
+    p_GT_H = np.zeros(tau.size)  # Hilbert of Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigint2 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    tau1 = tau[sigint1]
+    tau2 = tau[sigint2]
+
+    p_GT_H[sigint1] = 1. + (1-tau1)*np.log(tau1+EPSILON) - (1-tau1)*np.log(1-tau1+EPSILON)
+    p_GT_H21 = (a-1)/6. * (a*(2*a+5) - 1 + 6*tau2**2 - 3*tau2*(1+3*a))
+    p_GT_H22 = (tau2-1)*(a-tau2)**2 * (np.log(a-tau2+EPSILON) - np.log(tau2-1+EPSILON))
+    p_GT_H[sigint2] = 1./6. * (p_GT_H21 + p_GT_H22)
+    p_GT_H /= np.pi
+
+    return p_GT_H
+
+
+def gt_blast_center_fast(frequency_peak_hz: float = 6.3,
+                         sample_rate_hz: float = 100.,
+                         noise_std_loss_bits: float = 16) -&gt; Tuple[np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Fast computation of GT pulse with noise
+
+    :param frequency_peak_hz: peak frequency, nominal 6.3 Hz for 1 tonne TNT
+    :param sample_rate_hz: sample rate, nominal 100 Hz
+    :param noise_std_loss_bits: noise loss relative to signal variance
+    :return: centered time in seconds, GT pulse with white noise
+    &#34;&#34;&#34;
+
+    duration_s = 16/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
+    pseudo_period_s = 1/frequency_peak_hz
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    return time_center_s, gt_white_aa
+
+
+def gt_blast_center_noise(duration_s: float = 16,
+                          frequency_peak_hz: float = 6.3,
+                          sample_rate_hz: float = 100,
+                          noise_std_loss_bits: float = 16) -&gt; Tuple[np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Fast computation of GT pulse with noise for a specified duration in seconds
+
+    :param duration_s: signal duration in seconds
+    :param frequency_peak_hz: peak frequency, nominal 6.3 Hz for 1 tonne TNT
+    :param sample_rate_hz: sample rate, nominal 100 Hz
+    :param noise_std_loss_bits: noise loss relative to signal variance
+    :return: centered time in seconds, GT pulse with white noise
+    &#34;&#34;&#34;
+    pseudo_period_s = 1/frequency_peak_hz
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    return time_center_s, gt_white_aa
+
+
+def gt_blast_center_noise_uneven(sensor_epoch_s: np.array,
+                                 noise_std_loss_bits: float = 2,
+                                 frequency_center_hz: Optional[float] = None) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Construct the GT explosion pulse of Garces (2019) for even or uneven sensor time
+    in Gaussion noise with SNR in bits re signal STD.
+    This is a very flexible variation.
+
+    :param sensor_epoch_s: array with timestamps for signal in epoch seconds
+    :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 2
+    :param frequency_center_hz: center frequency in Hz. Optional
+    :return: numpy array with anti-aliased GT explosion pulse with Gaussian noise
+    &#34;&#34;&#34;
+
+    time_duration_s = sensor_epoch_s[-1]-sensor_epoch_s[0]
+
+    if frequency_center_hz:
+        pseudo_period_s = 1/frequency_center_hz
+    else:
+        pseudo_period_s = time_duration_s/4.
+
+    # Convert to seconds
+    time_center_s = sensor_epoch_s - sensor_epoch_s[0] - time_duration_s/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(np.copy(sig_gt), noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+
+    return gt_white_aa
+
+
+# Integrals and derivatives, with delta function estimate and discontinuity boundary conditions
+def gt_blast_derivative_period_center(time_center_s: np.ndarray,
+                                      pseudo_period_s: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Derivative of the GT blast with delta function approximation
+
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy ndarray with derivative of the GT blast with delta function approximation
+    &#34;&#34;&#34;
+    # Garces (2019) ground truth GT blast pulse
+    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GTd = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GTd[sigint1] = -1.
+    p_GTd[sigintG17] = -1./6. * (3. + np.sqrt(6) - 3*tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17])
+
+    return p_GTd
+
+
+def gt_blast_integral_period_center(time_center_s: np.ndarray,
+                                    pseudo_period_s: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Integral of the GT blast with initial condition at zero crossing
+
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy ndarray with integral of GT blast pulse
+    &#34;&#34;&#34;
+    # Garces (2019) ground truth GT blast pulse
+    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GTi = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GTi[sigint1] = (1. - tau[sigint1]/2.)*tau[sigint1]
+
+    p_GTi[sigintG17] = -tau[sigintG17]/72. * (
+            3 * tau[sigintG17]**3 - 4 * (3 + 2 * np.sqrt(6)) * tau[sigintG17]**2 +
+            6 * (9 + 4 * np.sqrt(6)) * tau[sigintG17] - 12 * (7 + 2 * np.sqrt(6)))
+
+    integration_constant = p_GTi[sigint1][-1] - p_GTi[sigintG17][0]
+    p_GTi[sigintG17] += integration_constant
+
+    return p_GTi
+
+
+def gt_blast_center_integral_and_derivative(frequency_peak_hz,
+                                            sample_rate_hz: float) -&gt; Tuple[float, np.ndarray, np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Integral and derivative of GT pulse relative to tau (NOT time_s)
+
+    :param frequency_peak_hz: peak frequency in Hz
+    :param sample_rate_hz: sample rate in Hz
+    :return: tau center, numpy ndarray with GT blast pulse, numpy ndarray with integral of GT blast pulse, numpy array
+        with derivative of GT blast pulse
+    &#34;&#34;&#34;
+
+    duration_s = 2/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
+    pseudo_period_s = 1/frequency_peak_hz
+    time_pos_s = pseudo_period_s/4.
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    tau_center = time_center_s/time_pos_s
+    tau_interval = np.mean(np.diff(tau_center))
+
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_gt_i = gt_blast_integral_period_center(time_center_s, pseudo_period_s)
+    sig_gt_d = gt_blast_derivative_period_center(time_center_s, pseudo_period_s)
+    sig_gt_d[np.argmax(sig_gt)-1] = np.max(np.diff(sig_gt))/tau_interval
+
+    return tau_center, sig_gt, sig_gt_i, sig_gt_d
+
+
+def gt_blast_ft(frequency_peak_hz: float,
+                frequency_hz: Union[float, np.ndarray]) -&gt; Union[float, complex, np.ndarray]:
+    &#34;&#34;&#34;
+    Fourier transform of the GT blast pulse
+
+    :param frequency_peak_hz: peak frequency in Hz
+    :param frequency_hz: frequency in Hz, float or np.ndarray
+    :return: Fourier transform of the GT blast pulse
+    &#34;&#34;&#34;
+    w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
+    ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
+    ft_G17_negative = np.exp(-1j*w_scaled*(1+np.sqrt(6.)))/(3.*w_scaled**4.) * \
+                      (1j*w_scaled*np.sqrt(6.) + 3. +
+                       np.exp(1j*w_scaled*np.sqrt(6.))*(3.*w_scaled**2. + 1j*w_scaled*2.*np.sqrt(6.)-3.))
+    ft_G17 = (ft_G17_positive + ft_G17_negative)*np.pi/(2*np.pi*frequency_peak_hz)
+    return ft_G17
+
+
+def gt_blast_spectral_density(frequency_peak_hz: float,
+                              frequency_hz: Union[float, np.ndarray]) -&gt; Tuple[Union[float, np.ndarray], float]:
+    &#34;&#34;&#34;
+    Spectral density of the GT blast pulse
+
+    :param frequency_peak_hz: peak frequency in Hz
+    :param frequency_hz: frequency in Hz, float or np.ndarray
+    :return: spectral_density, spectral_density_peak
+    &#34;&#34;&#34;
+    fourier_tx = gt_blast_ft(frequency_peak_hz, frequency_hz)
+    spectral_density = 2*np.abs(fourier_tx*np.conj(fourier_tx))
+    spectral_density_peak = np.max(spectral_density)
+    return spectral_density, spectral_density_peak</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="libquantum.blast_pulse.gt_blast_center_fast"><code class="name flex">
+<span>def <span class="ident">gt_blast_center_fast</span></span>(<span>frequency_peak_hz: float = 6.3, sample_rate_hz: float = 100.0, noise_std_loss_bits: float = 16) ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fast computation of GT pulse with noise</p>
+<p>:param frequency_peak_hz: peak frequency, nominal 6.3 Hz for 1 tonne TNT
+:param sample_rate_hz: sample rate, nominal 100 Hz
+:param noise_std_loss_bits: noise loss relative to signal variance
+:return: centered time in seconds, GT pulse with white noise</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_center_fast(frequency_peak_hz: float = 6.3,
+                         sample_rate_hz: float = 100.,
+                         noise_std_loss_bits: float = 16) -&gt; Tuple[np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Fast computation of GT pulse with noise
+
+    :param frequency_peak_hz: peak frequency, nominal 6.3 Hz for 1 tonne TNT
+    :param sample_rate_hz: sample rate, nominal 100 Hz
+    :param noise_std_loss_bits: noise loss relative to signal variance
+    :return: centered time in seconds, GT pulse with white noise
+    &#34;&#34;&#34;
+
+    duration_s = 16/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
+    pseudo_period_s = 1/frequency_peak_hz
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    return time_center_s, gt_white_aa</code></pre>
+</details>
+</dd>
+<dt id="libquantum.blast_pulse.gt_blast_center_integral_and_derivative"><code class="name flex">
+<span>def <span class="ident">gt_blast_center_integral_and_derivative</span></span>(<span>frequency_peak_hz, sample_rate_hz: float) ‑> Tuple[float, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Integral and derivative of GT pulse relative to tau (NOT time_s)</p>
+<p>:param frequency_peak_hz: peak frequency in Hz
+:param sample_rate_hz: sample rate in Hz
+:return: tau center, numpy ndarray with GT blast pulse, numpy ndarray with integral of GT blast pulse, numpy array
+with derivative of GT blast pulse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_center_integral_and_derivative(frequency_peak_hz,
+                                            sample_rate_hz: float) -&gt; Tuple[float, np.ndarray, np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Integral and derivative of GT pulse relative to tau (NOT time_s)
+
+    :param frequency_peak_hz: peak frequency in Hz
+    :param sample_rate_hz: sample rate in Hz
+    :return: tau center, numpy ndarray with GT blast pulse, numpy ndarray with integral of GT blast pulse, numpy array
+        with derivative of GT blast pulse
+    &#34;&#34;&#34;
+
+    duration_s = 2/frequency_peak_hz       # 16 cycles for 6th octave (M = 14)
+    pseudo_period_s = 1/frequency_peak_hz
+    time_pos_s = pseudo_period_s/4.
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    tau_center = time_center_s/time_pos_s
+    tau_interval = np.mean(np.diff(tau_center))
+
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_gt_i = gt_blast_integral_period_center(time_center_s, pseudo_period_s)
+    sig_gt_d = gt_blast_derivative_period_center(time_center_s, pseudo_period_s)
+    sig_gt_d[np.argmax(sig_gt)-1] = np.max(np.diff(sig_gt))/tau_interval
+
+    return tau_center, sig_gt, sig_gt_i, sig_gt_d</code></pre>
+</details>
+</dd>
+<dt id="libquantum.blast_pulse.gt_blast_center_noise"><code class="name flex">
+<span>def <span class="ident">gt_blast_center_noise</span></span>(<span>duration_s: float = 16, frequency_peak_hz: float = 6.3, sample_rate_hz: float = 100, noise_std_loss_bits: float = 16) ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fast computation of GT pulse with noise for a specified duration in seconds</p>
+<p>:param duration_s: signal duration in seconds
+:param frequency_peak_hz: peak frequency, nominal 6.3 Hz for 1 tonne TNT
+:param sample_rate_hz: sample rate, nominal 100 Hz
+:param noise_std_loss_bits: noise loss relative to signal variance
+:return: centered time in seconds, GT pulse with white noise</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_center_noise(duration_s: float = 16,
+                          frequency_peak_hz: float = 6.3,
+                          sample_rate_hz: float = 100,
+                          noise_std_loss_bits: float = 16) -&gt; Tuple[np.ndarray, np.ndarray]:
+    &#34;&#34;&#34;
+    Fast computation of GT pulse with noise for a specified duration in seconds
+
+    :param duration_s: signal duration in seconds
+    :param frequency_peak_hz: peak frequency, nominal 6.3 Hz for 1 tonne TNT
+    :param sample_rate_hz: sample rate, nominal 100 Hz
+    :param noise_std_loss_bits: noise loss relative to signal variance
+    :return: centered time in seconds, GT pulse with white noise
+    &#34;&#34;&#34;
+    pseudo_period_s = 1/frequency_peak_hz
+    duration_points = int(duration_s*sample_rate_hz)
+    time_center_s = np.arange(duration_points)/sample_rate_hz
+    time_center_s -= time_center_s[-1]/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(sig_gt, noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+    return time_center_s, gt_white_aa</code></pre>
+</details>
+</dd>
+<dt id="libquantum.blast_pulse.gt_blast_center_noise_uneven"><code class="name flex">
+<span>def <span class="ident">gt_blast_center_noise_uneven</span></span>(<span>sensor_epoch_s: <built-in function array>, noise_std_loss_bits: float = 2, frequency_center_hz: Union[float, NoneType] = None) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Construct the GT explosion pulse of Garces (2019) for even or uneven sensor time
+in Gaussion noise with SNR in bits re signal STD.
+This is a very flexible variation.</p>
+<p>:param sensor_epoch_s: array with timestamps for signal in epoch seconds
+:param noise_std_loss_bits: number of bits below signal standard deviation. Default is 2
+:param frequency_center_hz: center frequency in Hz. Optional
+:return: numpy array with anti-aliased GT explosion pulse with Gaussian noise</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_center_noise_uneven(sensor_epoch_s: np.array,
+                                 noise_std_loss_bits: float = 2,
+                                 frequency_center_hz: Optional[float] = None) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Construct the GT explosion pulse of Garces (2019) for even or uneven sensor time
+    in Gaussion noise with SNR in bits re signal STD.
+    This is a very flexible variation.
+
+    :param sensor_epoch_s: array with timestamps for signal in epoch seconds
+    :param noise_std_loss_bits: number of bits below signal standard deviation. Default is 2
+    :param frequency_center_hz: center frequency in Hz. Optional
+    :return: numpy array with anti-aliased GT explosion pulse with Gaussian noise
+    &#34;&#34;&#34;
+
+    time_duration_s = sensor_epoch_s[-1]-sensor_epoch_s[0]
+
+    if frequency_center_hz:
+        pseudo_period_s = 1/frequency_center_hz
+    else:
+        pseudo_period_s = time_duration_s/4.
+
+    # Convert to seconds
+    time_center_s = sensor_epoch_s - sensor_epoch_s[0] - time_duration_s/2.
+    sig_gt = gt_blast_period_center(time_center_s, pseudo_period_s)
+    sig_noise = white_noise_fbits(np.copy(sig_gt), noise_std_loss_bits)
+    gt_white = sig_gt + sig_noise
+    # AA filter
+    gt_white_aa = antialias_halfNyquist(gt_white)
+
+    return gt_white_aa</code></pre>
+</details>
+</dd>
+<dt id="libquantum.blast_pulse.gt_blast_derivative_period_center"><code class="name flex">
+<span>def <span class="ident">gt_blast_derivative_period_center</span></span>(<span>time_center_s: numpy.ndarray, pseudo_period_s: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Derivative of the GT blast with delta function approximation</p>
+<p>:param time_center_s: array with time
+:param pseudo_period_s: period in seconds
+:return: numpy ndarray with derivative of the GT blast with delta function approximation</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_derivative_period_center(time_center_s: np.ndarray,
+                                      pseudo_period_s: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Derivative of the GT blast with delta function approximation
+
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy ndarray with derivative of the GT blast with delta function approximation
+    &#34;&#34;&#34;
+    # Garces (2019) ground truth GT blast pulse
+    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GTd = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GTd[sigint1] = -1.
+    p_GTd[sigintG17] = -1./6. * (3. + np.sqrt(6) - 3*tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17])
+
+    return p_GTd</code></pre>
+</details>
+</dd>
+<dt id="libquantum.blast_pulse.gt_blast_ft"><code class="name flex">
+<span>def <span class="ident">gt_blast_ft</span></span>(<span>frequency_peak_hz: float, frequency_hz: Union[float, numpy.ndarray]) ‑> Union[float, complex, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fourier transform of the GT blast pulse</p>
+<p>:param frequency_peak_hz: peak frequency in Hz
+:param frequency_hz: frequency in Hz, float or np.ndarray
+:return: Fourier transform of the GT blast pulse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_ft(frequency_peak_hz: float,
+                frequency_hz: Union[float, np.ndarray]) -&gt; Union[float, complex, np.ndarray]:
+    &#34;&#34;&#34;
+    Fourier transform of the GT blast pulse
+
+    :param frequency_peak_hz: peak frequency in Hz
+    :param frequency_hz: frequency in Hz, float or np.ndarray
+    :return: Fourier transform of the GT blast pulse
+    &#34;&#34;&#34;
+    w_scaled = 0.5*np.pi*frequency_hz/frequency_peak_hz
+    ft_G17_positive = (1. - 1j*w_scaled - np.exp(-1j*w_scaled))/w_scaled**2.
+    ft_G17_negative = np.exp(-1j*w_scaled*(1+np.sqrt(6.)))/(3.*w_scaled**4.) * \
+                      (1j*w_scaled*np.sqrt(6.) + 3. +
+                       np.exp(1j*w_scaled*np.sqrt(6.))*(3.*w_scaled**2. + 1j*w_scaled*2.*np.sqrt(6.)-3.))
+    ft_G17 = (ft_G17_positive + ft_G17_negative)*np.pi/(2*np.pi*frequency_peak_hz)
+    return ft_G17</code></pre>
+</details>
+</dd>
+<dt id="libquantum.blast_pulse.gt_blast_integral_period_center"><code class="name flex">
+<span>def <span class="ident">gt_blast_integral_period_center</span></span>(<span>time_center_s: numpy.ndarray, pseudo_period_s: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Integral of the GT blast with initial condition at zero crossing</p>
+<p>:param time_center_s: array with time
+:param pseudo_period_s: period in seconds
+:return: numpy ndarray with integral of GT blast pulse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_integral_period_center(time_center_s: np.ndarray,
+                                    pseudo_period_s: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Integral of the GT blast with initial condition at zero crossing
+
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy ndarray with integral of GT blast pulse
+    &#34;&#34;&#34;
+    # Garces (2019) ground truth GT blast pulse
+    # with the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GTi = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GTi[sigint1] = (1. - tau[sigint1]/2.)*tau[sigint1]
+
+    p_GTi[sigintG17] = -tau[sigintG17]/72. * (
+            3 * tau[sigintG17]**3 - 4 * (3 + 2 * np.sqrt(6)) * tau[sigintG17]**2 +
+            6 * (9 + 4 * np.sqrt(6)) * tau[sigintG17] - 12 * (7 + 2 * np.sqrt(6)))
+
+    integration_constant = p_GTi[sigint1][-1] - p_GTi[sigintG17][0]
+    p_GTi[sigintG17] += integration_constant
+
+    return p_GTi</code></pre>
+</details>
+</dd>
+<dt id="libquantum.blast_pulse.gt_blast_period_center"><code class="name flex">
+<span>def <span class="ident">gt_blast_period_center</span></span>(<span>time_center_s: numpy.ndarray, pseudo_period_s: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>GT blast pulse</p>
+<p>:param time_center_s: array with time
+:param pseudo_period_s: period in seconds
+:return: numpy array with GT blast pulse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_period_center(time_center_s: np.ndarray,
+                           pseudo_period_s: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    GT blast pulse
+
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy array with GT blast pulse
+    &#34;&#34;&#34;
+    # With the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    # Initialize GT
+    p_GT = np.zeros(tau.size)  # Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigintG17 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    p_GT[sigint1] = (1. - tau[sigint1])
+    p_GT[sigintG17] = 1./6. * (1. - tau[sigintG17]) * (1. + np.sqrt(6) - tau[sigintG17]) ** 2.
+
+    return p_GT</code></pre>
+</details>
+</dd>
+<dt id="libquantum.blast_pulse.gt_blast_spectral_density"><code class="name flex">
+<span>def <span class="ident">gt_blast_spectral_density</span></span>(<span>frequency_peak_hz: float, frequency_hz: Union[float, numpy.ndarray]) ‑> Tuple[Union[float, numpy.ndarray], float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Spectral density of the GT blast pulse</p>
+<p>:param frequency_peak_hz: peak frequency in Hz
+:param frequency_hz: frequency in Hz, float or np.ndarray
+:return: spectral_density, spectral_density_peak</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_blast_spectral_density(frequency_peak_hz: float,
+                              frequency_hz: Union[float, np.ndarray]) -&gt; Tuple[Union[float, np.ndarray], float]:
+    &#34;&#34;&#34;
+    Spectral density of the GT blast pulse
+
+    :param frequency_peak_hz: peak frequency in Hz
+    :param frequency_hz: frequency in Hz, float or np.ndarray
+    :return: spectral_density, spectral_density_peak
+    &#34;&#34;&#34;
+    fourier_tx = gt_blast_ft(frequency_peak_hz, frequency_hz)
+    spectral_density = 2*np.abs(fourier_tx*np.conj(fourier_tx))
+    spectral_density_peak = np.max(spectral_density)
+    return spectral_density, spectral_density_peak</code></pre>
+</details>
+</dd>
+<dt id="libquantum.blast_pulse.gt_hilbert_blast_period_center"><code class="name flex">
+<span>def <span class="ident">gt_hilbert_blast_period_center</span></span>(<span>time_center_s: numpy.ndarray, pseudo_period_s: float) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Hilbert transform of the GT blast pulse</p>
+<p>:param time_center_s: array with time
+:param pseudo_period_s: period in seconds
+:return: numpy array with Hilbert transform of the GT blast pulse</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gt_hilbert_blast_period_center(time_center_s: np.ndarray,
+                                   pseudo_period_s: float) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Hilbert transform of the GT blast pulse
+
+    :param time_center_s: array with time
+    :param pseudo_period_s: period in seconds
+    :return: numpy array with Hilbert transform of the GT blast pulse
+    &#34;&#34;&#34;
+    # With the +1, tau is the zero crossing time - time_start renamed to time_zero for first zero crossing.
+    time_pos_s = pseudo_period_s/4.
+    tau = time_center_s/time_pos_s + 1.
+    a = 1 + np.sqrt(6)
+    # Initialize GT
+    p_GT_H = np.zeros(tau.size)  # Hilbert of Granstrom-Triangular (GT), 2019
+    # Initialize time ranges
+    sigint1 = np.where((0.0 &lt;= tau) &amp; (tau &lt;= 1.))  # ONLY positive pulse
+    sigint2 = np.where((1. &lt; tau) &amp; (tau &lt;= 1 + np.sqrt(6.)))  # GT balanced pulse
+    tau1 = tau[sigint1]
+    tau2 = tau[sigint2]
+
+    p_GT_H[sigint1] = 1. + (1-tau1)*np.log(tau1+EPSILON) - (1-tau1)*np.log(1-tau1+EPSILON)
+    p_GT_H21 = (a-1)/6. * (a*(2*a+5) - 1 + 6*tau2**2 - 3*tau2*(1+3*a))
+    p_GT_H22 = (tau2-1)*(a-tau2)**2 * (np.log(a-tau2+EPSILON) - np.log(tau2-1+EPSILON))
+    p_GT_H[sigint2] = 1./6. * (p_GT_H21 + p_GT_H22)
+    p_GT_H /= np.pi
+
+    return p_GT_H</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="libquantum" href="index.html">libquantum</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="libquantum.blast_pulse.gt_blast_center_fast" href="#libquantum.blast_pulse.gt_blast_center_fast">gt_blast_center_fast</a></code></li>
+<li><code><a title="libquantum.blast_pulse.gt_blast_center_integral_and_derivative" href="#libquantum.blast_pulse.gt_blast_center_integral_and_derivative">gt_blast_center_integral_and_derivative</a></code></li>
+<li><code><a title="libquantum.blast_pulse.gt_blast_center_noise" href="#libquantum.blast_pulse.gt_blast_center_noise">gt_blast_center_noise</a></code></li>
+<li><code><a title="libquantum.blast_pulse.gt_blast_center_noise_uneven" href="#libquantum.blast_pulse.gt_blast_center_noise_uneven">gt_blast_center_noise_uneven</a></code></li>
+<li><code><a title="libquantum.blast_pulse.gt_blast_derivative_period_center" href="#libquantum.blast_pulse.gt_blast_derivative_period_center">gt_blast_derivative_period_center</a></code></li>
+<li><code><a title="libquantum.blast_pulse.gt_blast_ft" href="#libquantum.blast_pulse.gt_blast_ft">gt_blast_ft</a></code></li>
+<li><code><a title="libquantum.blast_pulse.gt_blast_integral_period_center" href="#libquantum.blast_pulse.gt_blast_integral_period_center">gt_blast_integral_period_center</a></code></li>
+<li><code><a title="libquantum.blast_pulse.gt_blast_period_center" href="#libquantum.blast_pulse.gt_blast_period_center">gt_blast_period_center</a></code></li>
+<li><code><a title="libquantum.blast_pulse.gt_blast_spectral_density" href="#libquantum.blast_pulse.gt_blast_spectral_density">gt_blast_spectral_density</a></code></li>
+<li><code><a title="libquantum.blast_pulse.gt_hilbert_blast_period_center" href="#libquantum.blast_pulse.gt_hilbert_blast_period_center">gt_hilbert_blast_period_center</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

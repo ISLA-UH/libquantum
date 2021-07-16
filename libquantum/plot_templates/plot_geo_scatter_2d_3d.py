@@ -1,5 +1,5 @@
 """
-This module contains 2D and 3 D geolocation scatter plots
+This module contains 2D and 3D geolocation scatter plots
 """
 
 import matplotlib.pyplot as plt

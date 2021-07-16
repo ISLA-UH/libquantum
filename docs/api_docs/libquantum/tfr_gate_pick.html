@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>libquantum.tfr_gate_pick API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="This module contains functions for frequency picking" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,21 +22,31 @@
 <h1 class="title">Module <code>libquantum.tfr_gate_pick</code></h1>
 </header>
 <section id="section-intro">
+<p>This module contains functions for frequency picking</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import numpy as np
+<pre><code class="python">&#34;&#34;&#34;
+This module contains functions for frequency picking
+&#34;&#34;&#34;
+
+import numpy as np
+from typing import Tuple, Union
 
 
-def submesh_from_passband(tfr_mesh_2d, frequency_1d, frequency_min, frequency_max):
+def submesh_from_passband(tfr_mesh_2d: np.ndarray,
+                          frequency_1d: np.ndarray,
+                          frequency_min: float,
+                          frequency_max: float) -&gt; Tuple[np.ndarray, np.ndarray]:
     &#34;&#34;&#34;
     Extracts only the coefficients in the passband of interest
-    :param mesh_2d: Assumes frequency is the first dimension (rows)
-    :param frequency_1d: Frequency vector, same ordering as mesh columns
-    :param frequency_min:
-    :param frequency_max:
-    :return:
+
+    :param tfr_mesh_2d: assumes frequency is the first dimension (rows)
+    :param frequency_1d: frequency vector, same ordering as mesh columns
+    :param frequency_min: minimum frequency for passband
+    :param frequency_max: maximum frequency for passband
+    :return: np.ndarray with submesh values and np.ndarray with submesh frequencies
     &#34;&#34;&#34;
     index_frequency_hz_min = np.argmin(np.abs(frequency_1d - frequency_min))
     index_frequency_hz_max = np.argmin(np.abs(frequency_1d - frequency_max))
@@ -46,15 +56,20 @@ def submesh_from_passband(tfr_mesh_2d, frequency_1d, frequency_min, frequency_ma
     return tfr_submesh, tfr_submesh_frequency
 
 
-def double_submesh_from_passband(tfr1_mesh_2d, tfr2_mesh_2d, frequency_1d, frequency_min, frequency_max):
+def double_submesh_from_passband(tfr1_mesh_2d: np.ndarray,
+                                 tfr2_mesh_2d: np.ndarray,
+                                 frequency_1d: np.ndarray,
+                                 frequency_min: float,
+                                 frequency_max: float) -&gt; Tuple[np.ndarray, np.ndarray, np.ndarray]:
     &#34;&#34;&#34;
-    Extracts only the coefficients in the passband of interest
-    :param tfr1_mesh_2d: Assumes frequency is the first dimension (rows)
-    :param tfr2_mesh_2d: Assumes frequency is the first dimension (rows), same dims as tfr1
-    :param frequency_1d: Frequency vector, same ordering as mesh columns
-    :param frequency_min:
-    :param frequency_max:
-    :return:
+    Extracts only the coefficients in the passband of interest for two np.ndarray mesh
+
+    :param tfr1_mesh_2d: assumes frequency is the first dimension (rows)
+    :param tfr2_mesh_2d: assumes frequency is the first dimension (rows), same dims as tfr1
+    :param frequency_1d: frequency vector, same ordering as mesh columns
+    :param frequency_min: minimum frequency for passband
+    :param frequency_max: maximum frequency for passband
+    :return: np.ndarray with submesh values for tfr1, np.ndarray with submesh values for tfr2, and tfr_submesh_frequency
     &#34;&#34;&#34;
     index_frequency_hz_min = np.argmin(np.abs(frequency_1d - frequency_min))
     index_frequency_hz_max = np.argmin(np.abs(frequency_1d - frequency_max))
@@ -65,14 +80,19 @@ def double_submesh_from_passband(tfr1_mesh_2d, tfr2_mesh_2d, frequency_1d, frequ
     return tfr1_submesh, tfr2_submesh, tfr_submesh_frequency
 
 
-def mesh_peaks_from_passband(mesh_2d, frequency_1d, frequency_min, frequency_max):
+def mesh_peaks_from_passband(mesh_2d: np.ndarray,
+                             frequency_1d: np.ndarray,
+                             frequency_min: float,
+                             frequency_max: float) -&gt; Tuple[Union[np.ndarray, int, float, complex], np.ndarray,
+                                                            np.ndarray]:
     &#34;&#34;&#34;
-    This is a key element, refine
-    :param mesh_2d:
-    :param frequency_1d:
-    :param frequency_min:
-    :param frequency_max:
-    :return:
+    Find frequency peaks in the passband of interest for mesh
+
+    :param mesh_2d: array with mesh
+    :param frequency_1d: frequency vector, same ordering as mesh columns
+    :param frequency_min:minimum frequency for passband
+    :param frequency_max: maximum frequency for passband
+    :return: maximum value of mesh, np.ndarray with frequency peaks, and np.ndarray with frequency peaks index
     &#34;&#34;&#34;
     index_frequency_hz_min_band = np.argmin(np.abs(frequency_1d - frequency_min))
     index_frequency_hz_max_band = np.argmin(np.abs(frequency_1d - frequency_max))
@@ -89,12 +109,15 @@ def mesh_peaks_from_passband(mesh_2d, frequency_1d, frequency_min, frequency_max
     return mesh_max, frequency_peak, frequency_index
 
 
-def mesh_peaks(mesh_2d, frequency_1d):
+def mesh_peaks(mesh_2d: np.ndarray,
+               frequency_1d: np.ndarray) -&gt; Tuple[Union[np.ndarray, int, float, complex], np.ndarray,
+                                                  np.ndarray]:
     &#34;&#34;&#34;
-    This is a key element, refine
-    :param mesh_2d:
-    :param frequency_1d:
-    :return:
+    Find frequency peaks in mesh
+
+    :param mesh_2d: array with mesh
+    :param frequency_1d: frequency vector, same ordering as mesh columns
+    :return: maximum value of mesh, np.ndarray with frequency peaks, and np.ndarray with frequency peaks index
     &#34;&#34;&#34;
 
     mesh_max = np.max(mesh_2d, axis=0)
@@ -107,13 +130,16 @@ def mesh_peaks(mesh_2d, frequency_1d):
     return mesh_max, frequency_peak, frequency_index
 
 
-def peak_mask(tfr_1d: np.array, tfr_1d_min: float, tfr_1d_max: float):
+def peak_mask(tfr_1d: np.array,
+              tfr_1d_min: float,
+              tfr_1d_max: float) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Constructs nan masks, useful for transportability
-    :param tfr_1d:
-    :param tfr_1d_min:
-    :param tfr_1d_max:
-    :return:
+
+    :param tfr_1d: array with values
+    :param tfr_1d_min: minimum value to start mask
+    :param tfr_1d_max: maximum value to end mask
+    :return: np.ndarray with NaN mask for min/max values provided
     &#34;&#34;&#34;
     # Initialize 1D mask
     tfr_gate_nan_mask = np.empty(tfr_1d.shape[0])
@@ -126,13 +152,16 @@ def peak_mask(tfr_1d: np.array, tfr_1d_min: float, tfr_1d_max: float):
     return tfr_gate_nan_mask
 
 
-def mesh_mask(tfr_2d: np.array, tfr_1d_min: float, tfr_1d_max: float):
+def mesh_mask(tfr_2d: np.array,
+              tfr_1d_min: float,
+              tfr_1d_max: float) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Uses the mighty np.ma framework, best for matrix-specific transforms
-    :param tfr_2d:
-    :param tfr_1d_min:
-    :param tfr_1d_max:
-    :return:
+
+    :param tfr_2d: array with mesh
+    :param tfr_1d_min: minimum value to start mask
+    :param tfr_1d_max: maximum value to end mask
+    :return: np.ndarray with NaN mask for min/max values provided
     &#34;&#34;&#34;
     mesh_condition1 = tfr_2d &lt; tfr_1d_min
     mesh_condition2 = tfr_2d &gt; tfr_1d_max
@@ -153,29 +182,34 @@ def mesh_mask(tfr_2d: np.array, tfr_1d_min: float, tfr_1d_max: float):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="libquantum.tfr_gate_pick.double_submesh_from_passband"><code class="name flex">
-<span>def <span class="ident">double_submesh_from_passband</span></span>(<span>tfr1_mesh_2d, tfr2_mesh_2d, frequency_1d, frequency_min, frequency_max)</span>
+<span>def <span class="ident">double_submesh_from_passband</span></span>(<span>tfr1_mesh_2d: numpy.ndarray, tfr2_mesh_2d: numpy.ndarray, frequency_1d: numpy.ndarray, frequency_min: float, frequency_max: float) ‑> Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Extracts only the coefficients in the passband of interest
-:param tfr1_mesh_2d: Assumes frequency is the first dimension (rows)
-:param tfr2_mesh_2d: Assumes frequency is the first dimension (rows), same dims as tfr1
-:param frequency_1d: Frequency vector, same ordering as mesh columns
-:param frequency_min:
-:param frequency_max:
-:return:</p></div>
+<div class="desc"><p>Extracts only the coefficients in the passband of interest for two np.ndarray mesh</p>
+<p>:param tfr1_mesh_2d: assumes frequency is the first dimension (rows)
+:param tfr2_mesh_2d: assumes frequency is the first dimension (rows), same dims as tfr1
+:param frequency_1d: frequency vector, same ordering as mesh columns
+:param frequency_min: minimum frequency for passband
+:param frequency_max: maximum frequency for passband
+:return: np.ndarray with submesh values for tfr1, np.ndarray with submesh values for tfr2, and tfr_submesh_frequency</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def double_submesh_from_passband(tfr1_mesh_2d, tfr2_mesh_2d, frequency_1d, frequency_min, frequency_max):
+<pre><code class="python">def double_submesh_from_passband(tfr1_mesh_2d: np.ndarray,
+                                 tfr2_mesh_2d: np.ndarray,
+                                 frequency_1d: np.ndarray,
+                                 frequency_min: float,
+                                 frequency_max: float) -&gt; Tuple[np.ndarray, np.ndarray, np.ndarray]:
     &#34;&#34;&#34;
-    Extracts only the coefficients in the passband of interest
-    :param tfr1_mesh_2d: Assumes frequency is the first dimension (rows)
-    :param tfr2_mesh_2d: Assumes frequency is the first dimension (rows), same dims as tfr1
-    :param frequency_1d: Frequency vector, same ordering as mesh columns
-    :param frequency_min:
-    :param frequency_max:
-    :return:
+    Extracts only the coefficients in the passband of interest for two np.ndarray mesh
+
+    :param tfr1_mesh_2d: assumes frequency is the first dimension (rows)
+    :param tfr2_mesh_2d: assumes frequency is the first dimension (rows), same dims as tfr1
+    :param frequency_1d: frequency vector, same ordering as mesh columns
+    :param frequency_min: minimum frequency for passband
+    :param frequency_max: maximum frequency for passband
+    :return: np.ndarray with submesh values for tfr1, np.ndarray with submesh values for tfr2, and tfr_submesh_frequency
     &#34;&#34;&#34;
     index_frequency_hz_min = np.argmin(np.abs(frequency_1d - frequency_min))
     index_frequency_hz_max = np.argmin(np.abs(frequency_1d - frequency_max))
@@ -187,25 +221,28 @@ def mesh_mask(tfr_2d: np.array, tfr_1d_min: float, tfr_1d_max: float):
 </details>
 </dd>
 <dt id="libquantum.tfr_gate_pick.mesh_mask"><code class="name flex">
-<span>def <span class="ident">mesh_mask</span></span>(<span>tfr_2d: <built-in function array>, tfr_1d_min: float, tfr_1d_max: float)</span>
+<span>def <span class="ident">mesh_mask</span></span>(<span>tfr_2d: <built-in function array>, tfr_1d_min: float, tfr_1d_max: float) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Uses the mighty np.ma framework, best for matrix-specific transforms
-:param tfr_2d:
-:param tfr_1d_min:
-:param tfr_1d_max:
-:return:</p></div>
+<div class="desc"><p>Uses the mighty np.ma framework, best for matrix-specific transforms</p>
+<p>:param tfr_2d: array with mesh
+:param tfr_1d_min: minimum value to start mask
+:param tfr_1d_max: maximum value to end mask
+:return: np.ndarray with NaN mask for min/max values provided</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def mesh_mask(tfr_2d: np.array, tfr_1d_min: float, tfr_1d_max: float):
+<pre><code class="python">def mesh_mask(tfr_2d: np.array,
+              tfr_1d_min: float,
+              tfr_1d_max: float) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Uses the mighty np.ma framework, best for matrix-specific transforms
-    :param tfr_2d:
-    :param tfr_1d_min:
-    :param tfr_1d_max:
-    :return:
+
+    :param tfr_2d: array with mesh
+    :param tfr_1d_min: minimum value to start mask
+    :param tfr_1d_max: maximum value to end mask
+    :return: np.ndarray with NaN mask for min/max values provided
     &#34;&#34;&#34;
     mesh_condition1 = tfr_2d &lt; tfr_1d_min
     mesh_condition2 = tfr_2d &gt; tfr_1d_max
@@ -219,23 +256,26 @@ def mesh_mask(tfr_2d: np.array, tfr_1d_min: float, tfr_1d_max: float):
 </details>
 </dd>
 <dt id="libquantum.tfr_gate_pick.mesh_peaks"><code class="name flex">
-<span>def <span class="ident">mesh_peaks</span></span>(<span>mesh_2d, frequency_1d)</span>
+<span>def <span class="ident">mesh_peaks</span></span>(<span>mesh_2d: numpy.ndarray, frequency_1d: numpy.ndarray) ‑> Tuple[Union[numpy.ndarray, int, float, complex], numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>This is a key element, refine
-:param mesh_2d:
-:param frequency_1d:
-:return:</p></div>
+<div class="desc"><p>Find frequency peaks in mesh</p>
+<p>:param mesh_2d: array with mesh
+:param frequency_1d: frequency vector, same ordering as mesh columns
+:return: maximum value of mesh, np.ndarray with frequency peaks, and np.ndarray with frequency peaks index</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def mesh_peaks(mesh_2d, frequency_1d):
+<pre><code class="python">def mesh_peaks(mesh_2d: np.ndarray,
+               frequency_1d: np.ndarray) -&gt; Tuple[Union[np.ndarray, int, float, complex], np.ndarray,
+                                                  np.ndarray]:
     &#34;&#34;&#34;
-    This is a key element, refine
-    :param mesh_2d:
-    :param frequency_1d:
-    :return:
+    Find frequency peaks in mesh
+
+    :param mesh_2d: array with mesh
+    :param frequency_1d: frequency vector, same ordering as mesh columns
+    :return: maximum value of mesh, np.ndarray with frequency peaks, and np.ndarray with frequency peaks index
     &#34;&#34;&#34;
 
     mesh_max = np.max(mesh_2d, axis=0)
@@ -249,27 +289,32 @@ def mesh_mask(tfr_2d: np.array, tfr_1d_min: float, tfr_1d_max: float):
 </details>
 </dd>
 <dt id="libquantum.tfr_gate_pick.mesh_peaks_from_passband"><code class="name flex">
-<span>def <span class="ident">mesh_peaks_from_passband</span></span>(<span>mesh_2d, frequency_1d, frequency_min, frequency_max)</span>
+<span>def <span class="ident">mesh_peaks_from_passband</span></span>(<span>mesh_2d: numpy.ndarray, frequency_1d: numpy.ndarray, frequency_min: float, frequency_max: float) ‑> Tuple[Union[numpy.ndarray, int, float, complex], numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>This is a key element, refine
-:param mesh_2d:
-:param frequency_1d:
-:param frequency_min:
-:param frequency_max:
-:return:</p></div>
+<div class="desc"><p>Find frequency peaks in the passband of interest for mesh</p>
+<p>:param mesh_2d: array with mesh
+:param frequency_1d: frequency vector, same ordering as mesh columns
+:param frequency_min:minimum frequency for passband
+:param frequency_max: maximum frequency for passband
+:return: maximum value of mesh, np.ndarray with frequency peaks, and np.ndarray with frequency peaks index</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def mesh_peaks_from_passband(mesh_2d, frequency_1d, frequency_min, frequency_max):
+<pre><code class="python">def mesh_peaks_from_passband(mesh_2d: np.ndarray,
+                             frequency_1d: np.ndarray,
+                             frequency_min: float,
+                             frequency_max: float) -&gt; Tuple[Union[np.ndarray, int, float, complex], np.ndarray,
+                                                            np.ndarray]:
     &#34;&#34;&#34;
-    This is a key element, refine
-    :param mesh_2d:
-    :param frequency_1d:
-    :param frequency_min:
-    :param frequency_max:
-    :return:
+    Find frequency peaks in the passband of interest for mesh
+
+    :param mesh_2d: array with mesh
+    :param frequency_1d: frequency vector, same ordering as mesh columns
+    :param frequency_min:minimum frequency for passband
+    :param frequency_max: maximum frequency for passband
+    :return: maximum value of mesh, np.ndarray with frequency peaks, and np.ndarray with frequency peaks index
     &#34;&#34;&#34;
     index_frequency_hz_min_band = np.argmin(np.abs(frequency_1d - frequency_min))
     index_frequency_hz_max_band = np.argmin(np.abs(frequency_1d - frequency_max))
@@ -287,25 +332,28 @@ def mesh_mask(tfr_2d: np.array, tfr_1d_min: float, tfr_1d_max: float):
 </details>
 </dd>
 <dt id="libquantum.tfr_gate_pick.peak_mask"><code class="name flex">
-<span>def <span class="ident">peak_mask</span></span>(<span>tfr_1d: <built-in function array>, tfr_1d_min: float, tfr_1d_max: float)</span>
+<span>def <span class="ident">peak_mask</span></span>(<span>tfr_1d: <built-in function array>, tfr_1d_min: float, tfr_1d_max: float) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Constructs nan masks, useful for transportability
-:param tfr_1d:
-:param tfr_1d_min:
-:param tfr_1d_max:
-:return:</p></div>
+<div class="desc"><p>Constructs nan masks, useful for transportability</p>
+<p>:param tfr_1d: array with values
+:param tfr_1d_min: minimum value to start mask
+:param tfr_1d_max: maximum value to end mask
+:return: np.ndarray with NaN mask for min/max values provided</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def peak_mask(tfr_1d: np.array, tfr_1d_min: float, tfr_1d_max: float):
+<pre><code class="python">def peak_mask(tfr_1d: np.array,
+              tfr_1d_min: float,
+              tfr_1d_max: float) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Constructs nan masks, useful for transportability
-    :param tfr_1d:
-    :param tfr_1d_min:
-    :param tfr_1d_max:
-    :return:
+
+    :param tfr_1d: array with values
+    :param tfr_1d_min: minimum value to start mask
+    :param tfr_1d_max: maximum value to end mask
+    :return: np.ndarray with NaN mask for min/max values provided
     &#34;&#34;&#34;
     # Initialize 1D mask
     tfr_gate_nan_mask = np.empty(tfr_1d.shape[0])
@@ -319,27 +367,31 @@ def mesh_mask(tfr_2d: np.array, tfr_1d_min: float, tfr_1d_max: float):
 </details>
 </dd>
 <dt id="libquantum.tfr_gate_pick.submesh_from_passband"><code class="name flex">
-<span>def <span class="ident">submesh_from_passband</span></span>(<span>tfr_mesh_2d, frequency_1d, frequency_min, frequency_max)</span>
+<span>def <span class="ident">submesh_from_passband</span></span>(<span>tfr_mesh_2d: numpy.ndarray, frequency_1d: numpy.ndarray, frequency_min: float, frequency_max: float) ‑> Tuple[numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Extracts only the coefficients in the passband of interest
-:param mesh_2d: Assumes frequency is the first dimension (rows)
-:param frequency_1d: Frequency vector, same ordering as mesh columns
-:param frequency_min:
-:param frequency_max:
-:return:</p></div>
+<div class="desc"><p>Extracts only the coefficients in the passband of interest</p>
+<p>:param tfr_mesh_2d: assumes frequency is the first dimension (rows)
+:param frequency_1d: frequency vector, same ordering as mesh columns
+:param frequency_min: minimum frequency for passband
+:param frequency_max: maximum frequency for passband
+:return: np.ndarray with submesh values and np.ndarray with submesh frequencies</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def submesh_from_passband(tfr_mesh_2d, frequency_1d, frequency_min, frequency_max):
+<pre><code class="python">def submesh_from_passband(tfr_mesh_2d: np.ndarray,
+                          frequency_1d: np.ndarray,
+                          frequency_min: float,
+                          frequency_max: float) -&gt; Tuple[np.ndarray, np.ndarray]:
     &#34;&#34;&#34;
     Extracts only the coefficients in the passband of interest
-    :param mesh_2d: Assumes frequency is the first dimension (rows)
-    :param frequency_1d: Frequency vector, same ordering as mesh columns
-    :param frequency_min:
-    :param frequency_max:
-    :return:
+
+    :param tfr_mesh_2d: assumes frequency is the first dimension (rows)
+    :param frequency_1d: frequency vector, same ordering as mesh columns
+    :param frequency_min: minimum frequency for passband
+    :param frequency_max: maximum frequency for passband
+    :return: np.ndarray with submesh values and np.ndarray with submesh frequencies
     &#34;&#34;&#34;
     index_frequency_hz_min = np.argmin(np.abs(frequency_1d - frequency_min))
     index_frequency_hz_max = np.argmin(np.abs(frequency_1d - frequency_max))
