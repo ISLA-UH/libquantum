@@ -11,6 +11,20 @@ Sparse Binary Representations of Cyber-Physical Signatures](https://www.mdpi.com
 
 - [Garces (2013), On Infrasound Standards, Part 1 Time, Frequency, and Energy Scaling](https://m.scirp.org/papers/abstract/33802)
 
+### Installation
+
+```shell script
+pip install libquantum
+```
+More details in the [Installation guide](docs/libquantum/intallation.md).
+
+### Examples
+Full examples can be found in the [examples documentation](docs/libquantum/examples.md).
+
+### API Documentation
+Check the [API Documentation](https://redvoxinc.github.io/libquantum).
+
+### Resources
 For the GT blast pulse, refer to:
 
 - [Garcés, M. A. (2019). Explosion Source Models,
@@ -26,8 +40,3 @@ Seism. Res. Lett.](https://pubs.geoscienceworld.org/ssa/srl/article-abstract/91/
 Empirical Acoustic Source Model for Chemical Explosions in Air,
 Bulletin of the Seismological Society of America](https://pubs.geoscienceworld.org/ssa/bssa/article-abstract/doi/10.1785/0120210030/600721/Empirical-Acoustic-Source-Model-for-Chemical?redirectedFrom=fulltext)
 
-### Resources
-
-- [Installation guide](docs/libquantum/intallation.md)
-- [Examples](docs/libquantum/examples.md)
-- [API Documentation](https://redvoxinc.github.io/libquantum)
