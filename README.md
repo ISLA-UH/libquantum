@@ -34,10 +34,10 @@ Bulletin of the Seismological Society of America](https://pubs.geoscienceworld.o
 ```shell script
 pip install libquantum
 ```
-More details in the [Installation guide](docs/libquantum/intallation.md).
+More details in the [Installation guide](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/intallation.md).
 
 ### Examples
-Full examples can be found in the [examples documentation](docs/libquantum/examples.md).
+Full examples can be found in the [examples documentation](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/examples.md).
 
 ### API Documentation
 Check the [API Documentation](https://redvoxinc.github.io/libquantum).
