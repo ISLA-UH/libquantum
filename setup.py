@@ -5,7 +5,7 @@ with open("requirements.txt", "r") as requirements_file:
     requirements = list(filter(lambda line: (not line.startswith("#")) and len(line) > 0, requirements))
 
 setup(name="libquantum",
-      version="1.1.3",
+      version="1.2.0",
       url='https://github.com/RedVoxInc/libquantum',
       license='Apache',
       author='RedVox',
@@ -19,4 +19,4 @@ setup(name="libquantum",
       long_description_content_type='text/markdown',
       long_description=open('README.md').read(),
       install_requires=requirements,
-      python_requires=">=3.6, <3.9")
+      python_requires=">=3.7")
