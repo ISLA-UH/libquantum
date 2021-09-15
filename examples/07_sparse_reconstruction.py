@@ -52,7 +52,7 @@ if __name__ == "__main__":
     """
 
     # Set Order
-    order_Nth = 3
+    order_Nth = 6
 
     # Target frequency
     frequency_main_hz = 4.  # Nominal 1 ton, after Kim et al. 2021
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     morl2_inv_imag2 = np.zeros((len(frequency_hz), len(sig_n)))
     print('Max absolute CWT coefficient:', cwtm_max_abs)
 
-    # TODO: Implement mode cutoff algorithms. Use max coefficient for reference time 0.
+    # TODO: Use max coefficient for reference time 0.
     # TODO: First reassemble separately. Then reassemble with mix and match if real and imag
     # Change algorithm: sort by highest to lowest magnitude
     max_axis = 1
@@ -154,8 +154,8 @@ if __name__ == "__main__":
     print(m_cw_imag_maxabs[arg_m_cw_imag_sort])
 
     # Select number of modes
-    j_real = 4
-    j_imag = 4
+    j_real = 32
+    j_imag = 32
 
     print("Number of bands:", len(frequency_hz))
     print("Number of modes in the superposition:", j_real)
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     fig_description = 'Reconstruction, all CWT coefficients'
     fig_title = fig_description
     plot_sparse_blast(fig_number, fig_description, fig_title,
-                 scaled_time=time_scaled, x_multiplier=1.0, y_max=1,
+                 scaled_time=time_scaled, x_multiplier=2, y_max=1.4,
                  synth1=sig_theory.real, symbol1=".-", label1='Equation',
                  synth2=sig_hilbert.real, symbol2="-", label2='SciPy Hilbert',
                  synth3=sig_inv.real, symbol3="-", label3='CWT Reconstruction')
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     # fig_title = ''  # for publication
     fig_title = 'Reconstruction from real CWT'
     plot_sparse_blast(fig_number, fig_description, fig_title,
-                 scaled_time=time_scaled, x_multiplier=1.0, y_max=1,
+                 scaled_time=time_scaled, x_multiplier=2, y_max=1.4,
                  synth1=sig_theory.real, symbol1=".-", label1='Equation',
                  synth2=sig_hilbert.real, symbol2="-", label2='SciPy Hilbert',
                  synth3=sig_superpose.real, symbol3="-", label3=fig_description)
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     fig_description = 'CWT, top ' + str(j_imag) + ' atoms'
     fig_title = 'Reconstruction from imag CWT'
     plot_sparse_blast(fig_number, fig_description, fig_title,
-                      scaled_time=time_scaled, x_multiplier=1.0, y_max=1,
+                      scaled_time=time_scaled, x_multiplier=2, y_max=1.4,
                       synth1=sig_theory.real, symbol1=".-", label1='Equation',
                       synth2=sig_hilbert.real, symbol2="-", label2='SciPy Hilbert',
                       synth3=sig_superpose.imag, symbol3="-", label3=fig_description)
