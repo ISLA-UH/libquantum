@@ -1,7 +1,7 @@
 numpy == 1.19.5  # Tensorflow spec - it's very picky
 scipy >= 1.5.1
 pandas >= 1.3.1
-redvox >= 3.0.7
+redvox >= 3.0.10
 libwwz >= 1.1.0
 
 # Plotting

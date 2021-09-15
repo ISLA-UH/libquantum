@@ -82,4 +82,6 @@ if __name__ == "__main__":
                                     figure_title=EVENT_NAME,
                                     frequency_hz_ymin=cwt_frequency_low_hz,
                                     frequency_hz_ymax=cwt_frequency_high_hz)
+
+
         plt.show()
