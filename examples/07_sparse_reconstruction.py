@@ -84,8 +84,8 @@ if __name__ == "__main__":
     sig_complex = sig_gt + sig_gt_hilbert*1j
 
     # Add white noise
-    # Variance computed from transient
-    bit_loss = 1
+    # Variance computed from transient, stressing at bit_loss=1
+    bit_loss = 6
     sig_noise = synth.white_noise_fbits(sig=sig_gt,
                                         std_bit_loss=bit_loss)
     gt_white = sig_gt + sig_noise
@@ -130,17 +130,9 @@ if __name__ == "__main__":
     sig_hilbert = signal.hilbert(sig_n)  # With noise
     sig_inv = np.sum(f_x_cwtm, 0)  # Reconstruction of signal with noise
 
-    # Initialize sparse coefficients
-    m_cw_real_sparse = np.zeros(len(frequency_hz))
-    m_cw_imag_sparse = np.zeros(len(frequency_hz))
-    m_cw_time_real_sparse = np.zeros(len(frequency_hz))
-    m_cw_time_imag_sparse = np.zeros(len(frequency_hz))
 
-    # Initialize modal superposition from largest contributions
-    morl2_inv_real2 = np.zeros((len(frequency_hz), len(sig_n)))
-    morl2_inv_imag2 = np.zeros((len(frequency_hz), len(sig_n)))
-
-    # TODO: First reassemble separately. Then reassemble with mix and match of real and imag
+    # TODO: CONSTRUCT FUNCTIONS
+    # TODO: First reassemble separately. Then reassemble with mix of real and imag
     # Change algorithm: sort by highest to lowest magnitude
     max_axis = 1
     # Grab the peak coefficient per frequency
@@ -150,14 +142,16 @@ if __name__ == "__main__":
     # IMAGINARY
     m_cw_imag_maxabs = np.max(np.abs(cwtm.imag), axis=max_axis)
     m_cw_imag_argmax = np.argmax(np.abs(cwtm.imag), axis=max_axis)
+    
+    # TODO: Masked mesh plot? Or use scatter?
 
+    # "Fancy" indexing (it's a thing, see np.take)
+    frequency_rows = np.arange(len(frequency_hz))
     # Build the sparse coefficient representation
-    # Construct a function (vectorize the method)
-    for j_freq in np.arange(len(frequency_hz)):
-        m_cw_real_sparse[j_freq] = cwtm[j_freq, m_cw_real_argmax[j_freq]].real
-        m_cw_imag_sparse[j_freq] = cwtm[j_freq, m_cw_imag_argmax[j_freq]].imag
-        m_cw_time_real_sparse[j_freq] = time_s[m_cw_real_argmax[j_freq]]
-        m_cw_time_imag_sparse[j_freq] = time_s[m_cw_imag_argmax[j_freq]]
+    m_cw_time_real_sparse = time_s[m_cw_real_argmax]
+    m_cw_time_imag_sparse = time_s[m_cw_imag_argmax]
+    m_cw_real_sparse = cwtm.real[frequency_rows, m_cw_real_argmax]
+    m_cw_imag_sparse = cwtm.imag[frequency_rows, m_cw_imag_argmax]
 
     # Sort in descending order
     arg_m_cw_real_sort = np.flip(np.argsort(m_cw_real_maxabs))
@@ -171,19 +165,42 @@ if __name__ == "__main__":
     sig_time_real_s = time_s - fundamental_wavelet_real_time_s
     sig_time_imag_s = time_s - fundamental_wavelet_imag_time_s
 
+    # Time offsets
+    sig_time_real_sparse = m_cw_time_real_sparse - fundamental_wavelet_real_time_s
+    sig_time_imag_sparse = m_cw_time_imag_sparse - fundamental_wavelet_imag_time_s
+
     # print(arg_m_cw_real_sort)
     # print(m_cw_real_maxabs[arg_m_cw_real_sort])
     # print(arg_m_cw_imag_sort)
     # print(m_cw_imag_maxabs[arg_m_cw_imag_sort])
 
     # Select number of modes
-    j_real = 32
-    j_imag = 32
+    j_real = 30
+    j_imag = 9
 
     print("Number of bands:", len(frequency_hz))
     print("Number of real modes in the superposition:", j_real)
     print("Number of imag modes in the superposition:", j_imag)
     print()
+
+    plt.figure()
+    plt.subplot(211)
+    plt.plot(sig_time_real_sparse[arg_m_cw_real_sort[0:j_real]],
+             m_cw_real_sparse[arg_m_cw_real_sort[0:j_real]], 'o')
+    plt.grid(True)
+    plt.title("Real CW components")
+    plt.subplot(212)
+    plt.plot(sig_time_imag_sparse[arg_m_cw_imag_sort[0:j_imag]],
+             m_cw_imag_sparse[arg_m_cw_imag_sort[0:j_imag]], 'o')
+    plt.grid(True)
+    plt.title("Imaginary")
+    # exit()
+
+    # TODO: Compute the percent of the energy, per coefficient and cumulative
+
+    # Initialize modal superposition from largest contributions
+    morl2_inv_real2 = np.zeros((len(frequency_hz), len(sig_n)))
+    morl2_inv_imag2 = np.zeros((len(frequency_hz), len(sig_n)))
 
     for j_sorted_real in arg_m_cw_real_sort[0:j_real]:
         if is_print_modes:
@@ -220,7 +237,7 @@ if __name__ == "__main__":
     sig_superpose = np.sum(morl2_inv_real2, axis=0) + np.sum(morl2_inv_imag2, axis=0) * 1j
 
     # PLOTS
-    fig_number = 1
+    fig_number = 2
     fig_description = 'Reconstruction, all CWT coefficients'
     fig_title = fig_description
     plot_sparse_blast(fig_number, fig_description, fig_title,
