@@ -51,13 +51,15 @@ if __name__ == "__main__":
     Performs inverse CWT on GP pulse as in Garces (2021)
     """
 
+    is_print_modes = False
     # Set Order
     order_Nth = 6
 
     # Target frequency
     frequency_main_hz = 4.  # Nominal 1 ton, after Kim et al. 2021
     pseudo_period_main_s = 1/frequency_main_hz
-    frequency_sample_rate_hz = 200.  # Recommend at least x6 target frequency
+    # frequency_sample_rate_hz = 200.  # Recommend at least x16 target frequency
+    frequency_sample_rate_hz = 32*frequency_main_hz  # Recommend at least x16 target frequency
 
     # Pulse frequency
     frequency_sig_hz = 1.*frequency_main_hz  # *np.sqrt(2) for 1/3 octave tests
@@ -110,6 +112,8 @@ if __name__ == "__main__":
     print('Order:', order_Nth)
     # Shape of cwtm
     print('CWT shape:', cwtm.shape)
+    print('Max absolute CWT coefficient:', cwtm_max_abs)
+
     # Keep tabs on center frequency
     index_frequency_center = np.argmin(np.abs(frequency_hz-frequency_sig_hz))
 
@@ -126,14 +130,17 @@ if __name__ == "__main__":
     sig_hilbert = signal.hilbert(sig_n)  # With noise
     sig_inv = np.sum(f_x_cwtm, 0)  # Reconstruction of signal with noise
 
-    # Initialize modal superposition from largest contributions
+    # Initialize sparse coefficients
+    m_cw_real_sparse = np.zeros(len(frequency_hz))
+    m_cw_imag_sparse = np.zeros(len(frequency_hz))
+    m_cw_time_real_sparse = np.zeros(len(frequency_hz))
+    m_cw_time_imag_sparse = np.zeros(len(frequency_hz))
 
+    # Initialize modal superposition from largest contributions
     morl2_inv_real2 = np.zeros((len(frequency_hz), len(sig_n)))
     morl2_inv_imag2 = np.zeros((len(frequency_hz), len(sig_n)))
-    print('Max absolute CWT coefficient:', cwtm_max_abs)
 
-    # TODO: Use max coefficient for reference time 0.
-    # TODO: First reassemble separately. Then reassemble with mix and match if real and imag
+    # TODO: First reassemble separately. Then reassemble with mix and match of real and imag
     # Change algorithm: sort by highest to lowest magnitude
     max_axis = 1
     # Grab the peak coefficient per frequency
@@ -144,52 +151,72 @@ if __name__ == "__main__":
     m_cw_imag_maxabs = np.max(np.abs(cwtm.imag), axis=max_axis)
     m_cw_imag_argmax = np.argmax(np.abs(cwtm.imag), axis=max_axis)
 
+    # Build the sparse coefficient representation
+    # Construct a function (vectorize the method)
+    for j_freq in np.arange(len(frequency_hz)):
+        m_cw_real_sparse[j_freq] = cwtm[j_freq, m_cw_real_argmax[j_freq]].real
+        m_cw_imag_sparse[j_freq] = cwtm[j_freq, m_cw_imag_argmax[j_freq]].imag
+        m_cw_time_real_sparse[j_freq] = time_s[m_cw_real_argmax[j_freq]]
+        m_cw_time_imag_sparse[j_freq] = time_s[m_cw_imag_argmax[j_freq]]
+
     # Sort in descending order
     arg_m_cw_real_sort = np.flip(np.argsort(m_cw_real_maxabs))
     arg_m_cw_imag_sort = np.flip(np.argsort(m_cw_imag_maxabs))
 
-    print(arg_m_cw_real_sort)
-    print(m_cw_real_maxabs[arg_m_cw_real_sort])
-    print(arg_m_cw_imag_sort)
-    print(m_cw_imag_maxabs[arg_m_cw_imag_sort])
+    # First coefficient arg (index 0) is the largest
+    fundamental_wavelet_real_time_s = time_s[m_cw_real_argmax[0]]
+    fundamental_wavelet_imag_time_s = time_s[m_cw_imag_argmax[0]]
+
+    # Reset time so it is centered on max abs amplitude
+    sig_time_real_s = time_s - fundamental_wavelet_real_time_s
+    sig_time_imag_s = time_s - fundamental_wavelet_imag_time_s
+
+    # print(arg_m_cw_real_sort)
+    # print(m_cw_real_maxabs[arg_m_cw_real_sort])
+    # print(arg_m_cw_imag_sort)
+    # print(m_cw_imag_maxabs[arg_m_cw_imag_sort])
 
     # Select number of modes
     j_real = 32
     j_imag = 32
 
     print("Number of bands:", len(frequency_hz))
-    print("Number of modes in the superposition:", j_real)
+    print("Number of real modes in the superposition:", j_real)
+    print("Number of imag modes in the superposition:", j_imag)
     print()
 
-    for j_freq in arg_m_cw_real_sort[0:j_real]:
-        print("*Real CW Reconstruction")
-        print(f"Frequency = {frequency_hz[j_freq]} Hz")
-        print(f"Scaled time offset = {time_scaled[m_cw_real_argmax[j_freq]]}")
-        print(f"CW coefficient abs amplitude = {m_cw_real_maxabs[j_freq]}")
-        print(f"CW coefficient amplitude = {cwtm[j_freq, m_cw_real_argmax[j_freq]].real}")
-        morl2_inv_real2[j_freq, :] = \
+    for j_sorted_real in arg_m_cw_real_sort[0:j_real]:
+        if is_print_modes:
+            print("*Real CW Reconstruction")
+            print(f"Frequency = {frequency_hz[j_sorted_real]} Hz")
+            print(f"Scaled time offset = {time_scaled[m_cw_real_argmax[j_sorted_real]]}")
+            print(f"CW coefficient abs amplitude = {m_cw_real_maxabs[j_sorted_real]}")
+            print(f"CW coefficient amplitude = {m_cw_real_sparse[j_sorted_real]}")
+        morl2_inv_real2[j_sorted_real, :] = \
             atoms_inverse.inv_morlet2_real(band_order_Nth=order_Nth,
                                            time_s=time_s,
-                                           offset_time_s=time_s[m_cw_real_argmax[j_freq]],
-                                           scale_frequency_center_hz=frequency_hz[j_freq],
-                                           cwt_amp_real=cwtm[j_freq, m_cw_real_argmax[j_freq]].real,
+                                           offset_time_s=m_cw_time_real_sparse[j_sorted_real],
+                                           scale_frequency_center_hz=frequency_hz[j_sorted_real],
+                                           cwt_amp_real=m_cw_real_sparse[j_sorted_real],
                                            frequency_sample_rate_hz=frequency_sample_rate_hz)
 
     print()
-    for j_freq in arg_m_cw_imag_sort[0:j_imag]:
-        print("*Imaginary CW Reconstruction")
-        print(f"Frequency = {frequency_hz[j_freq]} Hz")
-        print(f"Scaled time offset = {time_scaled[m_cw_imag_argmax[j_freq]]}")
-        print(f"CW coefficient abs amplitude = {m_cw_imag_maxabs[j_freq]}")
-        print(f"CW coefficient amplitude = {cwtm[j_freq, m_cw_imag_argmax[j_freq]].imag}")
-        morl2_inv_imag2[j_freq, :] = \
+    for j_sorted_imag in arg_m_cw_imag_sort[0:j_imag]:
+        if is_print_modes:
+            print("*Imaginary CW Reconstruction")
+            print(f"Frequency = {frequency_hz[j_sorted_imag]} Hz")
+            print(f"Scaled time offset = {time_scaled[m_cw_imag_argmax[j_sorted_imag]]}")
+            print(f"CW coefficient abs amplitude = {m_cw_imag_maxabs[j_sorted_imag]}")
+            print(f"CW coefficient amplitude = {m_cw_imag_sparse[j_sorted_imag]}")
+        morl2_inv_imag2[j_sorted_imag, :] = \
             atoms_inverse.inv_morlet2_imag(band_order_Nth=order_Nth,
                                            time_s=time_s,
-                                           offset_time_s=time_s[m_cw_imag_argmax[j_freq]],
-                                           scale_frequency_center_hz=frequency_hz[j_freq],
-                                           cwt_amp_imag=cwtm[j_freq, m_cw_imag_argmax[j_freq]].imag,
+                                           offset_time_s=m_cw_time_imag_sparse[j_sorted_imag],
+                                           scale_frequency_center_hz=frequency_hz[j_sorted_imag],
+                                           cwt_amp_imag=m_cw_imag_sparse[j_sorted_imag],
                                            frequency_sample_rate_hz=frequency_sample_rate_hz)
 
+    # Complex waveform
     sig_superpose = np.sum(morl2_inv_real2, axis=0) + np.sum(morl2_inv_imag2, axis=0) * 1j
 
     # PLOTS
