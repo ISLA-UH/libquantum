@@ -145,11 +145,11 @@ if __name__ == "__main__":
     
     # TODO: Masked mesh plot? Or use scatter?
 
-    # "Fancy" indexing (it's a thing, see np.take)
-    frequency_rows = np.arange(len(frequency_hz))
     # Build the sparse coefficient representation
     m_cw_time_real_sparse = time_s[m_cw_real_argmax]
     m_cw_time_imag_sparse = time_s[m_cw_imag_argmax]
+    # "Fancy" indexing (it's a thing, see np.take)
+    frequency_rows = np.arange(len(frequency_hz))
     m_cw_real_sparse = cwtm.real[frequency_rows, m_cw_real_argmax]
     m_cw_imag_sparse = cwtm.imag[frequency_rows, m_cw_imag_argmax]
 
@@ -158,15 +158,15 @@ if __name__ == "__main__":
     arg_m_cw_imag_sort = np.flip(np.argsort(m_cw_imag_maxabs))
 
     # First coefficient arg (index 0) is the largest
-    fundamental_wavelet_real_time_s = time_s[m_cw_real_argmax[0]]
-    fundamental_wavelet_imag_time_s = time_s[m_cw_imag_argmax[0]]
+    fundamental_wavelet_real_time_s = time_s[m_cw_real_argmax[arg_m_cw_real_sort[0]]]
+    fundamental_wavelet_imag_time_s = time_s[m_cw_imag_argmax[arg_m_cw_imag_sort[0]]]
 
     # Reset time so it is centered on max abs amplitude
     sig_time_real_s = time_s - fundamental_wavelet_real_time_s
     sig_time_imag_s = time_s - fundamental_wavelet_imag_time_s
 
     # Time offsets
-    sig_time_real_sparse = m_cw_time_real_sparse - fundamental_wavelet_real_time_s
+    sig_time_real_sparse = m_cw_time_real_sparse - fundamental_wavelet_real_time_s  # TODO - Fix, this should be centered on zero
     sig_time_imag_sparse = m_cw_time_imag_sparse - fundamental_wavelet_imag_time_s
 
     # print(arg_m_cw_real_sort)
@@ -175,8 +175,8 @@ if __name__ == "__main__":
     # print(m_cw_imag_maxabs[arg_m_cw_imag_sort])
 
     # Select number of modes
-    j_real = 30
-    j_imag = 9
+    j_real = 32
+    j_imag = 32
 
     print("Number of bands:", len(frequency_hz))
     print("Number of real modes in the superposition:", j_real)
