@@ -74,15 +74,10 @@ if __name__ == "__main__":
     time_s = np.arange(time_points)/frequency_sample_rate_hz
     time_half_s = np.max(time_s)/2.
     time_shifted_s = time_s - time_half_s
-    time_scaled = time_shifted_s*frequency_main_hz
 
     # Build signal, no noise
     sig_gt = kaboom.gt_blast_period_center(time_center_s=time_shifted_s,
                                            pseudo_period_s=pseudo_period_s)
-    sig_gt_hilbert = kaboom.gt_hilbert_blast_period_center(time_center_s=time_shifted_s,
-                                                           pseudo_period_s=pseudo_period_s)
-    sig_complex = sig_gt + sig_gt_hilbert*1j
-
     # Add white noise
     # Variance computed from transient, stressing at bit_loss=1
     bit_loss = 6
@@ -91,7 +86,6 @@ if __name__ == "__main__":
     gt_white = sig_gt + sig_noise
 
     # AA filter of signal with noise
-    noise = synth.antialias_halfNyquist(synth=sig_noise)
     sig_n = synth.antialias_halfNyquist(synth=gt_white)  # With noise
 
     # Compute complex wavelet transform of real signal + noise
@@ -99,40 +93,28 @@ if __name__ == "__main__":
         atoms.cwt_chirp_from_sig(sig_wf=sig_n,
                                  frequency_sample_rate_hz=frequency_sample_rate_hz,
                                  band_order_Nth=order_Nth)
-
-    cwtm_max_abs = np.max(np.abs(cwtm))
-    # For noise
-    cwtm_noise, _, _, _ = \
-        atoms.cwt_chirp_from_sig(sig_wf=noise,
-                                 frequency_sample_rate_hz=frequency_sample_rate_hz,
-                                 band_order_Nth=order_Nth)
-
-    frequency_scaled = frequency_hz/frequency_main_hz
-
-    print('Order:', order_Nth)
-    # Shape of cwtm
-    print('CWT shape:', cwtm.shape)
-    print('Max absolute CWT coefficient:', cwtm_max_abs)
-
-    # Keep tabs on center frequency
-    index_frequency_center = np.argmin(np.abs(frequency_hz-frequency_sig_hz))
-
-    morl2_scale, reconstruct = \
+    # Reconstruction coefficients
+    _, reconstruct = \
         atoms_inverse.morlet2_reconstruct(band_order_Nth=order_Nth,
                                           scale_frequency_center_hz=frequency_hz,
                                           frequency_sample_rate_hz=frequency_sample_rate_hz)
     # Scaled wavelet coefficients
     f_x_cwtm = utils.d1tile_x_d2(d1=reconstruct,
-                                 d2=cwtm)
-
-    # Reference functions
-    sig_theory = np.copy(sig_complex)  # No noise
-    sig_hilbert = signal.hilbert(sig_n)  # With noise
+                                 d2=cwtm.real)
+    # Inverse to verify reconstruction (only works for real, returns Hilbert on imaginary
     sig_inv = np.sum(f_x_cwtm, 0)  # Reconstruction of signal with noise
 
+    #############################
+    # High level summary
+    print('Order:', order_Nth)
+    # Shape of cwtm
+    print('CWT shape:', cwtm.shape)
+    # Keep tabs on center frequency
+    index_frequency_center = np.argmin(np.abs(frequency_hz-frequency_sig_hz))
+    print(f"Closest center frequency to signal frequency is {frequency_hz[index_frequency_center]} Hz")
 
     # TODO: CONSTRUCT FUNCTIONS
-    # TODO: First reassemble separately. Then reassemble with mix of real and imag
+
     # Change algorithm: sort by highest to lowest magnitude
     max_axis = 1
     # Grab the peak coefficient per frequency
@@ -161,18 +143,29 @@ if __name__ == "__main__":
     fundamental_wavelet_real_time_s = time_s[m_cw_real_argmax[arg_m_cw_real_sort[0]]]
     fundamental_wavelet_imag_time_s = time_s[m_cw_imag_argmax[arg_m_cw_imag_sort[0]]]
 
+    # Frequency of peak coefficient
+    fundamental_wavelet_real_frequency_hz = frequency_hz[arg_m_cw_real_sort[0]]
+    fundamental_wavelet_imag_frequency_hz = frequency_hz[arg_m_cw_imag_sort[0]]
+
     # Reset time so it is centered on max abs amplitude
     sig_time_real_s = time_s - fundamental_wavelet_real_time_s
     sig_time_imag_s = time_s - fundamental_wavelet_imag_time_s
 
-    # Time offsets
-    sig_time_real_sparse = m_cw_time_real_sparse - fundamental_wavelet_real_time_s  # TODO - Fix, this should be centered on zero
+    # Time offsets, zero for fundamental
+    sig_time_real_sparse = m_cw_time_real_sparse - fundamental_wavelet_real_time_s
     sig_time_imag_sparse = m_cw_time_imag_sparse - fundamental_wavelet_imag_time_s
+
+    print('Max absolute CWT coefficient:', np.max(np.abs(cwtm)))
 
     # print(arg_m_cw_real_sort)
     # print(m_cw_real_maxabs[arg_m_cw_real_sort])
     # print(arg_m_cw_imag_sort)
     # print(m_cw_imag_maxabs[arg_m_cw_imag_sort])
+
+    # TODO: Zero out non-contributing coefficients
+    # TODO: Options for scaling time and frequency
+    # TODO: First reassemble separately. Then reassemble with mix of real and imag
+    time_scaled = time_shifted_s*frequency_main_hz
 
     # Select number of modes
     j_real = 32
@@ -201,6 +194,8 @@ if __name__ == "__main__":
     # Initialize modal superposition from largest contributions
     morl2_inv_real2 = np.zeros((len(frequency_hz), len(sig_n)))
     morl2_inv_imag2 = np.zeros((len(frequency_hz), len(sig_n)))
+
+
 
     for j_sorted_real in arg_m_cw_real_sort[0:j_real]:
         if is_print_modes:
@@ -242,9 +237,9 @@ if __name__ == "__main__":
     fig_title = fig_description
     plot_sparse_blast(fig_number, fig_description, fig_title,
                  scaled_time=time_scaled, x_multiplier=2, y_max=1.4,
-                 synth1=sig_theory.real, symbol1=".-", label1='Equation',
-                 synth2=sig_hilbert.real, symbol2="-", label2='SciPy Hilbert',
-                 synth3=sig_inv.real, symbol3="-", label3='CWT Reconstruction')
+                 synth1=sig_gt, symbol1=".-", label1='Equation',
+                 synth2=sig_n, symbol2="-", label2='AA_LP',
+                 synth3=sig_inv, symbol3="-", label3='CWT Reconstruction')
 
     fig_number += 1
     fig_description = 'CWT, top ' + str(j_real) + ' atoms'
@@ -252,8 +247,8 @@ if __name__ == "__main__":
     fig_title = 'Reconstruction from real CWT'
     plot_sparse_blast(fig_number, fig_description, fig_title,
                  scaled_time=time_scaled, x_multiplier=2, y_max=1.4,
-                 synth1=sig_theory.real, symbol1=".-", label1='Equation',
-                 synth2=sig_hilbert.real, symbol2="-", label2='SciPy Hilbert',
+                 synth1=sig_gt, symbol1=".-", label1='Equation',
+                 synth2=sig_n, symbol2="-", label2='AA LP',
                  synth3=sig_superpose.real, symbol3="-", label3=fig_description)
 
     fig_number += 1
@@ -261,8 +256,8 @@ if __name__ == "__main__":
     fig_title = 'Reconstruction from imag CWT'
     plot_sparse_blast(fig_number, fig_description, fig_title,
                       scaled_time=time_scaled, x_multiplier=2, y_max=1.4,
-                      synth1=sig_theory.real, symbol1=".-", label1='Equation',
-                      synth2=sig_hilbert.real, symbol2="-", label2='SciPy Hilbert',
+                      synth1=sig_gt, symbol1=".-", label1='Equation',
+                      synth2=sig_n, symbol2="-", label2='AA LP',
                       synth3=sig_superpose.imag, symbol3="-", label3=fig_description)
 
     plt.show()
