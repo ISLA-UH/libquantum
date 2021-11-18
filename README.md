@@ -37,7 +37,7 @@ pip install libquantum
 More details in the [Installation guide](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/intallation.md).
 
 ### Examples
-Full examples can be found in the [examples documentation](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/examples.md).
+Full examples can be found in the [examples documentation](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/examples.md#examples-using-libquantum).
 
 ### API Documentation
 Check the [API Documentation](https://redvoxinc.github.io/libquantum).
