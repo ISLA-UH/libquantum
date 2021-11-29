@@ -1,17 +1,16 @@
-# For M1 chip
-numpy # == 1.19.5  # Tensorflow spec - it's very picky
-scipy # >= 1.5.1
-pandas # >= 1.3.1
-kymatio
-torch
-
-# redvox >= 3.0.10
-# libwwz >= 1.1.0
+# M1 Pro chip, Python 3.9.9
+numpy >= 1.21.4
+scipy >= 1.7.3
+pandas >= 1.3.4
+kymatio >= 0.2.1
+torch >= 1.10.0
 
 # Plotting
-matplotlib # >= 3.4.2
+matplotlib >= 3.5.0
 
-# TFR
+# TO BE UPDATED
+# redvox >= 3.0.10
+# libwwz >= 1.1.0
 # librosa
 
 
