@@ -8,9 +8,11 @@ torch >= 1.10.0
 # Plotting
 matplotlib >= 3.5.0
 
+# TFR
+# libwwz >= 1.1.0
+
 # TO BE UPDATED
 # redvox >= 3.0.10
-# libwwz >= 1.1.0
 # librosa
 
 

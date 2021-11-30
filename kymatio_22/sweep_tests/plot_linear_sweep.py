@@ -14,8 +14,8 @@ from kymatio.numpy import Scattering1D
 from kymatio.scattering1d.filter_bank import calibrate_scattering_filters
 import matplotlib.pyplot as plt
 import numpy as np
-from libquantum import atoms, entropy, scales, spectra, utils, synthetics
-
+# from libquantum import atoms, entropy, scales, spectra, utils, synthetics
+from libquantum import synthetics
 
 ###############################################################################
 # Write a function that can generate a harmonic signal

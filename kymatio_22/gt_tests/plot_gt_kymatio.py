@@ -15,7 +15,7 @@ See plot_synthetic_mag
 from kymatio.numpy import Scattering1D
 import matplotlib.pyplot as plt
 import numpy as np
-import kymatio_21.kymatio_atom_utils as atom
+import kymatio_22.kymatio_atom_utils as atom
 
 ###############################################################################
 # Let's take a look at what such a signal could look like

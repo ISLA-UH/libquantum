@@ -17,7 +17,7 @@ from kymatio.torch import Scattering1D
 
 from torch.autograd import backward
 import matplotlib.pyplot as plt
-import kymatio_21.kymatio_atom_utils as atom
+import kymatio_22.kymatio_atom_utils as atom
 
 ###############################################################################
 # Modified with a more careful handling of the initialization noise - not completely random.
