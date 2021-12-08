@@ -1,6 +1,8 @@
 # These dependencies are requirements for development and distribution of libquantum
-# all updated with conda install
+# on Apple M1 Silicone chip
+# Updated with conda install from miniforge, verify with cuda list
+# Last updated 08 December 2021
 
-pdoc3 >= 0.9.2
-twine >= 3.3.0
-wheel >= 0.36.2
+pdoc3 >= 0.8.1
+twine >= 3.7.1
+wheel >= 0.37.0
