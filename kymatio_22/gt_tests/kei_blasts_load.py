@@ -2,12 +2,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
+# CONSTANTS
+REF_HE_1KG_FREQUENCY_HZ = 40.
+REF_HE_1KG_PERIOD_S = 1./40.
+
 
 def main():
     # Set Path to pickled Data
-    # export_path = '/Users/tokyok/Desktop/curated_explosions.pkl'
-    export_path = '/Users/mgarces/Documents/DATA_API_M/Kei_blasts_20211202/curated_explosions.pkl'
-    # export_path = '/PATH/TO/PICKLE//curated_explosions.pkl'
+    export_path = '/Users/milton/Documents/DATA/Kei_blasts_20211202/curated_explosions.pkl'
 
     # Import the pickled Data
     explosion_dataframe = pd.read_pickle(export_path)
@@ -22,14 +24,18 @@ def main():
     for event in unique_events:
         # select the data of said event
         event_dataframe = explosion_dataframe[explosion_dataframe.event_name == event]
+        event_yield_kg = event_dataframe.effective_yield_kg[event_dataframe.index[0]]
+        print("Event " + event + " yield in kg: " + str(event_yield_kg))
+        event_sach_scaling = event_yield_kg**(1/3)
 
+        print("Predicted peak frequency: ")
         # Set up plot and loop through each station
         f, ax = plt.subplots(ncols=1, figsize=[12, 6], num=event)
         for num, id in enumerate(event_dataframe.index):
             # get time and normalized audio
             time = np.arange(len(event_dataframe['audio_raw'][id])) / event_dataframe['audio_sample_rate'][id]
             audio = event_dataframe['audio_raw'][id] / np.nanmax(event_dataframe['audio_raw'][id])
-
+            print("Sample rate, Hz: " + str(event_dataframe['audio_sample_rate'][id]))
             # add to the plot and shift by num for wiggles
             ax.plot(time, audio + num * 2, 'black')
 
