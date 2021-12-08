@@ -1,24 +1,24 @@
-# M1 Pro chip, Miniconda and Miniforge ARM64 environments, Python 3.8.11 and Python 3.9.7, respectively
+# M1 Silicon chip requirements
+# Miniconda and Miniforge ARM64 environments, Python 3.8.11 and Python 3.9.7, respectively
+# Recommended for M1 Silicon: Miniforge Conda environment, Miniforge3-MacOSX-arm64.sh
+# Last updated 8 December 2021
 
-numpy # >= 1.19.5 for minicuda3, >= 1.21.4 for miniforge3 with conda install
-      # Librosa downgrades to 1.20.3 on miniforge, but at least it runs!
-scipy # >= 1.7.1 for cuda, 1.7.3 for forge with conda install
-# librosa # >= 0.8.1 with miniforge with conda install, no go with miniconda
-pandas # >= 1.3.4 for both with conda install
+numpy >= 1.19.5  # miniconda3, >= 1.21.4 for miniforge3 with conda install
+                 # Librosa downgrades to 1.20.3 on miniforge; still meets specs
+scipy # >= 1.7.1 # for miniconda, 1.7.3 for miniforge, with conda install
+librosa >= 0.8.1 # with miniforge conda install, no go with miniconda
+pandas >= 1.3.4  # for both with conda install
+redvox >= 3.1.0  # for miniforge install, only way to install librosa
 
 # Plotting
-matplotlib # >= 3.5.0 for both
-
-# ML
-kymatio # >= 0.2.1, with pip install
-torch # >= 1.10.0, with pip install
+matplotlib >= 3.5.0 # for both with conda install
 
 # TFR
-libwwz # >= 1.2.0, with pip install
+libwwz >= 1.2.0 # with pip install
 
-# TO BE UPDATED
-# redvox # >= 3.0.10
-# tensorflow, it's picky
+# ML
+kymatio >= 0.2.1 # with pip install
+torch >= 1.10.0 # with pip install
 
 
 

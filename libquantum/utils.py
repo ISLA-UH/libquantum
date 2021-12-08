@@ -10,7 +10,7 @@ from scipy import signal
 
 from scipy.integrate import cumulative_trapezoid
 from libquantum.scales import EPSILON
-# from redvox.common import date_time_utils as dt
+from redvox.common import date_time_utils as dt
 
 def taper_tukey(sig_wf_or_time: np.ndarray,
                 fraction_cosine: float) -> np.ndarray:
@@ -25,22 +25,22 @@ def taper_tukey(sig_wf_or_time: np.ndarray,
     return signal.windows.tukey(M=np.size(sig_wf_or_time), alpha=fraction_cosine, sym=True)
 
 
-# def datetime_now_epoch_s() -> float:
-#     """
-#     Returns the invocation Unix time in seconds
-#
-#     :return: The current epoch timestamp as seconds since the epoch UTC
-#     """
-#     return dt.datetime_to_epoch_seconds_utc(dt.now())
-#
-#
-# def datetime_now_epoch_micros() -> float:
-#     """
-#     Returns the invocation Unix time in microseconds
-#
-#     :return: The current epoch timestamp as microseconds since the epoch UTC
-#     """
-#     return dt.datetime_to_epoch_microseconds_utc(dt.now())
+def datetime_now_epoch_s() -> float:
+    """
+    Returns the invocation Unix time in seconds
+
+    :return: The current epoch timestamp as seconds since the epoch UTC
+    """
+    return dt.datetime_to_epoch_seconds_utc(dt.now())
+
+
+def datetime_now_epoch_micros() -> float:
+    """
+    Returns the invocation Unix time in microseconds
+
+    :return: The current epoch timestamp as microseconds since the epoch UTC
+    """
+    return dt.datetime_to_epoch_microseconds_utc(dt.now())
 
 
 # Integrals and derivatives
