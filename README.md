@@ -8,7 +8,7 @@ of quantized order N.
 
 NOTE: 
 Requirements upgraded to run on Apple M1 Silicon chip 
-with the RedVox SDK version 3.1.0 or later.
+with the RedVox SDK version 3.1.0 or later. Please read the notes on requirements.txt
 
 Refer to the open access publications:
 
