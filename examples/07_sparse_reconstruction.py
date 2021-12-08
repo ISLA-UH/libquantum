@@ -5,7 +5,6 @@ Perform inverse CWT reconstruction as in Garces, 2020.
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.signal as signal
 from libquantum import synthetics as synth
 from libquantum import blast_pulse as kaboom
 from libquantum import utils, atoms, atoms_inverse

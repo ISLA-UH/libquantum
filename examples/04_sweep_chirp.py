@@ -54,13 +54,19 @@ if __name__ == "__main__":
     sig_frequency_high_hz = 400.
     head_points = 4000
 
+    # # Key design (input/request) parameters
+    # sig_wf_sample_rate_hz = 48000.
+    # sig_frequency_low_hz = 1.
+    # sig_frequency_high_hz = 24000.
+    # head_points = int(6*4000)
+
     # Standardized frequencies
     frequency_center_hz, frequency_start_hz, frequency_end_hz = \
         synthetics.gabor_grain_frequencies(frequency_order_input=order_number_input,
                                            frequency_low_input=sig_frequency_low_hz,
                                            frequency_high_input=sig_frequency_high_hz,
                                            frequency_sample_rate_input=sig_wf_sample_rate_hz,
-                                           frequency_base_input = scale_base)
+                                           frequency_base_input=scale_base)
 
     print('\nSweep specifications')
     print('Highest Nth edge frequency, Hz:', np.max(frequency_end_hz))

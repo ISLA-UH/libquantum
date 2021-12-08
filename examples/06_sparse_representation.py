@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from libquantum import atoms, entropy, scales, spectra, utils, synthetics
+from libquantum import atoms, entropy, scales, utils
 from libquantum import blast_pulse as kaboom
 import libquantum.plot_templates.plot_time_frequency_reps as pltq
 

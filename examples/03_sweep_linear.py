@@ -43,6 +43,13 @@ if __name__ == "__main__":
     sig_duration_s = 13.19675
     head_s = 0.5
 
+    # sig_wf_sample_rate_hz = 8000.
+    # sig_frequency_hz_start = 40.
+    # sig_frequency_hz_end = 400.
+    # sig_duration_s = 13.19675
+    # head_s = 0.5
+
+
     # Blueshift sweep
     sig_wf_blu, sig_wf_epoch_s = synthetics.chirp_linear_in_noise(snr_bits=12.,
                                                                   sample_rate_hz=sig_wf_sample_rate_hz,
