@@ -1,6 +1,7 @@
-# M1 Pro chip, Python 3.9.9
-numpy >= 1.21.4
-scipy >= 1.7.3
+# M1 Pro chip, Miniconda ARM64, Python 3.8.11
+
+numpy >= 1.19.5
+scipy >= 1.7.1
 pandas >= 1.3.4
 kymatio >= 0.2.1
 torch >= 1.10.0
@@ -9,7 +10,7 @@ torch >= 1.10.0
 matplotlib >= 3.5.0
 
 # TFR
-# libwwz >= 1.1.0
+libwwz >= 1.2.0
 
 # TO BE UPDATED
 # redvox >= 3.0.10
