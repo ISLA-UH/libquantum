@@ -6,6 +6,10 @@ built on Gabor uncertainty principle for
 logarithmic constant Q base 2 (binary) frequency bands 
 of quantized order N.
 
+NOTE: 
+Requirements upgraded to run on Apple M1 Silicon chip 
+with the RedVox SDK version 3.1.0 or later.
+
 Refer to the open access publications:
 
 - [Garces (2020), Quantized Constant-Q Gabor Atoms for 
