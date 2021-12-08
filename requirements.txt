@@ -1,20 +1,24 @@
-# M1 Pro chip, Miniconda ARM64, Python 3.8.11
+# M1 Pro chip, Miniconda and Miniforge ARM64 environments, Python 3.8.11 and Python 3.9.7, respectively
 
-numpy >= 1.19.5
-scipy >= 1.7.1
-pandas >= 1.3.4
-kymatio >= 0.2.1
-torch >= 1.10.0
+numpy # >= 1.19.5 for minicuda3, >= 1.21.4 for miniforge3 with conda install
+      # Librosa downgrades to 1.20.3 on miniforge, but at least it runs!
+scipy # >= 1.7.1 for cuda, 1.7.3 for forge with conda install
+# librosa # >= 0.8.1 with miniforge with conda install, no go with miniconda
+pandas # >= 1.3.4 for both with conda install
 
 # Plotting
-matplotlib >= 3.5.0
+matplotlib # >= 3.5.0 for both
+
+# ML
+kymatio # >= 0.2.1, with pip install
+torch # >= 1.10.0, with pip install
 
 # TFR
-libwwz >= 1.2.0
+libwwz # >= 1.2.0, with pip install
 
 # TO BE UPDATED
-# redvox >= 3.0.10
-# librosa
+# redvox # >= 3.0.10
+# tensorflow, it's picky
 
 
 
