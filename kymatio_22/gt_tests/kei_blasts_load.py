@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import libquantum.utils as utils
 
 # CONSTANTS
-REF_HE_1KG_FREQUENCY_HZ = 40.
-REF_HE_1KG_PERIOD_S = 1./40.
-
+REF_HE_1KG_FREQUENCY_HZ = 50.
+REF_HE_1KG_PERIOD_S = 0.02
+REF_SAMPLE_RATE_HZ = 8000.0
 
 def main():
     # Set Path to pickled Data
@@ -27,15 +28,25 @@ def main():
         event_yield_kg = event_dataframe.effective_yield_kg[event_dataframe.index[0]]
         print("Event " + event + " yield in kg: " + str(event_yield_kg))
         event_sach_scaling = event_yield_kg**(1/3)
+        event_gt_peak_frequency_hz = REF_HE_1KG_FREQUENCY_HZ/event_sach_scaling
+        event_gt_pseudoperiod_s = REF_HE_1KG_PERIOD_S*event_sach_scaling
+        print("Predicted GT peak frequency, Hz: ", event_gt_peak_frequency_hz)
+        print("Predicted GT pseudoperiod, s: ", event_gt_pseudoperiod_s)
 
-        print("Predicted peak frequency: ")
         # Set up plot and loop through each station
         f, ax = plt.subplots(ncols=1, figsize=[12, 6], num=event)
         for num, id in enumerate(event_dataframe.index):
-            # get time and normalized audio
-            time = np.arange(len(event_dataframe['audio_raw'][id])) / event_dataframe['audio_sample_rate'][id]
-            audio = event_dataframe['audio_raw'][id] / np.nanmax(event_dataframe['audio_raw'][id])
-            print("Sample rate, Hz: " + str(event_dataframe['audio_sample_rate'][id]))
+            # get time and normalized audio, upsample 80/800 Hz to 8 kHz
+            if event_dataframe['audio_sample_rate'][id] < REF_SAMPLE_RATE_HZ:
+                resampled_aud = utils.upsample_fourier(sig_wf=event_dataframe['audio_raw'][id],
+                                                       sig_sample_rate_hz=event_dataframe['audio_sample_rate'][id],
+                                                       new_sample_rate_hz=REF_SAMPLE_RATE_HZ)
+                audio = resampled_aud / np.nanmax(resampled_aud)
+                time = np.arange(len(audio)) / REF_SAMPLE_RATE_HZ
+            else:
+                time = np.arange(len(event_dataframe['audio_raw'][id])) / event_dataframe['audio_sample_rate'][id]
+                audio = event_dataframe['audio_raw'][id] / np.nanmax(event_dataframe['audio_raw'][id])
+
             # add to the plot and shift by num for wiggles
             ax.plot(time, audio + num * 2, 'black')
 

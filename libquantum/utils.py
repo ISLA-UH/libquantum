@@ -12,6 +12,24 @@ from scipy.integrate import cumulative_trapezoid
 from libquantum.scales import EPSILON
 from redvox.common import date_time_utils as dt
 
+
+def upsample_fourier(sig_wf: np.ndarray,
+                     sig_sample_rate_hz: float,
+                     new_sample_rate_hz: float = 8000.) -> np.ndarray:
+    """
+    Upsample the Fourier way.
+
+    :param sig_wf: input signal waveform, reasonably well preprocessed
+    :param sig_sample_rate_hz: signal sample rate
+    :param new_sample_rate_hz: resampling sample rate
+    :return: resampled signal
+    """
+    sig_len = len(sig_wf)
+    new_len = int(sig_len * new_sample_rate_hz / sig_sample_rate_hz)
+    sig_resampled = signal.resample(x=sig_wf, num=new_len)
+    return sig_resampled
+
+
 def taper_tukey(sig_wf_or_time: np.ndarray,
                 fraction_cosine: float) -> np.ndarray:
     """
