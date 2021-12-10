@@ -43,6 +43,20 @@ def taper_tukey(sig_wf_or_time: np.ndarray,
     return signal.windows.tukey(M=np.size(sig_wf_or_time), alpha=fraction_cosine, sym=True)
 
 
+# def taper_tukey_array(number_signals: int,
+#                       number_samples: int,
+#                       fraction_cosine: float = 0.1) -> np.ndarray:
+#     """
+#     Construct a teper matrix
+#     :param number_signals:
+#     :param number_samples:
+#     :param fraction_cosine:
+#     :return:
+#     """
+#     tukey_nsamples = signal.windows.tukey(M=number_samples, alpha=fraction_cosine, sym=True)
+#     tukey_array = just_tile(tukey_nsamples)
+
+
 def datetime_now_epoch_s() -> float:
     """
     Returns the invocation Unix time in seconds
@@ -469,3 +483,22 @@ def d1tile_x_d2(d1: Union[float, np.ndarray],
     else:
         raise TypeError('Cannot handle an array of shape {}.'.format(str(d1.shape)))
     return d1_x_d2
+
+
+def decimate_array(sig_wf: np.array,
+                   downsampling_factor: int) -> np.ndarray:
+    """
+    Decimate data and timestamps for an individual station
+    All signals MUST have the same sample rate
+    :param sig_wf: signal waveform
+    :param downsampling_factor: the downsampling factor
+    :param filter_order: the order of the filter
+    :return: np.array decimated data
+    """
+    # decimate signal data
+    decimated_data = signal.decimate(x=sig_wf,
+                                    q=downsampling_factor,
+                                    axis=1,
+                                    zero_phase=True)
+
+    return decimated_data
