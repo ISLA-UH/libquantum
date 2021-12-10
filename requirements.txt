@@ -19,7 +19,3 @@ libwwz >= 1.2.0 # with pip install
 # ML
 kymatio >= 0.2.1 # with pip install
 torch >= 1.10.0 # with pip install
-
-
-
-
