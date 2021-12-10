@@ -35,18 +35,16 @@ if __name__ == "__main__":
         print("LEN SIG:", len(df['signal']))
         print(df.signal.dtypes)
 
-        plt.plot(df['signal'][0][0])
-        plt.show()
-        #
-        # for uclass in unique_class:
-        #     sig_df = df[df['class_id'] == uclass]
-        #     sig_df_id = sig_df.index
-        #     sig_number_per_class = len(sig_df_id)
-        #     print(uclass + ": " + str(sig_number_per_class))
-        #     print(sig_df_id)
-            # # plt.plot()
-            # for j in sig_df_id:
-            #     print("Index j:", j)
-            #     plt.plot(np.asarray(df['signal'][j]))
-            # # plt.show()
-
+        # Display waveforms per class.
+        # Curiously structured 'signal' object.
+        for uclass in unique_class:
+            sig_df = df[df['class_id'] == uclass]
+            sig_df_id = sig_df.index
+            sig_number_per_class = len(sig_df_id)
+            print(uclass + ": " + str(sig_number_per_class))
+            print(sig_df_id)
+            X = sig_df['signal'].to_numpy()
+            X = np.vstack(X).transpose()
+            plt.plot(X)
+            plt.title(file_name + " signals for " + uclass)
+            plt.show()
