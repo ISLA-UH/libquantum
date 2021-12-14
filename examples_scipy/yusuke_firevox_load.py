@@ -25,7 +25,8 @@ if __name__ == "__main__":
     new_sample_rate_hz = sample_rate_hz/decimation_factor
 
     for file_name in input_files:
-        file_path = file_path_m1 + file_name
+        # file_path = file_path_m1 + file_name
+        file_path = file_path_mg + file_name
         df = pd.read_pickle(file_path)
         print("\nData file: ", file_path)
         print("Columns: ", df.columns)
@@ -45,7 +46,7 @@ if __name__ == "__main__":
             sig_df_id = sig_df.index
             sig_number_per_class = len(sig_df_id)
             print(uclass + ": " + str(sig_number_per_class))
-            print(sig_df_id)
+            # print(sig_df_id)
             X = sig_df['signal'].to_numpy()
             X = np.vstack(X).transpose()
             plt.plot(X)
