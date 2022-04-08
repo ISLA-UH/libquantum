@@ -6,7 +6,7 @@ https://mne.tools/stable/generated/mne.time_frequency.tfr_array_stockwell.html#m
 """
 
 import numpy as np
-from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig
+from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig_test
 from matplotlib import pyplot as plt
 print(__doc__)
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     print("Sig n:", sig_in.shape)
 
     # Compute strided RMS
-    rms_sig_wf, rms_sig_time_s = calculate_rms_sig(sig_wf=sig_in, sig_time_s=t)
+    rms_sig_wf, rms_sig_time_s = calculate_rms_sig_test(sig_wf=sig_in, sig_time_s=t)
 
     plt.figure()
     plt.plot(t, sig_in)

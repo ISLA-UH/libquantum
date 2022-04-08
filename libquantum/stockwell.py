@@ -58,6 +58,48 @@ def calculate_rms_sig(sig_wf: np.array,
     return rms_sig_wf, rms_sig_time_s
 
 
+def calculate_rms_sig_test(sig_wf: np.array,
+                      sig_time_s: np.array,
+                      points_per_seg: int = None,
+                      points_hop: int = None) -> Tuple[np.array, np.array]:
+    """
+    Look at
+    https://localcoder.org/rolling-window-for-1d-arrays-in-numpy
+    :param sig_wf: audio waveform
+    :param sig_time_s: audio timestamps in seconds
+    :param points_per_seg: number of points. Default is
+    :param points_hop: number of points overlap per window. Default is 50%
+
+    :return: rms_sig_wf, rms_sig_time_s
+    """
+
+    if points_per_seg is None:
+        points_per_seg: int = int(len(sig_wf)/8)
+    if points_hop is None:
+        points_hop: int = int(0.5 * points_per_seg)
+
+
+    # https://numpy.org/devdocs/reference/generated/numpy.lib.stride_tricks.sliding_window_view.html
+    sig_wf_windowed = \
+        np.lib.stride_tricks.sliding_window_view(sig_wf, window_shape=points_per_seg)[0::points_hop, :].copy()
+
+    # TODO: Build nan support
+    rms_sig_wf = sig_wf_windowed.std(axis=-1)
+
+    # sig time
+    rms_sig_time_s = sig_time_s[0::points_hop].copy()
+
+    # check dims
+    diff = abs(len(rms_sig_time_s) - len(rms_sig_wf))
+
+    if (diff % 2) != 0:
+        rms_sig_time_s = rms_sig_time_s[0:-1]
+    else:
+        rms_sig_time_s = rms_sig_time_s[1:-1]
+
+    return rms_sig_wf, rms_sig_time_s
+
+
 def centers_to_edges(*arrays):
     """Convert center points to edges.
     Parameters
