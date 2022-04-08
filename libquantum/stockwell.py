@@ -6,9 +6,56 @@ https://mne.tools/stable/generated/mne.time_frequency.tfr_array_stockwell.html#m
 """
 
 import numpy as np
+from typing import List, Tuple, Optional, Union
 from matplotlib import pyplot as plt
 from scipy.fft import fft, ifft, fftfreq
-print(__doc__)
+# print(__doc__)
+
+
+def calculate_rms_sig(sig_wf: np.array,
+                      sig_time_s: np.array,
+                      points_per_seg: int = None,
+                      points_hop: int = None) -> Tuple[np.array, np.array]:
+    """
+    RMS Audio
+    # Adapted from https://stackoverflow.com/questions/45730504/how-do-i-create-a-sliding-window-with-a-50-overlap-with-a-numpy-array
+    :param sig_wf: audio waveform
+    :param sig_time_s: audio timestamps in seconds
+    :param points_per_seg: number of points. Default is
+    :param points_hop: number of points overlap per window. Default is 50%
+
+    :return: rms_sig_wf, rms_sig_time_s
+    """
+
+    if points_per_seg is None:
+        points_per_seg: int = int(len(sig_wf)/8)
+    if points_hop is None:
+        points_hop: int = int(0.5 * points_per_seg)
+
+    # RMS sig wf
+    # Initialize
+    sh = (sig_wf.size - points_per_seg + 1, points_per_seg)  # shape of new array
+    # Tuple of bytes to step in each dimension when traversing an array
+    st = sig_wf.strides * 2
+
+    # strided copy sig_wf, note stride spec
+    sig_wf_windowed = np.lib.stride_tricks.as_strided(sig_wf, shape=sh, strides=st)[0::points_hop].copy()
+
+    # List comprehension without intialization
+    rms_sig_wf: List = [np.nanstd(sub_array) for sub_array in sig_wf_windowed]
+
+    # sig time
+    rms_sig_time_s = sig_time_s[0::points_hop]
+
+    # check dims
+    diff = abs(len(rms_sig_time_s) - len(rms_sig_wf))
+
+    if (diff % 2) != 0:
+        rms_sig_time_s = rms_sig_time_s[0:-1]
+    else:
+        rms_sig_time_s = rms_sig_time_s[1:-1]
+
+    return rms_sig_wf, rms_sig_time_s
 
 
 def centers_to_edges(*arrays):
@@ -166,33 +213,3 @@ def tfr_array_stockwell(data, sfreq, fmin=None, fmax=None, n_fft=None,
 
     return psd, freqs
 
-
-if __name__ == "__main__":
-    n_times = 1024  # Just over 1 second epochs
-    sfreq = 1000.0  # Sample frequency
-
-    seed = 42
-    rng = np.random.RandomState(seed)
-    noise = rng.randn(n_times)/10.
-
-    # Add a 50 Hz sinusoidal burst to the noise and ramp it.
-    t = np.arange(n_times, dtype=np.float64) / sfreq
-    signal = np.sin(np.pi * 2. * 50. * t)  # 50 Hz sinusoid signal
-    signal[np.logical_or(t < 0.45, t > 0.55)] = 0.  # Hard windowing
-    on_time = np.logical_and(t >= 0.45, t <= 0.55)
-    signal[on_time] *= np.hanning(on_time.sum())  # Ramping
-    sig_in = signal+noise
-    print("Sig n:", sig_in.shape)
-    # plt.plot(sig_in)
-    # plt.show()
-
-    freqs = np.arange(5., 100., 3.)
-    vmin, vmax = -3., 3.  # Define our color limits.
-
-    # Stockwell
-    fmin, fmax = freqs[[0, -1]]
-    [st_power, f] = tfr_array_stockwell(data=sig_in, sfreq=sfreq, fmin=fmin, fmax=fmax, width=3.0)
-    print("Shape of power:", st_power.shape)
-    print("Shape of frequencies:", f.shape)
-    plt.pcolormesh(st_power, cmap='RdBu_r')
-    plt.show()
