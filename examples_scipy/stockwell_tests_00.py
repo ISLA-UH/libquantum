@@ -29,7 +29,7 @@ if __name__ == "__main__":
     print("Sig n:", sig_in.shape)
 
     # Compute strided RMS
-    rms_sig_wf, rms_sig_time_s = calculate_rms_sig_test(sig_wf=sig_in, sig_time_s=t)
+    rms_sig_wf, rms_sig_time_s = calculate_rms_sig_test(sig_wf=sig_in, sig_time=t)
 
     plt.figure()
     plt.plot(t, sig_in)

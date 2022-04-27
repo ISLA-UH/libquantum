@@ -5,6 +5,45 @@ from typing import Optional, Tuple, Union
 import matplotlib.pyplot as plt
 
 
+def plot_synth(sig_wf, sig_time,
+               sig_rms_wf, sig_rms_time,
+               signal_time_base:str='seconds'):
+    """
+    Waveform
+    :param sig_wf:
+    :param sig_time:
+    :param sig_rms_wf:
+    :param sig_rms_time:
+    :param signal_time_base:
+    :return:
+    """
+
+    plt.figure()
+    plt.plot(sig_time, sig_wf)
+    plt.plot(sig_rms_time, sig_rms_wf)
+    plt.title('Input waveform and RMS')
+    plt.xlabel("Time, " + signal_time_base)
+
+
+def plot_synth_tfr(tfr_power, tfr_frequency, tfr_time,
+                   title_str: str='TFR',
+                   signal_time_base:str='seconds'):
+    """
+    TFR
+    :param sig_tfr:
+    :param sig_tfr_frequency:
+    :param sig_tfr_time:
+    :param signal_time_base:
+    :return:
+    """
+
+    plt.figure()
+    plt.pcolormesh(tfr_time, tfr_frequency, tfr_power, cmap='RdBu_r')
+    plt.title(title_str)
+    plt.ylabel("Frequency, samples per " + signal_time_base)
+    plt.xlabel("Time, " + signal_time_base)
+
+
 def signal_gate(wf, t, tmin, tmax, fraction_cosine: float = 0):
     """
     Time gate and apply Tukey window, rectangular is the default
@@ -105,8 +144,8 @@ def synth_01(a: float = 100,
 
     # Oversample, then decimate
     time_all = oversample_time(time_duration, time_sample_interval, oversample_scale)
-    superpose = np.cos(np.pi*a*time_all + np.pi*b*time_all*time_all) + \
-                 np.cos(4*np.pi * np.sin(np.pi*f*time_all) + np.pi*80*time_all)
+    superpose = np.cos(a*np.pi*time_all - b*np.pi*time_all*time_all) + \
+                np.cos(4*np.pi * np.sin(np.pi*f*time_all) + np.pi*80*time_all)
     # Taper
     signal_gate(wf=superpose, t=time_all, tmin=0, tmax=1, fraction_cosine=0.05)
     # Decimate by same oversample scale
@@ -116,9 +155,10 @@ def synth_01(a: float = 100,
     return synth_wf, synth_time
 
 
-def synth_02(f1: float = 45,
-             t1: float = 0.3,
-             alpha2: float = 0.4,
+def synth_02(t1: float = 0.3,
+             t2: float = 0.7,
+             t3: float = 0.5,
+             f1: float = 45,
              f2: float = 75,
              f3: float = 15,
              time_sample_interval: float = 1/1000,
@@ -126,9 +166,10 @@ def synth_02(f1: float = 45,
              oversample_scale: int = 2):
     """
     Example Synthetic 2
-    :param f1:
     :param t1:
-    :param alpha2:
+    :param t2:
+    :param t3:
+    :param f1:
     :param f2:
     :param f3:
     :param time_sample_interval:
@@ -138,11 +179,9 @@ def synth_02(f1: float = 45,
     """
 
     t = oversample_time(time_duration, time_sample_interval, oversample_scale)
-    t2 = t1 + alpha2
-    t3 = t1 + (t2-t1)/2.
 
     pulse1 = np.exp(-35*np.pi*(t-t1)**2)*np.cos(np.pi*f1*t)
-    pulse2 = np.exp(-35*np.pi*(t-t2)**2)*np.cos(np.pi*f2*t)
+    pulse2 = np.exp(-35*np.pi*(t-t2)**2)*np.cos(np.pi*f1*t)
     pulse3 = np.exp(-55*np.pi*(t-t3)**2)*np.cos(np.pi*f2*t)
     pulse4 = np.exp(-45*np.pi*(t-t3)**2)*np.cos(np.pi*f3*t)
 
@@ -174,8 +213,8 @@ def synth_03(a: float = 30,
 
     # Oversample, then decimate
     time_all = oversample_time(time_duration, time_sample_interval, oversample_scale)
-    superpose = np.cos(np.pi*20*np.log(a*time_all + 1)) + \
-                np.cos(np.pi*b*time_all + np.pi*c*time_all*time_all)
+    superpose = np.cos(20*np.pi*np.log(a*time_all + 1)) + \
+                np.cos(b*np.pi*time_all + c*np.pi*(time_all**2))
     signal_gate(wf=superpose, t=time_all, tmin=0, tmax=1, fraction_cosine=0.05)
 
     # Decimate by same oversample scale

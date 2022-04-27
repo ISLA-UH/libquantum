@@ -59,14 +59,14 @@ def calculate_rms_sig(sig_wf: np.array,
 
 
 def calculate_rms_sig_test(sig_wf: np.array,
-                      sig_time_s: np.array,
-                      points_per_seg: int = None,
-                      points_hop: int = None) -> Tuple[np.array, np.array]:
+                           sig_time: np.array,
+                           points_per_seg: int = None,
+                           points_hop: int = None) -> Tuple[np.array, np.array]:
     """
     Look at
     https://localcoder.org/rolling-window-for-1d-arrays-in-numpy
     :param sig_wf: audio waveform
-    :param sig_time_s: audio timestamps in seconds
+    :param sig_time: audio timestamps in seconds
     :param points_per_seg: number of points. Default is
     :param points_hop: number of points overlap per window. Default is 50%
 
@@ -87,7 +87,7 @@ def calculate_rms_sig_test(sig_wf: np.array,
     rms_sig_wf = sig_wf_windowed.std(axis=-1)
 
     # sig time
-    rms_sig_time_s = sig_time_s[0::points_hop].copy()
+    rms_sig_time_s = sig_time[0::points_hop].copy()
 
     # check dims
     diff = abs(len(rms_sig_time_s) - len(rms_sig_wf))
