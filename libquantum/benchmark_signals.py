@@ -5,9 +5,9 @@ from typing import Optional, Tuple, Union
 import matplotlib.pyplot as plt
 
 
-def plot_synth(sig_wf, sig_time,
-               sig_rms_wf, sig_rms_time,
-               signal_time_base:str='seconds'):
+def plot_tdr(sig_wf, sig_time,
+             sig_rms_wf, sig_rms_time,
+             signal_time_base:str='seconds'):
     """
     Waveform
     :param sig_wf:
@@ -25,11 +25,11 @@ def plot_synth(sig_wf, sig_time,
     plt.xlabel("Time, " + signal_time_base)
 
 
-def plot_synth_tfr(tfr_power, tfr_frequency, tfr_time,
-                   title_str: str='TFR',
-                   signal_time_base:str='seconds'):
+def plot_tfr_lin(tfr_power, tfr_frequency, tfr_time,
+                 title_str: str='TFR, power',
+                 signal_time_base: str='seconds'):
     """
-    TFR
+    TFR in linear power
     :param sig_tfr:
     :param sig_tfr_frequency:
     :param sig_tfr_time:
@@ -39,6 +39,33 @@ def plot_synth_tfr(tfr_power, tfr_frequency, tfr_time,
 
     plt.figure()
     plt.pcolormesh(tfr_time, tfr_frequency, tfr_power, cmap='RdBu_r')
+    plt.title(title_str)
+    plt.ylabel("Frequency, samples per " + signal_time_base)
+    plt.xlabel("Time, " + signal_time_base)
+
+
+def plot_tfr_log(tfr_power, tfr_frequency, tfr_time,
+                 bits_min: float = -8,
+                 bits_max: float = 0,
+                 title_str: str='TFR, top bits',
+                 signal_time_base: str='seconds'):
+    """
+    TFR in bits
+    :param sig_tfr:
+    :param sig_tfr_frequency:
+    :param sig_tfr_time:
+    :param bits_max:
+    :param bits_min:
+    :param signal_time_base:
+    :return:
+    """
+
+    tfr_bits = 0.5*np.log2(tfr_power/np.max(tfr_power))
+
+    plt.figure()
+    plt.pcolormesh(tfr_time, tfr_frequency, tfr_bits,
+                   cmap='RdBu_r',
+                   vmin=bits_min, vmax=bits_max)
     plt.title(title_str)
     plt.ylabel("Frequency, samples per " + signal_time_base)
     plt.xlabel("Time, " + signal_time_base)

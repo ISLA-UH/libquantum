@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig_test
-from libquantum.benchmark_signals import plot_synth_tfr, plot_synth
+from libquantum.benchmark_signals import plot_tdr, plot_tfr_lin, plot_tfr_log
 
 
 DIR_PATH = "/Users/mgarces/Documents/DATA_2022/Tonga/CEA"
@@ -45,8 +45,8 @@ if __name__ == "__main__":
 
     rms_sig_wf, rms_sig_time = calculate_rms_sig_test(sig_wf=sig_wf, sig_time=sig_days, points_per_seg=16)
 
-    plot_synth(sig_wf=sig_wf, sig_time=sig_days,
-               sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
+    plot_tdr(sig_wf=sig_wf, sig_time=sig_days,
+             sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
 
     freqs = np.arange(0.001, 0.1, 0.001)
     fmin, fmax = freqs[[0, -1]]
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     # Stockwell
     [st_power, frequency] = tfr_array_stockwell(data=sig_wf, sfreq=1, fmin=fmin, fmax=fmax, width=3)
 
-    plot_synth_tfr(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
+    plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
     plt.show()
 
 
