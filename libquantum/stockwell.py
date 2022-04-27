@@ -166,7 +166,33 @@ def precompute_st_windows(n_samp, start_f, stop_f, sfreq, width):
     tw = fftfreq(n_samp, 1. / sfreq) / n_samp
     tw = np.r_[tw[:1], tw[1:][::-1]]
 
+    # TODO: FIX THIS TOO!!
     k = width  # 1 for classical stockwell transform
+    # TODO: FIX THIS!!
+    f_range = np.arange(start_f, stop_f, 1)
+    windows = np.empty((len(f_range), len(tw)), dtype=np.complex128)
+    for i_f, f in enumerate(f_range):
+        if f == 0.:
+            window = np.ones(len(tw))
+        else:
+            window = ((f / (np.sqrt(2. * np.pi) * k)) *
+                      np.exp(-0.5 * (1. / k ** 2.) * (f ** 2.) * tw ** 2.))
+        window /= window.sum()  # normalisation
+        windows[i_f] = fft(window)
+    return windows
+
+
+def precompute_st_windows(n_samp, start_f, stop_f, sfreq, width):
+    """Precompute stockwell Gaussian windows (in the freq domain).
+    From mne-python, _stockwell.py
+    """
+
+    tw = fftfreq(n_samp, 1. / sfreq) / n_samp
+    tw = np.r_[tw[:1], tw[1:][::-1]]
+
+    # TODO: FIX THIS TOO!! Width sets the frequency interval
+    k = width  # 1 for classical stockwell transform
+    # TODO: FIX THIS!!
     f_range = np.arange(start_f, stop_f, 1)
     windows = np.empty((len(f_range), len(tw)), dtype=np.complex128)
     for i_f, f in enumerate(f_range):
