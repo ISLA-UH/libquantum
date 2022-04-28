@@ -45,16 +45,23 @@ if __name__ == "__main__":
 
     rms_sig_wf, rms_sig_time = calculate_rms_sig_test(sig_wf=sig_wf, sig_time=sig_days, points_per_seg=16)
 
-    plot_tdr(sig_wf=sig_wf, sig_time=sig_days,
-             sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
-
-    freqs = np.arange(0.001, 0.1, 0.001)
-    fmin, fmax = freqs[[0, -1]]
+    fmin = 0.01
+    fmax = 0.1
 
     # Stockwell
-    [st_power, frequency] = tfr_array_stockwell(data=sig_wf, sfreq=1, fmin=fmin, fmax=fmax, width=3)
+    [st_power, frequency, W] = tfr_array_stockwell(data=sig_wf, sfreq=1, fmin=fmin, fmax=fmax, width=3)
+    print(frequency.shape)
+    print(W.shape, len(W))
+    print(st_power.shape)
+    plt.plot(np.abs(W[0, :]))
+    plt.show()
 
+    exit()
+    plot_tdr(sig_wf=sig_wf, sig_time=sig_days,
+             sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
     plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
+    plot_tfr_log(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
+
     plt.show()
 
 

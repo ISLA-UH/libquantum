@@ -35,9 +35,16 @@ def main(sample_rate: float,
     rms_sig_wf, rms_sig_time = calculate_rms_sig_test(sig_wf=sig_in, sig_time=time_in, points_per_seg=16)
 
     # Stockwell transform
-    [st_power, frequency] = tfr_array_stockwell(data=sig_in, sfreq=sample_rate,
+    [st_power, frequency, W] = tfr_array_stockwell(data=sig_in, sfreq=sample_rate,
                                                 fmin=frequency_center_min,
                                                 fmax=frequency_center_max, width=3.0)
+
+    # TODO: Figure this out!
+    print("Shape of W:", W.shape)
+    plt.plot(np.abs(W))
+    plt.show()
+
+    exit()
 
     plot_tdr(sig_wf=sig_in, sig_time=time_in,
                sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)

@@ -158,7 +158,7 @@ def check_input_st(x_in, n_fft):
     return x_in, n_fft, zero_pad
 
 
-def precompute_st_windows(n_samp, start_f, stop_f, sfreq, width):
+def precompute_st_windows_orig(n_samp, start_f, stop_f, sfreq, width):
     """Precompute stockwell Gaussian windows (in the freq domain).
     From mne-python, _stockwell.py
     """
@@ -166,7 +166,7 @@ def precompute_st_windows(n_samp, start_f, stop_f, sfreq, width):
     tw = fftfreq(n_samp, 1. / sfreq) / n_samp
     tw = np.r_[tw[:1], tw[1:][::-1]]
 
-    # TODO: FIX THIS TOO!!
+    # TODO: FIX THIS!!
     k = width  # 1 for classical stockwell transform
     # TODO: FIX THIS!!
     f_range = np.arange(start_f, stop_f, 1)
@@ -182,7 +182,7 @@ def precompute_st_windows(n_samp, start_f, stop_f, sfreq, width):
     return windows
 
 
-def precompute_st_windows(n_samp, start_f, stop_f, sfreq, width):
+def precompute_st_windows(n_samp, sfreq, f_range, width, delta_f: int = None):
     """Precompute stockwell Gaussian windows (in the freq domain).
     From mne-python, _stockwell.py
     """
@@ -190,10 +190,9 @@ def precompute_st_windows(n_samp, start_f, stop_f, sfreq, width):
     tw = fftfreq(n_samp, 1. / sfreq) / n_samp
     tw = np.r_[tw[:1], tw[1:][::-1]]
 
-    # TODO: FIX THIS TOO!! Width sets the frequency interval
+    # TODO: FIX THIS!! Width sets the frequency interval
     k = width  # 1 for classical stockwell transform
-    # TODO: FIX THIS!!
-    f_range = np.arange(start_f, stop_f, 1)
+
     windows = np.empty((len(f_range), len(tw)), dtype=np.complex128)
     for i_f, f in enumerate(f_range):
         if f == 0.:
@@ -204,6 +203,29 @@ def precompute_st_windows(n_samp, start_f, stop_f, sfreq, width):
         window /= window.sum()  # normalisation
         windows[i_f] = fft(window)
     return windows
+
+
+def st_power_orig(x, start_f, zero_pad, W):
+    """Aux function."""
+    n_samp = x.shape[-1]
+    n_out = (n_samp - zero_pad)
+    psd = np.empty((len(W), n_out))
+    X = fft(x)
+    XX = np.concatenate([X, X], axis=-1)
+    print("XX:", XX.shape)
+    for i_f, window in enumerate(W):
+        f = start_f + i_f
+        ST = ifft(XX[f:f + n_samp] * window)
+        if zero_pad > 0:
+            TFR = ST[:-zero_pad:1]
+        else:
+            TFR = ST[::1]
+        TFR_abs = np.abs(TFR)
+        # TODO: Correct default value
+        TFR_abs[TFR_abs == 0] = 1.
+        TFR_abs *= TFR_abs  # Square
+        psd[i_f, :] = TFR_abs
+    return psd
 
 
 def st_power(x, start_f, zero_pad, W):
@@ -229,7 +251,7 @@ def st_power(x, start_f, zero_pad, W):
     return psd
 
 
-def tfr_array_stockwell(data, sfreq, fmin=None, fmax=None, n_fft=None,
+def tfr_array_stockwell(data, sfreq, fmin=None, fmax=None, n_fft=None, delta_f=None,
                         width=1.0):
     """Compute power and intertrial coherence using Stockwell (S) transform.
     Same computation as `~mne.time_frequency.tfr_stockwell`, but operates on
@@ -266,18 +288,30 @@ def tfr_array_stockwell(data, sfreq, fmin=None, fmax=None, n_fft=None,
 
     data, n_fft_, zero_pad = check_input_st(data, n_fft)
 
+
     freqs = fftfreq(n_fft_, 1. / sfreq)
     if fmin is None:
         fmin = freqs[freqs > 0][0]
     if fmax is None:
         fmax = freqs.max()
 
-    start_f = np.abs(freqs - fmin).argmin()
-    stop_f = np.abs(freqs - fmax).argmin()
-    freqs = freqs[start_f:stop_f]
+    start_f_idx = np.abs(freqs - fmin).argmin()
+    stop_f_idx = np.abs(freqs - fmax).argmin()
+    f_start = freqs[start_f_idx]
+    f_stop = freqs[stop_f_idx]
 
-    W = precompute_st_windows(data.shape[0], start_f, stop_f, sfreq, width)
-    psd = st_power(data, start_f, zero_pad, W)
+    # TODO: Standardize (replace 12)
+    if delta_f is None:
+        if (f_stop - f_start) > 12:  # To reproduce examples
+            delta_f = 1.
+        else:
+            delta_f = (f_stop - f_start)/12.
 
-    return psd, freqs
+    # TODO: Add log space
+    f_range = np.arange(f_start, f_stop, delta_f)
+
+    W = precompute_st_windows(data.shape[0], sfreq, f_range, width)
+    psd = st_power(data, start_f_idx, zero_pad, W)
+
+    return psd, f_range, W
 
