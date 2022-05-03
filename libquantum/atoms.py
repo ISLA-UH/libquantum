@@ -83,11 +83,47 @@ def chirp_spectrum(frequency_hz: np.ndarray,
     angular_frequency_shifted = angular_frequency - angular_frequency_center
     frequency_shifted_hz = angular_frequency_shifted*frequency_sample_rate_hz/(2*np.pi)
 
-    spectrum_amplitude = np.sqrt(np.pi/p_complex)
+    # spectrum_amplitude = np.sqrt(np.pi/p_complex)
+    spectrum_amplitude = np.sqrt(p_complex/np.abs(p_complex))
     gauss_arg = 1./(4*p_complex)
-    spectrum_gauss = np.exp(-gauss_arg * (angular_frequency_shifted * scale_atom) ** 2)
+    # spectrum_gauss = np.exp(-gauss_arg * (angular_frequency_shifted * scale_atom) ** 2)
+    spectrum_gauss = np.exp(-gauss_arg * (angular_frequency_shifted**2))
     # Phase shift from time offset
     spectrum_gabor = spectrum_amplitude * spectrum_gauss * np.exp(-1j * offset_phase)
+
+    return spectrum_gabor, frequency_shifted_hz
+
+
+def chirp_spectrum_centered(band_order_Nth: float,
+                            scale_frequency_center_hz: float,
+                            frequency_sample_rate_hz: float,
+                            index_shift: float = 0,
+                            scale_base: float = scales.Slice.G2) -> Tuple[Union[complex, float, np.ndarray], np.ndarray]:
+    """
+    Spectrum of quantum wavelet for specified band_order_Nth and arbitrary time duration
+
+    :param frequency_hz: frequency range below Nyquist
+    :param offset_time_s: time of wavelet centroid
+    :param band_order_Nth: Nth order of constant Q bands
+    :param scale_frequency_center_hz: band center frequency in Hz
+    :param frequency_sample_rate_hz: sample rate on Hz
+    :param index_shift: index of shift. Default is 0.0
+    :param scale_base: positive reference Base G > 1. Default is G2
+    :return: Fourier transform of the Gabor atom
+    """
+
+    # TODO: Generalize to two dictionaries
+    cycles_M, quality_factor_Q, gamma = \
+        chirp_MQG_from_N(band_order_Nth, index_shift, scale_base)
+    scale_atom = chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
+    p_complex = chirp_p_complex(scale_atom, gamma, index_shift)
+    angular_frequency_shifted = np.arange(-np.pi, np.pi, np.pi/2**7)
+    frequency_shifted_hz = angular_frequency_shifted*frequency_sample_rate_hz/(2*np.pi)
+
+    # spectrum_amplitude = np.sqrt(np.pi/p_complex)
+    spectrum_amplitude = np.sqrt(p_complex/np.abs(p_complex))
+    spectrum_gauss = np.exp(-(angular_frequency_shifted**2)/(4*p_complex))
+    spectrum_gabor = spectrum_amplitude * spectrum_gauss
 
     return spectrum_gabor, frequency_shifted_hz
 
