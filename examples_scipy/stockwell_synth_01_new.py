@@ -44,7 +44,7 @@ def main(sample_rate: float,
     plt.plot(np.abs(W))
     plt.show()
 
-    exit()
+    # exit()
 
     plot_tdr(sig_wf=sig_in, sig_time=time_in,
                sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
