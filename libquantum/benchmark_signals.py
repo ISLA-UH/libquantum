@@ -1,13 +1,32 @@
 import numpy as np
 import scipy.signal as signal
+from libquantum.scales import EPSILON
 from scipy.integrate import cumulative_trapezoid
 from typing import Optional, Tuple, Union
 import matplotlib.pyplot as plt
 
 
-def plot_tdr(sig_wf, sig_time,
-             sig_rms_wf, sig_rms_time,
-             signal_time_base:str='seconds'):
+def plot_tdr_sig(sig_wf, sig_time,
+                 signal_time_base:str='seconds'):
+    """
+    Waveform
+    :param sig_wf:
+    :param sig_time:
+    :param sig_rms_wf:
+    :param sig_rms_time:
+    :param signal_time_base:
+    :return:
+    """
+
+    plt.figure()
+    plt.plot(sig_time, sig_wf)
+    plt.title('Input waveform')
+    plt.xlabel("Time, " + signal_time_base)
+
+
+def plot_tdr_rms(sig_wf, sig_time,
+                 sig_rms_wf, sig_rms_time,
+                 signal_time_base:str='seconds'):
     """
     Waveform
     :param sig_wf:
@@ -44,11 +63,18 @@ def plot_tfr_lin(tfr_power, tfr_frequency, tfr_time,
     plt.xlabel("Time, " + signal_time_base)
 
 
-def plot_tfr_log(tfr_power, tfr_frequency, tfr_time,
-                 bits_min: float = -8,
-                 bits_max: float = 0,
-                 title_str: str='TFR, top bits',
-                 signal_time_base: str='seconds'):
+def plot_st_window(window, frequency, signal_time_base: str='seconds'):
+    plt.figure(figsize=(8, 8))
+    for j, freq in enumerate(frequency):
+        plt.plot(np.log2(np.abs(window[j, :]) + EPSILON), label=freq)
+    plt.legend()
+
+
+def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
+                  bits_min: float = -8,
+                  bits_max: float = 0,
+                  title_str: str='TFR, top bits',
+                  signal_time_base: str='seconds'):
     """
     TFR in bits
     :param sig_tfr:

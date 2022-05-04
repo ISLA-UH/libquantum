@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig_test
-from libquantum.benchmark_signals import plot_tdr, plot_tfr_lin, plot_tfr_log
+from libquantum.benchmark_signals import plot_tdr_rms, plot_tfr_lin, plot_tfr_bits
 
 
 DIR_PATH = "/Users/mgarces/Documents/DATA_2022/Tonga/CEA"
@@ -57,10 +57,10 @@ if __name__ == "__main__":
     plt.show()
 
     exit()
-    plot_tdr(sig_wf=sig_wf, sig_time=sig_days,
-             sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
+    plot_tdr_rms(sig_wf=sig_wf, sig_time=sig_days,
+                 sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
     plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
-    plot_tfr_log(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
+    plot_tfr_bits(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
 
     plt.show()
 

@@ -3,20 +3,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
-    # input_files = ['20200222_FireVox_annotated_data.pkl',
-    #                '20200210_FireVox_annotated_data.pkl',
-    #                '20200711_FireVox_A_annotated_data.pkl',
-    #                '20200711_FireVox_B_annotated_data.pkl',
-    #                '20200711_FireVox_C_annotated_data.pkl',
-    #                '20200711_FireVox_D_annotated_data.pkl',
-    #                '20200711_FireVox_E_F_annotated_data.pkl']
-
-    input_files = ['20200210_FireVox_annotated_data.pkl',
+    input_files = ['20200222_FireVox_annotated_data.pkl',
+                   '20200210_FireVox_annotated_data.pkl',
                    '20200711_FireVox_A_annotated_data.pkl',
                    '20200711_FireVox_B_annotated_data.pkl',
                    '20200711_FireVox_C_annotated_data.pkl',
                    '20200711_FireVox_D_annotated_data.pkl',
                    '20200711_FireVox_E_F_annotated_data.pkl']
+
+    # input_files = ['20200210_FireVox_annotated_data.pkl',
+    #                '20200711_FireVox_A_annotated_data.pkl',
+    #                '20200711_FireVox_B_annotated_data.pkl',
+    #                '20200711_FireVox_C_annotated_data.pkl',
+    #                '20200711_FireVox_D_annotated_data.pkl',
+    #                '20200711_FireVox_E_F_annotated_data.pkl']
 
     file_path_mg = "/Users/mgarces/Documents/DATA_API_M/FireVox_2020/RedVox_Milton/annotated_data/"
     file_path_m1 = "/Users/milton/Documents/DATA/FireVox_2020/RedVox_Milton/annotated_data/"

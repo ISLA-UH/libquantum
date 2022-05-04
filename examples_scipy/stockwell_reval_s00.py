@@ -5,12 +5,38 @@ First test synthetic: synth_00
 
 import numpy as np
 from scipy.fft import fft, rfft, ifft, fftfreq
+from libquantum.scales import EPSILON
 from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig_test
 from libquantum.benchmark_signals import synth_00
-from libquantum.benchmark_signals import plot_tdr, plot_tfr_lin, plot_tfr_log
+from libquantum.benchmark_signals import plot_tdr_sig, plot_tfr_lin, plot_tfr_bits, plot_st_window
 
 from matplotlib import pyplot as plt
 print(__doc__)
+
+
+def check_input_st_isla(x_in, n_fft):
+    """Aux function."""
+    # flatten to 2 D and memorize original shape
+    n_times = x_in.shape[-1]
+
+    def _is_power_of_two(n):
+        return not (n > 0 and (n & (n - 1)))
+
+    if n_fft is None or (not _is_power_of_two(n_fft) and n_times > n_fft):
+        # Compute next power of 2
+        n_fft = 2 ** int(np.ceil(np.log2(n_times)))
+    elif n_fft < n_times:
+        raise ValueError("n_fft cannot be smaller than signal size. "
+                         "Got %s < %s." % (n_fft, n_times))
+    if n_times < n_fft:
+        print('The input signal is shorter ({}) than "n_fft" ({}). '
+              'Applying zero padding.'.format(x_in.shape[-1], n_fft))
+        zero_pad = n_fft - n_times
+        pad_array = np.zeros(x_in.shape[:-1] + (zero_pad,), x_in.dtype)
+        x_in = np.concatenate((x_in, pad_array), axis=-1)
+    else:
+        zero_pad = 0
+    return x_in, n_fft, zero_pad
 
 
 def precompute_st_windows_isla(n_samp, sfreq, f_range, width, delta_f: int = None):
@@ -95,10 +121,10 @@ def tfr_array_stockwell_isla(data, sfreq, fmin=None, fmax=None, n_fft=None, delt
     """
 
     # TODO: Test
-    # data, n_fft_, zero_pad = check_input_st(data, n_fft)
-    # freqs = fftfreq(n_fft_, 1. / sfreq)
+    data, n_fft_, zero_pad = check_input_st_isla(data, n_fft)
+    freqs = fftfreq(n_fft_, 1. / sfreq)
 
-    freqs = fftfreq(n_fft, 1. / sfreq)
+    # freqs = fftfreq(n_fft, 1. / sfreq)
     if fmin is None:
         fmin = freqs[freqs > 0][0]
     if fmax is None:
@@ -125,7 +151,7 @@ def tfr_array_stockwell_isla(data, sfreq, fmin=None, fmax=None, n_fft=None, delt
     return psd, f_range, W
 
 
-def main(sample_rate, signal_time_base:str='seconds'):
+def main(sample_rate, signal_time_base: str='seconds'):
     """
     Evaluate synthetics
     :param sample_rate:
@@ -145,7 +171,7 @@ def main(sample_rate, signal_time_base:str='seconds'):
     #          sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
 
 
-    freqs = np.arange(5., 500., 2.)
+    freqs = np.arange(5., 500., 5.)
     fmin, fmax = freqs[[0, -1]]
 
     # Stockwell
@@ -153,12 +179,10 @@ def main(sample_rate, signal_time_base:str='seconds'):
 
     # TODO: Construct function
     print("Shape of W:", W.shape)
-    plt.figure()
-    plt.plot(np.abs(W))
-    plt.show()
-
+    plot_tdr_sig(sig_wf=sig_in, sig_time=time_in)
+    plot_st_window(window=W, frequency=freqs)
     plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
-    plot_tfr_log(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
+    # plot_tfr_bits(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
     plt.show()
 
 
