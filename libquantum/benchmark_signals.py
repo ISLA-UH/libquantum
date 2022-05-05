@@ -63,13 +63,6 @@ def plot_tfr_lin(tfr_power, tfr_frequency, tfr_time,
     plt.xlabel("Time, " + signal_time_base)
 
 
-def plot_st_window(window, frequency_s, frequency_fft, signal_time_base: str='seconds'):
-    plt.figure(figsize=(8, 8))
-    for j, freq in enumerate(frequency_s):
-        plt.plot(frequency_fft, np.log2(np.abs(window[j, :]) + EPSILON), label=freq)
-    plt.legend()
-
-
 def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
                   bits_min: float = -8,
                   bits_max: float = 0,
@@ -95,6 +88,30 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
     plt.title(title_str)
     plt.ylabel("Frequency, samples per " + signal_time_base)
     plt.xlabel("Time, " + signal_time_base)
+
+
+def plot_st_window_tdr_lin(window, freq_sx, time_fft, signal_time_base: str='seconds'):
+    plt.figure(figsize=(8, 8))
+    for j, freq in enumerate(freq_sx):
+        plt.plot(time_fft, np.abs(window[j, :]), label=freq)
+    plt.legend()
+    plt.title('TDR window, linear')
+
+
+def plot_st_window_tfr_bits(window, frequency_sx, frequency_fft, signal_time_base: str='seconds'):
+    plt.figure(figsize=(8, 8))
+    for j, freq in enumerate(frequency_sx):
+        plt.plot(frequency_fft, np.log2(np.abs(window[j, :]) + EPSILON), label=freq)
+    plt.legend()
+    plt.title('TFR window, bits')
+
+
+def plot_st_window_tfr_lin(window, frequency_sx, frequency_fft, signal_time_base: str='seconds'):
+    plt.figure(figsize=(8, 8))
+    for j, freq in enumerate(frequency_sx):
+        plt.plot(frequency_fft, np.abs(window[j, :]), label=freq)
+    plt.legend()
+    plt.title('TFR window, lin')
 
 
 def signal_gate(wf, t, tmin, tmax, fraction_cosine: float = 0):

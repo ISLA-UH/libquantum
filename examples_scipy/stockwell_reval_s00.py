@@ -8,7 +8,8 @@ from scipy.fft import fft, rfft, ifft, fftfreq, fftshift
 from libquantum.scales import EPSILON
 from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig_test
 from libquantum.benchmark_signals import synth_00
-from libquantum.benchmark_signals import plot_tdr_sig, plot_tfr_lin, plot_tfr_bits, plot_st_window
+from libquantum.benchmark_signals import plot_tdr_sig, plot_tfr_lin, plot_tfr_bits, \
+    plot_st_window_tdr_lin, plot_st_window_tfr_bits, plot_st_window_tfr_lin
 
 from matplotlib import pyplot as plt
 print(__doc__)
@@ -158,6 +159,12 @@ def main(sample_rate, signal_time_base: str='seconds'):
     :param signal_time_base:
     :return:
     """
+
+    # TODO: FIX THIS!! Width sets the frequency interval
+    order = 8
+    M = 12/5*order
+    k = 3*order/8  # 1 for classical stockwell transform
+
     sample_interval = 1/sample_rate
     sig_in, time_in = synth_00(time_sample_interval=sample_interval, time_duration=1.024)
     n_fft = sig_in.shape[-1]
@@ -167,21 +174,27 @@ def main(sample_rate, signal_time_base: str='seconds'):
     X = fft(sig_in)
     XX = np.concatenate([X, X], axis=-1)
     freqs_fft = fftfreq(n_fft, sample_interval)
+    mu_fft = 2*np.pi*freqs_fft/sample_rate
+
     # Make symmetric about origin
     freqs_fft_symmetric = fftshift(freqs_fft)
     print(freqs_fft.shape, X.shape, XX.shape)
 
-    # f =  fs*t / n_fft
+    # # f =  fs*t / n_fft
     # tw = freqs_fft / n_fft
     # print(tw)
     # # Keeps zero frequency [first element] at start, reverses all elements afterwards
     # # x[::-1] reverses all elements
     # tw = np.r_[tw[:1], tw[1:][::-1]]
+    # TODO: Cleaner, maybe not needed if using FT of gaussian
     tw = freqs_fft_symmetric / n_fft
     print(tw)
 
-    fmin = 10.
-    fmax = 500.
+    Tw = n_fft/sample_rate
+    fmin_nth = 12/5 * order/Tw
+    print("Min frequency, hz:", fmin_nth)
+    fmin = fmin_nth
+    fmax = sample_rate/2.
     df = 50.
 
     # Find edges
@@ -192,10 +205,9 @@ def main(sample_rate, signal_time_base: str='seconds'):
     f_stop = freqs_fft[stop_f_idx]
     freqs_s = np.arange(f_start, f_stop, df)
 
+    # Gabor window
+    nu_s = 2*np.pi*freqs_s/sample_rate  # Nondimensionalized angular frequency
     print("TW.shape", tw.shape)
-    # TODO: FIX THIS!! Width sets the frequency interval
-    order = 8
-    k = 3*order/8  # 1 for classical stockwell transform
 
     windows_t = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
     windows_f = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
@@ -207,15 +219,47 @@ def main(sample_rate, signal_time_base: str='seconds'):
         else:
             window = ((f / (np.sqrt(2. * np.pi) * k)) *
                       np.exp(-0.5 * (1. / k ** 2.) * (f ** 2.) * tw ** 2.))
-
         windows_t[i_f] = window/window.sum()  # normalisation
         windows_f[i_f] = fft(windows_t[i_f])
 
-    # Time domain window
-    plot_st_window(window=windows_t, frequency_s=freqs_s, frequency_fft=tw)
-    # Frequency domain window
-    plot_st_window(window=windows_f, frequency_s=freqs_s, frequency_fft=freqs_fft)
+    t2 = sample_rate*tw
+    windows_t2 = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
+    windows_f2 = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
+    for i_f, nu in enumerate(nu_s):
+        if nu == 0.:
+            window2 = np.ones(len(tw))
+        else:
+            sigma = M/nu
+            window_scaling = 1/(np.sqrt(2. * np.pi) * sigma)
+            window2 = window_scaling * np.exp(-0.5 * (t2 ** 2.)/(sigma ** 2.))
+        windows_t2[i_f] = window2/window2.sum()  # normalisation, in principle, integral is unity.
+        windows_f2[i_f] = fft(windows_t2[i_f])
 
+    # TODO: THIS WORKS! Use vector multiplication instead of for loop
+    windows_f3 = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
+    for i_f, nu in enumerate(nu_s):
+        if nu == 0.:
+            windows_f3[i_f] = np.ones(len(tw))
+        else:
+            sigma = M/nu
+            windows_f3[i_f] = np.exp(-0.5 * (sigma ** 2.)*(mu_fft ** 2.))
+
+
+    # These can be generated exactly!
+
+    # # Time domain window
+    # plot_st_window_tdr_lin(window=windows_t, freq_sx=freqs_s, time_fft=tw)
+    # plot_st_window_tdr_lin(window=windows_t2, freq_sx=freqs_s, time_fft=tw)
+    #
+    # # Frequency domain window
+    # plot_st_window_tfr_bits(window=fftshift(windows_f), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
+    # plot_st_window_tfr_bits(window=fftshift(windows_f2), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
+    # These can be generated exactly!
+    plot_st_window_tfr_lin(window=fftshift(windows_f2), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
+    plot_st_window_tfr_lin(window=fftshift(windows_f3), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
+
+    plt.show()
+    exit()
     # plt.figure()
     # plt.plot(freqs_fft_symmetric, np.abs(X))
     # plt.title('X')
@@ -231,17 +275,17 @@ def main(sample_rate, signal_time_base: str='seconds'):
                                                         fmin=fmin, fmax=fmax,
                                                         width=k, delta_f=df)
 
-    plot_st_window(window=W, frequency_s=freqs_s, frequency_fft=freqs_fft)
+    plot_st_window_tfr_bits(window=W, frequency_sx=freqs_s, frequency_fft=freqs_fft)
     plt.show()
 
-    exit()
+
 
 
     # TODO: Construct function
     print("Shape of W:", W.shape)
     print("Shape of frequency:", frequency.shape)
     plot_tdr_sig(sig_wf=sig_in, sig_time=time_in)
-    plot_st_window(window=W, frequency_s=freqs_s, frequency_fft=freqs_fft)
+    plot_st_window_tfr_bits(window=W, frequency_sx=freqs_s, frequency_fft=freqs_fft)
     plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
     # plot_tfr_bits(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
     plt.show()
