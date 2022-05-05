@@ -4,7 +4,7 @@ First test synthetic: synth_00
 """
 
 import numpy as np
-from scipy.fft import fft, rfft, ifft, fftfreq
+from scipy.fft import fft, rfft, ifft, fftfreq, fftshift
 from libquantum.scales import EPSILON
 from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig_test
 from libquantum.benchmark_signals import synth_00
@@ -160,27 +160,88 @@ def main(sample_rate, signal_time_base: str='seconds'):
     """
     sample_interval = 1/sample_rate
     sig_in, time_in = synth_00(time_sample_interval=sample_interval, time_duration=1.024)
-    print("Sig n:", sig_in.shape)
+    n_fft = sig_in.shape[-1]
+    print("Sig n:", n_fft)
 
-    # # Compute strided RMS
-    # # TODO: Fix hop time and add offset on time from start
-    # rms_sig_wf, rms_sig_time = calculate_rms_sig_test(sig_wf=sig_in, sig_time=time_in, points_per_seg=16)
+    # Take FFT and concatenate
+    X = fft(sig_in)
+    XX = np.concatenate([X, X], axis=-1)
+    freqs_fft = fftfreq(n_fft, sample_interval)
+    # Make symmetric about origin
+    freqs_fft_symmetric = fftshift(freqs_fft)
+    print(freqs_fft.shape, X.shape, XX.shape)
+
+    # f =  fs*t / n_fft
+    # tw = freqs_fft / n_fft
+    # print(tw)
+    # # Keeps zero frequency [first element] at start, reverses all elements afterwards
+    # # x[::-1] reverses all elements
+    # tw = np.r_[tw[:1], tw[1:][::-1]]
+    tw = freqs_fft_symmetric / n_fft
+    print(tw)
+
+    fmin = 10.
+    fmax = 500.
+    df = 50.
+
+    # Find edges
+    # freqs_s = np.arange(fmin, fmax, df)
+    start_f_idx = np.abs(freqs_fft - fmin).argmin()
+    stop_f_idx = np.abs(freqs_fft - fmax).argmin()
+    f_start = freqs_fft[start_f_idx]
+    f_stop = freqs_fft[stop_f_idx]
+    freqs_s = np.arange(f_start, f_stop, df)
+
+    print("TW.shape", tw.shape)
+    # TODO: FIX THIS!! Width sets the frequency interval
+    order = 8
+    k = 3*order/8  # 1 for classical stockwell transform
+
+    windows_t = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
+    windows_f = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
+
+    # TODO: Too low a frequency leads to instability - won't fit
+    for i_f, f in enumerate(freqs_s):
+        if f == 0.:
+            window = np.ones(len(tw))
+        else:
+            window = ((f / (np.sqrt(2. * np.pi) * k)) *
+                      np.exp(-0.5 * (1. / k ** 2.) * (f ** 2.) * tw ** 2.))
+
+        windows_t[i_f] = window/window.sum()  # normalisation
+        windows_f[i_f] = fft(windows_t[i_f])
+
+    # Time domain window
+    plot_st_window(window=windows_t, frequency_s=freqs_s, frequency_fft=tw)
+    # Frequency domain window
+    plot_st_window(window=windows_f, frequency_s=freqs_s, frequency_fft=freqs_fft)
+
+    # plt.figure()
+    # plt.plot(freqs_fft_symmetric, np.abs(X))
+    # plt.title('X')
     #
-    # # TODO: Test convolution envelope
-    # plot_tdr(sig_wf=sig_in, sig_time=time_in,
-    #          sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
-
-
-    freqs = np.arange(5., 500., 5.)
-    fmin, fmax = freqs[[0, -1]]
+    # plt.figure()
+    # plt.plot(np.abs(XX))
+    # plt.title('XX')
+    # plt.show()
 
     # Stockwell
-    [st_power, frequency, W] = tfr_array_stockwell(data=sig_in, sfreq=sample_rate, fmin=fmin, fmax=fmax, width=3.0)
+    [st_power, frequency, W] = tfr_array_stockwell_isla(data=sig_in,
+                                                        sfreq=sample_rate,
+                                                        fmin=fmin, fmax=fmax,
+                                                        width=k, delta_f=df)
+
+    plot_st_window(window=W, frequency_s=freqs_s, frequency_fft=freqs_fft)
+    plt.show()
+
+    exit()
+
 
     # TODO: Construct function
     print("Shape of W:", W.shape)
+    print("Shape of frequency:", frequency.shape)
     plot_tdr_sig(sig_wf=sig_in, sig_time=time_in)
-    plot_st_window(window=W, frequency=freqs)
+    plot_st_window(window=W, frequency_s=freqs_s, frequency_fft=freqs_fft)
     plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
     # plot_tfr_bits(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
     plt.show()

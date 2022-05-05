@@ -63,10 +63,10 @@ def plot_tfr_lin(tfr_power, tfr_frequency, tfr_time,
     plt.xlabel("Time, " + signal_time_base)
 
 
-def plot_st_window(window, frequency, signal_time_base: str='seconds'):
+def plot_st_window(window, frequency_s, frequency_fft, signal_time_base: str='seconds'):
     plt.figure(figsize=(8, 8))
-    for j, freq in enumerate(frequency):
-        plt.plot(np.log2(np.abs(window[j, :]) + EPSILON), label=freq)
+    for j, freq in enumerate(frequency_s):
+        plt.plot(frequency_fft, np.log2(np.abs(window[j, :]) + EPSILON), label=freq)
     plt.legend()
 
 
