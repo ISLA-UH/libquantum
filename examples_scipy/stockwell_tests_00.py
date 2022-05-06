@@ -6,7 +6,7 @@ https://mne.tools/stable/generated/mne.time_frequency.tfr_array_stockwell.html#m
 """
 
 import numpy as np
-from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig_test
+from libquantum.stockwell_orig import tfr_array_stockwell, calculate_rms_sig_test
 from matplotlib import pyplot as plt
 print(__doc__)
 

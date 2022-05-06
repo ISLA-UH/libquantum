@@ -6,7 +6,7 @@ First test synthetic: synth_00
 import numpy as np
 from scipy.fft import fft, rfft, ifft, fftfreq, fftshift
 from libquantum.scales import EPSILON
-from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig_test
+from libquantum.stockwell_orig import tfr_array_stockwell, calculate_rms_sig_test
 from libquantum.benchmark_signals import synth_00
 from libquantum.benchmark_signals import plot_tdr_sig, plot_tfr_lin, plot_tfr_bits, \
     plot_st_window_tdr_lin, plot_st_window_tfr_bits, plot_st_window_tfr_lin
@@ -40,116 +40,77 @@ def check_input_st_isla(x_in, n_fft):
     return x_in, n_fft, zero_pad
 
 
-def precompute_st_windows_isla(n_samp, sfreq, f_range, width, delta_f: int = None):
-    """Precompute stockwell Gaussian windows (in the freq domain).
-    From mne-python, _stockwell.py
-    """
+def tfr_array_stockwell_isla(data, sample_rate, fmin=None, fmax=None, n_fft=None, df=None,
+                             order=8.0, binary_order: str = False):
 
-    tw = fftfreq(n_samp, 1. / sfreq) / n_samp
-    tw = np.r_[tw[:1], tw[1:][::-1]]
+    M = 12/5*order
+    sample_interval = 1/sample_rate
+    if n_fft is None:
+        n_fft = data.shape[-1]
 
-    # TODO: FIX THIS!! Width sets the frequency interval
-    k = width  # 1 for classical stockwell transform
+    Tw = n_fft/sample_rate
+    fmin_nth = 12/5 * order/Tw
 
-    windows = np.empty((len(f_range), len(tw)), dtype=np.complex128)
-    for i_f, f in enumerate(f_range):
-        if f == 0.:
-            window = np.ones(len(tw))
-        else:
-            window = ((f / (np.sqrt(2. * np.pi) * k)) *
-                      np.exp(-0.5 * (1. / k ** 2.) * (f ** 2.) * tw ** 2.))
-        window /= window.sum()  # normalisation
-        windows[i_f] = fft(window)
-    return windows
-
-
-def st_power_isla(x, start_f, zero_pad, W):
-    """Aux function."""
-    n_samp = x.shape[-1]
-    n_out = (n_samp - zero_pad)
-    psd = np.empty((len(W), n_out))
-    X = fft(x)
-    XX = np.concatenate([X, X], axis=-1)
-    print("XX:", XX.shape)
-    for i_f, window in enumerate(W):
-        f = start_f + i_f
-        ST = ifft(XX[f:f + n_samp] * window)
-        if zero_pad > 0:
-            TFR = ST[:-zero_pad:1]
-        else:
-            TFR = ST[::1]
-        TFR_abs = np.abs(TFR)
-        # TODO: Correct default value
-        TFR_abs[TFR_abs == 0] = 1.
-        TFR_abs *= TFR_abs  # Square
-        psd[i_f, :] = TFR_abs
-    return psd
-
-
-def tfr_array_stockwell_isla(data, sfreq, fmin=None, fmax=None, n_fft=None, delta_f=None,
-                        width=1.0):
-    """Compute power and intertrial coherence using Stockwell (S) transform.
-    Same computation as `~mne.time_frequency.tfr_stockwell`, but operates on
-    :class:`NumPy arrays <numpy.ndarray>` instead of `~mne.Epochs` objects.
-    See :footcite:`Stockwell2007,MoukademEtAl2014,WheatEtAl2010,JonesEtAl2006`
-    for more information.
-    Parameters
-    ----------
-    data : ndarray, shape (n_epochs, n_channels, n_times)
-        The signal to transform.
-    sfreq : float
-        The sampling frequency.
-    fmin : None, float
-        The minimum frequency to include. If None defaults to the minimum fft
-        frequency greater than zero.
-    fmax : None, float
-        The maximum frequency to include. If None defaults to the maximum fft.
-    n_fft : int | None
-        The length of the windows used for FFT. If None, it defaults to the
-        next power of 2 larger than the signal length.
-    width : float
-        The width of the Gaussian window. If < 1, increased temporal
-        resolution, if > 1, increased frequency resolution. Defaults to 1.
-        (classical S-Transform).
-
-    Returns
-    -------
-    st_power : ndarray
-        The multitaper power of the Stockwell transformed data.
-    freqs : ndarray
-        The frequencies.
-
-    """
-
-    # TODO: Test
-    data, n_fft_, zero_pad = check_input_st_isla(data, n_fft)
-    freqs = fftfreq(n_fft_, 1. / sfreq)
-
-    # freqs = fftfreq(n_fft, 1. / sfreq)
     if fmin is None:
-        fmin = freqs[freqs > 0][0]
+        fmin = fmin_nth
     if fmax is None:
-        fmax = freqs.max()
+        fmax = sample_rate/2.
+    if df is None:
+        df = 1.
 
-    start_f_idx = np.abs(freqs - fmin).argmin()
-    stop_f_idx = np.abs(freqs - fmax).argmin()
-    f_start = freqs[start_f_idx]
-    f_stop = freqs[stop_f_idx]
+    # Take FFT and concatenate
+    X = fft(data)
+    XX = np.concatenate([X, X], axis=-1)
+    freqs_fft = fftfreq(n_fft, sample_interval)
+    mu_fft = 2*np.pi*freqs_fft/sample_rate
 
-    # TODO: Standardize (replace 12)
-    if delta_f is None:
-        if (f_stop - f_start) > 12:  # To reproduce examples
-            delta_f = 1.
+    # TODO: Standardize
+    start_f_idx = np.abs(freqs_fft - fmin).argmin()
+    stop_f_idx = np.abs(freqs_fft - fmax).argmin()
+    f_start = freqs_fft[start_f_idx]
+    f_stop = freqs_fft[stop_f_idx]
+    if binary_order is True:
+        num_octaves = np.log2(f_stop/f_start)
+        num_bands = int(num_octaves*order)
+        print("Number of bands:", num_bands)
+        freqs_s = np.logspace(np.log2(f_start), np.log2(f_stop), num=num_bands, base=2.)
+    else:
+        freqs_s = np.arange(f_start, f_stop, df)
+    print("Shape of freqs_s", freqs_s.shape)
+    print("SX Band edges:", freqs_s[0], freqs_s[-1])
+
+    # TODO: Consolidate all the loops over freqs_s
+    # Construct shifting frequency indexes
+    freqs_s_index = np.empty(len(freqs_s), dtype=int)
+    for isx, fsx in enumerate(freqs_s):
+        freqs_s_index[isx] = np.abs(freqs_fft - freqs_s[isx]).argmin()
+
+    # TODO: find fft frequencies that exactly match - necessary for shifting FFT
+    # Gabor window
+    # TODO: Reconcile with above granularity
+    nu_s = 2*np.pi*freqs_s/sample_rate  # Nondimensionalized angular frequency
+    windows_f3 = np.empty((len(freqs_s), len(data)), dtype=np.complex128)
+
+    # TODO: These can be constructed as a matrix w/o for loop
+    for i_f, nu in enumerate(nu_s):
+        if nu == 0.:
+            windows_f3[i_f] = np.ones(len(data))
         else:
-            delta_f = (f_stop - f_start)/12.
+            sigma = M/nu
+            windows_f3[i_f] = np.exp(-0.5 * (sigma ** 2.)*(mu_fft ** 2.))
 
-    # TODO: Add log space
-    f_range = np.arange(f_start, f_stop, delta_f)
+    psd3 = np.empty((len(windows_f3), n_fft))
 
-    W = precompute_st_windows_isla(data.shape[0], sfreq, f_range, width)
-    psd = st_power_isla(data, start_f_idx, zero_pad=0, W=W)
+    # Frequency shift the FFT, then compute the IFFT
+    for i_f, window in enumerate(windows_f3):
+        # this is f_fft + f_s
+        f_idx = freqs_s_index[i_f]
+        TFR = ifft(XX[f_idx:f_idx + n_fft] * window) + EPSILON
+        TFR_abs = np.abs(TFR)
+        TFR_abs *= TFR_abs  # Square
+        psd3[i_f, :] = TFR_abs
 
-    return psd, f_range, W
+    return psd3, freqs_s, freqs_fft, windows_f3
 
 
 def main(sample_rate, signal_time_base: str='seconds'):
@@ -160,134 +121,50 @@ def main(sample_rate, signal_time_base: str='seconds'):
     :return:
     """
 
-    # TODO: FIX THIS!! Width sets the frequency interval
     order = 8
-    M = 12/5*order
-    k = 3*order/8  # 1 for classical stockwell transform
+    # k = 3*order/8  # 1 for classic stockwell transform
+    k = 3
 
     sample_interval = 1/sample_rate
     sig_in, time_in = synth_00(time_sample_interval=sample_interval, time_duration=1.024)
+
     n_fft = sig_in.shape[-1]
-    print("Sig n:", n_fft)
-
-    # Take FFT and concatenate
-    X = fft(sig_in)
-    XX = np.concatenate([X, X], axis=-1)
-    freqs_fft = fftfreq(n_fft, sample_interval)
-    mu_fft = 2*np.pi*freqs_fft/sample_rate
-
-    # Make symmetric about origin
-    freqs_fft_symmetric = fftshift(freqs_fft)
-    print(freqs_fft.shape, X.shape, XX.shape)
-
-    # # f =  fs*t / n_fft
-    # tw = freqs_fft / n_fft
-    # print(tw)
-    # # Keeps zero frequency [first element] at start, reverses all elements afterwards
-    # # x[::-1] reverses all elements
-    # tw = np.r_[tw[:1], tw[1:][::-1]]
-    # TODO: Cleaner, maybe not needed if using FT of gaussian
-    tw = freqs_fft_symmetric / n_fft
-    print(tw)
-
     Tw = n_fft/sample_rate
     fmin_nth = 12/5 * order/Tw
+    print("Signal number of points:", n_fft)
     print("Min frequency, hz:", fmin_nth)
     fmin = fmin_nth
     fmax = sample_rate/2.
-    df = 50.
 
-    # Find edges
-    # freqs_s = np.arange(fmin, fmax, df)
-    start_f_idx = np.abs(freqs_fft - fmin).argmin()
-    stop_f_idx = np.abs(freqs_fft - fmax).argmin()
-    f_start = freqs_fft[start_f_idx]
-    f_stop = freqs_fft[stop_f_idx]
-    freqs_s = np.arange(f_start, f_stop, df)
-
-    # Gabor window
-    nu_s = 2*np.pi*freqs_s/sample_rate  # Nondimensionalized angular frequency
-    print("TW.shape", tw.shape)
-
-    windows_t = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
-    windows_f = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
-
-    # TODO: Too low a frequency leads to instability - won't fit
-    for i_f, f in enumerate(freqs_s):
-        if f == 0.:
-            window = np.ones(len(tw))
-        else:
-            window = ((f / (np.sqrt(2. * np.pi) * k)) *
-                      np.exp(-0.5 * (1. / k ** 2.) * (f ** 2.) * tw ** 2.))
-        windows_t[i_f] = window/window.sum()  # normalisation
-        windows_f[i_f] = fft(windows_t[i_f])
-
-    t2 = sample_rate*tw
-    windows_t2 = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
-    windows_f2 = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
-    for i_f, nu in enumerate(nu_s):
-        if nu == 0.:
-            window2 = np.ones(len(tw))
-        else:
-            sigma = M/nu
-            window_scaling = 1/(np.sqrt(2. * np.pi) * sigma)
-            window2 = window_scaling * np.exp(-0.5 * (t2 ** 2.)/(sigma ** 2.))
-        windows_t2[i_f] = window2/window2.sum()  # normalisation, in principle, integral is unity.
-        windows_f2[i_f] = fft(windows_t2[i_f])
-
-    # TODO: THIS WORKS! Use vector multiplication instead of for loop
-    windows_f3 = np.empty((len(freqs_s), len(tw)), dtype=np.complex128)
-    for i_f, nu in enumerate(nu_s):
-        if nu == 0.:
-            windows_f3[i_f] = np.ones(len(tw))
-        else:
-            sigma = M/nu
-            windows_f3[i_f] = np.exp(-0.5 * (sigma ** 2.)*(mu_fft ** 2.))
-
-
-    # These can be generated exactly!
-
-    # # Time domain window
-    # plot_st_window_tdr_lin(window=windows_t, freq_sx=freqs_s, time_fft=tw)
-    # plot_st_window_tdr_lin(window=windows_t2, freq_sx=freqs_s, time_fft=tw)
-    #
-    # # Frequency domain window
-    # plot_st_window_tfr_bits(window=fftshift(windows_f), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
-    # plot_st_window_tfr_bits(window=fftshift(windows_f2), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
-    # These can be generated exactly!
-    plot_st_window_tfr_lin(window=fftshift(windows_f2), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
-    plot_st_window_tfr_lin(window=fftshift(windows_f3), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
-
-    plt.show()
-    exit()
-    # plt.figure()
-    # plt.plot(freqs_fft_symmetric, np.abs(X))
-    # plt.title('X')
-    #
-    # plt.figure()
-    # plt.plot(np.abs(XX))
-    # plt.title('XX')
+    # Stockwell, canned version; breaks if df not 1
+    # The default df = 1
+    [st_power, frequency, W] = \
+        tfr_array_stockwell(data=sig_in,
+                            sfreq=sample_rate,
+                            fmin=fmin, fmax=fmax,
+                            width=k, delta_f=1)
+    [psd3, freqs_s, freqs_fft, windows_f3] = \
+        tfr_array_stockwell_isla(data=sig_in,
+                                 sample_rate=sample_rate,
+                                 fmin=fmin, fmax=fmax,
+                                 order=order, df=10)
+    # # plot_st_window_tfr_lin(window=W, frequency_sx=frequency, frequency_fft=freqs_fft)
+    # # plot_st_window_tfr_lin(window=windows_f3, frequency_sx=freqs_s, frequency_fft=freqs_fft)
+    # plot_st_window_tfr_lin(window=fftshift(W), frequency_sx=frequency, frequency_fft=fftshift(freqs_fft))
+    # plot_st_window_tfr_lin(window=fftshift(windows_f3), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
     # plt.show()
 
-    # Stockwell
-    [st_power, frequency, W] = tfr_array_stockwell_isla(data=sig_in,
-                                                        sfreq=sample_rate,
-                                                        fmin=fmin, fmax=fmax,
-                                                        width=k, delta_f=df)
-
-    plot_st_window_tfr_bits(window=W, frequency_sx=freqs_s, frequency_fft=freqs_fft)
-    plt.show()
-
-
-
-
-    # TODO: Construct function
-    print("Shape of W:", W.shape)
+    print("Shape of W:", st_power.shape)
     print("Shape of frequency:", frequency.shape)
-    plot_tdr_sig(sig_wf=sig_in, sig_time=time_in)
-    plot_st_window_tfr_bits(window=W, frequency_sx=freqs_s, frequency_fft=freqs_fft)
-    plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
+    print("Shape of psd3:", psd3.shape)
+    print("Shape of freqs_s", freqs_s.shape)
+    # print(freqs_s)
+    # plot_tdr_sig(sig_wf=sig_in, sig_time=time_in)
+    # plot_st_window_tfr_bits(window=W, frequency_sx=freqs_s, frequency_fft=freqs_fft)
     # plot_tfr_bits(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
+    # plot_tfr_bits(tfr_power=psd3, tfr_frequency=freqs_s, tfr_time=time_in)
+    plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
+    plot_tfr_lin(tfr_power=psd3, tfr_frequency=freqs_s, tfr_time=time_in)
     plt.show()
 
 

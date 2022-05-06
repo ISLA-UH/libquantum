@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from libquantum.stockwell import tfr_array_stockwell, calculate_rms_sig_test
+from libquantum.stockwell_orig import tfr_array_stockwell, calculate_rms_sig_test
 from libquantum.benchmark_signals import plot_tdr_rms, plot_tfr_lin, plot_tfr_bits
 
 

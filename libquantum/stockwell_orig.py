@@ -205,7 +205,7 @@ def st_power_orig(x, start_f, zero_pad, W):
     return psd
 
 
-def precompute_st_windows(n_samp, sfreq, f_range, width, delta_f: int = None):
+def precompute_st_windows(n_samp, sfreq, f_range, width):
     """Precompute stockwell Gaussian windows (in the freq domain).
     From mne-python, _stockwell.py
     """
@@ -235,7 +235,7 @@ def st_power(x, start_f, zero_pad, W):
     psd = np.empty((len(W), n_out))
     X = fft(x)
     XX = np.concatenate([X, X], axis=-1)
-    print("XX:", XX.shape)
+    # print("XX:", XX.shape)
     for i_f, window in enumerate(W):
         f = start_f + i_f
         ST = ifft(XX[f:f + n_samp] * window)
@@ -300,9 +300,9 @@ def tfr_array_stockwell(data, sfreq, fmin=None, fmax=None, n_fft=None, delta_f=N
     f_start = freqs[start_f_idx]
     f_stop = freqs[stop_f_idx]
 
-    # TODO: Standardize (replace 12)
+    # TODO: Standardize (replace 12), use ratios
     if delta_f is None:
-        if (f_stop - f_start) > 12:  # To reproduce examples
+        if (f_stop - f_start) > 8:  # To reproduce examples
             delta_f = 1.
         else:
             delta_f = (f_stop - f_start)/12.
