@@ -67,6 +67,7 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
                   bits_min: float = -8,
                   bits_max: float = 0,
                   title_str: str='TFR, top bits',
+                  y_scale: str = None,
                   signal_time_base: str='seconds'):
     """
     TFR in bits
@@ -85,6 +86,10 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
     plt.pcolormesh(tfr_time, tfr_frequency, tfr_bits,
                    cmap='RdBu_r',
                    vmin=bits_min, vmax=bits_max)
+    if y_scale is None:
+        plt.yscale('lin')
+    else:
+        plt.yscale('log')
     plt.title(title_str)
     plt.ylabel("Frequency, samples per " + signal_time_base)
     plt.xlabel("Time, " + signal_time_base)

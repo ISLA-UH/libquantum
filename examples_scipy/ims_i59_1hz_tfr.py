@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from libquantum.stockwell_orig import tfr_array_stockwell, calculate_rms_sig_test
+from libquantum.stockwell import tfr_array_stockwell_isla
 from libquantum.benchmark_signals import plot_tdr_rms, plot_tfr_lin, plot_tfr_bits
 
 
@@ -13,10 +13,11 @@ MAKE_PICKLE = False
 SECONDS_PER_HOUR = 3600
 SECONDS_PER_DAY = SECONDS_PER_HOUR*24
 NUM_DAYS = 1
-# NUM_DAYS = 7.5
+NUM_DAYS = 7.5
 # NUM_DAYS = 10
-# NUM_SECONDS = int(NUM_DAYS*SECONDS_PER_DAY)
-NUM_SECONDS = 2**12
+NUM_SECONDS_EXACT = int(NUM_DAYS*SECONDS_PER_DAY)
+# Power of two
+NUM_SECONDS = 2**int(np.floor((np.log2(NUM_SECONDS_EXACT))))
 
 STATION_ID = 'I59H1'
 OUTPUT_PICKLE_PATH = DIR_PATH
@@ -43,24 +44,28 @@ if __name__ == "__main__":
     # plt.xlabel('Days')
     # plt.show()
 
-    rms_sig_wf, rms_sig_time = calculate_rms_sig_test(sig_wf=sig_wf, sig_time=sig_days, points_per_seg=16)
+    # rms_sig_wf, rms_sig_time = calculate_rms_sig_test(sig_wf=sig_wf, sig_time=sig_days, points_per_seg=16)
 
-    fmin = 0.01
+    fmin = 0.0001
     fmax = 0.1
 
     # Stockwell
-    [st_power, frequency, W] = tfr_array_stockwell(data=sig_wf, sfreq=1, fmin=fmin, fmax=fmax, width=3)
-    print(frequency.shape)
-    print(W.shape, len(W))
-    print(st_power.shape)
-    plt.plot(np.abs(W[0, :]))
-    plt.show()
+    [st_power, frequency, frequency_fft, W] = \
+        tfr_array_stockwell_isla(data=sig_wf,
+                                 sample_rate=1,
+                                 fmin=fmin,
+                                 fmax=fmax,
+                                 order=6,
+                                 binary_order=True)
+    print("Number SX frequencies:", frequency.shape)
+    print("Shape of W:", W.shape)
+    print("Shape of SX:", st_power.shape)
 
-    exit()
-    plot_tdr_rms(sig_wf=sig_wf, sig_time=sig_days,
-                 sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
-    plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
-    plot_tfr_bits(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
+    # exit()
+    # plot_tdr_rms(sig_wf=sig_wf, sig_time=sig_days,
+    #              sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
+    # plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
+    plot_tfr_bits(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days, y_scale='log')
 
     plt.show()
 
