@@ -3,7 +3,8 @@ from scipy.fft import fft, rfft, ifft, fftfreq, fftshift
 from libquantum.scales import EPSILON
 # TODO: Construct Styx repo
 
-def tfr_array_stockwell_isla(data, sample_rate, fmin=None, fmax=None, n_fft=None, df=None,
+
+def tfr_stockwell(data, sample_rate, fmin=None, fmax=None, n_fft=None, df=None,
                              order=8.0, binary_order: bool = False):
 
     M = 12/5*order
@@ -11,6 +12,7 @@ def tfr_array_stockwell_isla(data, sample_rate, fmin=None, fmax=None, n_fft=None
     if n_fft is None:
         n_fft = data.shape[-1]
 
+    # TODO: Add zero padding
     Tw = n_fft/sample_rate
     fmin_nth = 12/5 * order/Tw
 
@@ -55,8 +57,9 @@ def tfr_array_stockwell_isla(data, sample_rate, fmin=None, fmax=None, n_fft=None
     nu_s = 2*np.pi*frequency_stx/sample_rate
 
     for isx, fsx in enumerate(frequency_stx):
-        frequency_stx_index[isx] = np.abs(frequency_fft - frequency_stx[isx]).argmin()
-        frequency_stx_fft[isx] = frequency_fft[frequency_stx_index[isx]]
+        stx_index = np.abs(frequency_fft - fsx).argmin()
+        fsx_fft = frequency_fft[stx_index[isx]]
+        nu_sx = 2*np.pi*fsx/sample_rate
 
     # TODO: find fft frequencies that exactly match - necessary for shifting FFT
     # Gabor window
