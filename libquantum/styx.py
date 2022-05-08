@@ -61,15 +61,11 @@ def tfr_stockwell(sig_wf: np.ndarray,
     window_longest_time = n_fft_pow2 / frequency_sample_rate
     frequency_min_nth = cycles_per_frequency/window_longest_time
 
-    # TODO: may want to push this downstream
+    # Initialize stx frequencies
     if frequency_min is None:
         frequency_min = frequency_min_nth
     if frequency_max is None:
         frequency_max = frequency_sample_rate / 2.
-    if frequency_step is None:
-        # Only for linear - may want to push this code downstream
-        # Reduce the fft resolution by a factor of two
-        frequency_step = 2 * (frequency_max - frequency_min) / len(frequency_fft)
 
     # TODO: Standardize
     # Computing nearest frequency later on anyway, and then using that to compute the fft.
@@ -77,6 +73,11 @@ def tfr_stockwell(sig_wf: np.ndarray,
     stop_f_idx = np.abs(frequency_fft - frequency_max).argmin()
     f_start = frequency_fft[start_f_idx]
     f_stop = frequency_fft[stop_f_idx]
+
+    if frequency_step is None:
+        # Only for linear - may want to push this code downstream
+        # Reduce the fft resolution by a factor of two
+        frequency_step = 2 * (frequency_max - frequency_min) / len(frequency_fft)
 
     if frequency_is_geometric is True:
         num_octaves = np.log2(f_stop/f_start)
