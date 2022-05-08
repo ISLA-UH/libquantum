@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from libquantum.stockwell import tfr_array_stockwell_isla
+from libquantum.styx import tfr_stockwell
 from libquantum.benchmark_signals import plot_tdr_rms, plot_tfr_lin, plot_tfr_bits
 
 
@@ -16,8 +17,7 @@ NUM_DAYS = 1
 # NUM_DAYS = 7.5
 # NUM_DAYS = 10
 NUM_SECONDS_EXACT = int(NUM_DAYS*SECONDS_PER_DAY)
-# Power of two
-NUM_SECONDS = 2**int(np.floor((np.log2(NUM_SECONDS_EXACT))))
+NUM_SECONDS = NUM_SECONDS_EXACT
 
 STATION_ID = 'I59H1'
 OUTPUT_PICKLE_PATH = DIR_PATH
@@ -35,12 +35,14 @@ if __name__ == "__main__":
     print("Index:", df.index[0])
     sig_wf = df['wf_raw_pa'][df.index[0]][0:NUM_SECONDS]
     sig_epoch_s = df['epoch_s'][df.index[0]][0:NUM_SECONDS]
-    sig_days = (sig_epoch_s - sig_epoch_s[0])/SECONDS_PER_DAY
-
+    sig_time_hours = (sig_epoch_s - sig_epoch_s[0])/SECONDS_PER_HOUR
+    sig_time_days = (sig_epoch_s - sig_epoch_s[0])/SECONDS_PER_DAY
+    #
+    # plt.figure()
     # plt.subplot(211)
     # plt.plot(sig_wf)
     # plt.subplot(212)
-    # plt.plot(sig_days, sig_wf)
+    # plt.plot(sig_time_hours, sig_wf)
     # plt.xlabel('Days')
     # plt.show()
 
@@ -50,23 +52,27 @@ if __name__ == "__main__":
     fmax = 0.1
 
     # Stockwell
-    [st_power, frequency, frequency_fft, W] = \
-        tfr_array_stockwell_isla(data=sig_wf,
-                                 sample_rate=1,
-                                 fmin=fmin,
-                                 fmax=fmax,
-                                 order=6,
-                                 binary_order=True)
+    # [st_power, frequency, frequency_fft, W] = \
+    #     tfr_array_stockwell_isla(data=sig_wf,
+    #                              sample_rate=1,
+    #                              fmin=fmin,
+    #                              fmax=fmax,
+    #                              order=6,
+    #                              binary_order=True)
+    [tfr_stx, psd_stx, frequency, frequency_fft, W] = \
+        tfr_stockwell(sig_wf=sig_wf,
+                      frequency_sample_rate=1,
+                      frequency_min=fmin,
+                      frequency_max=fmax,
+                      nth_order=6,
+                      frequency_is_geometric=True)
     print("Number SX frequencies:", frequency.shape)
     print("Shape of W:", W.shape)
-    print("Shape of SX:", st_power.shape)
+    print("Shape of SX:", psd_stx.shape)
 
-    # exit()
-    # plot_tdr_rms(sig_wf=sig_wf, sig_time=sig_days,
-    #              sig_rms_wf=rms_sig_wf, sig_rms_time=rms_sig_time)
-    # plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days)
-    plot_tfr_bits(tfr_power=st_power, tfr_frequency=frequency, tfr_time=sig_days, y_scale='log')
-
+    # TODO: Fix plots, standardize units - go to libquantum plot templates
+    plot_tfr_bits(tfr_power=psd_stx, tfr_frequency=frequency, tfr_time=sig_time_hours,
+                  y_scale='log', signal_time_base="hours")
     plt.show()
 
 
