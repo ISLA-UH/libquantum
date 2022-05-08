@@ -1,15 +1,20 @@
 import numpy as np
 from scipy.fft import fft, rfft, ifft, fftfreq, fftshift
 from libquantum.scales import EPSILON
-# TODO: Construct Styx repo
 
 
-def sig_pad_up_to_pow2(sig_wf, n_fft):
-    """Aux function."""
-    # flatten to 2 D and memorize original shape
+def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
+    """
+    Zero-pad signal to the higher 2**n points for FFT
+    :param sig_wf:
+    :param n_fft:
+    :return:
+    """
+
+    # Flatten to 2 D and memorize original shape
     n_times = sig_wf.shape[-1]
 
-    # This is a clever bit of code
+    # Legerdemain
     def _is_power_of_two(n):
         return not (n > 0 and (n & (n - 1)))
 
