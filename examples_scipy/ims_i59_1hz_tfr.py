@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from libquantum.stockwell import tfr_array_stockwell_isla
-from libquantum.styx import tfr_stockwell
+from libquantum.styx import tfr_stx_fft
 from libquantum.benchmark_signals import plot_tdr_rms, plot_tfr_lin, plot_tfr_bits
 
 
@@ -51,21 +51,14 @@ if __name__ == "__main__":
     fmin = 0.0001
     fmax = 0.1
 
-    # Stockwell
-    # [st_power, frequency, frequency_fft, W] = \
-    #     tfr_array_stockwell_isla(data=sig_wf,
-    #                              sample_rate=1,
-    #                              fmin=fmin,
-    #                              fmax=fmax,
-    #                              order=6,
-    #                              binary_order=True)
     [tfr_stx, psd_stx, frequency, frequency_fft, W] = \
-        tfr_stockwell(sig_wf=sig_wf,
-                      frequency_sample_rate=1,
-                      frequency_min=fmin,
-                      frequency_max=fmax,
-                      nth_order=6,
-                      frequency_is_geometric=True)
+        tfr_stx_fft(sig_wf=sig_wf,
+                    time_sample_interval=1,
+                    frequency_min=fmin,
+                    frequency_max=fmax,
+                    nth_order=6,
+                    is_geometric=True,
+                    is_inferno=True)
     print("Number SX frequencies:", frequency.shape)
     print("Shape of W:", W.shape)
     print("Shape of SX:", psd_stx.shape)
