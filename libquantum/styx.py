@@ -1,6 +1,13 @@
+""""
+Standardized Stockwell transform (stx) with optimization parameters
+After Moukadem et al., 2022, A new optimized Stockwell transform applied on synthetic and real non-stationary signals
+Rederivation in preparation, Garces et al. 2022; last updated 9 May 2022
+
+"""
 import numpy as np
-from scipy.fft import fft, rfft, ifft, fftfreq, fftshift
+from scipy.fft import fft, ifft, fftfreq
 from libquantum import scales
+from typing import Tuple
 
 
 def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
@@ -38,31 +45,41 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
 
 def tfr_stx_fft(sig_wf: np.ndarray,
                 time_sample_interval: float,
-                nth_order: float = 8.0,
+                scale_order_input: float = 8.0,
                 n_fft_in: int = None,
                 frequency_min: float = None,
                 frequency_max: float = None,
                 frequency_step: float = None,
+                factor_q: float = 0.,
+                power_p: float = 0.,
+                power_r: float = 1.,
                 is_geometric: bool = False,
-                is_inferno: bool = False):
+                is_inferno: bool = False,
+                scale_base_input: float = scales.Slice.G3,
+                scale_ref_input: float = scales.Slice.T1S,
+                ) -> Tuple[np.ndarray, np.ndarray,  np.ndarray, np.ndarray, np.ndarray]:
     """
-    Classic Stockwell transform fft implementation.
-    Optimized version has more free variables and needs to be validated.
-    :param sig_wf:
-    :param time_sample_interval:
-    :param nth_order:
-    :param n_fft_in:
-    :param frequency_min:
-    :param frequency_max:
-    :param frequency_step:
-    :param is_geometric:
-    :param is_inferno:
-    For initial evaluation/validation
-    :return: tfr_stx, psd_stx, frequency_stx, frequency_stx_fft, windows_fft
-    """
+    # Stockwell transform, fft implementation.
+    # Optimized version has more free variables in sigma_scaling; testing in progress
+    :param sig_wf: input waveform. If not 2**n points, it will zero pad up
+    :param time_sample_interval: sample interval, inverse of sample rate
+    :param scale_order_input: fractional octave band order; 12 is the musical standard
+    :param n_fft_in: requested nfft, should be greater or equal to the signal length. Method zero pads up.
+    :param frequency_min: lowest stx frequency of interest
+    :param frequency_max: highest stx frequency of interest
+    :param frequency_step: stx frequency of interest if linearly sampled
+    :param factor_q: sigma_scaling adjustment, under evaluation
+    :param power_p: sigma_scaling adjustment, under evaluation
+    :param power_r: sigma_scaling adjustment. under evaluation
+    :param is_geometric: are frequencies geometrically spaced? If so, overrides frequency_step
+    :param is_inferno: are frequencies geometrically spaced and standardized as in inferno?
+    :param scale_base_input: scale base; default is base 10, base 2 octaves is scales.Slice.G2
+    :param scale_ref_input: scale reference time; default is 1 s
+    # :return: tfr_stx, psd_stx, frequency_stx, frequency_stx_fft, windows_fft
+    # """
 
     frequency_sample_rate: float = 1 / time_sample_interval
-    cycles_M: float = 12. / 5. * nth_order
+    cycles_M: float = 12. / 5. * scale_order_input
     lin_fft_decimate: float = 2.
 
     # Compute the nearest higher power of two number of points for the fft
@@ -72,7 +89,7 @@ def tfr_stx_fft(sig_wf: np.ndarray,
     n_fft_out = n_fft_pow2 - zero_pad
 
     # Transformations are on zero padded signals from here onwards
-    # Take FFT and concatenate. A leaner version would let the fft do the padding.
+    # Take FFT and concatenate. A leaner version could let the fft do the padding.
     sig_fft = fft(sig_wf_pow2)
     sig_fft_cat = np.concatenate([sig_fft, sig_fft], axis=-1)
 
@@ -82,7 +99,6 @@ def tfr_stx_fft(sig_wf: np.ndarray,
     window_longest_time = n_fft_pow2 / frequency_sample_rate
     frequency_min_nth = cycles_M/window_longest_time
 
-    # TODO: Standardize, or construct a function
     # Initialize stx frequencies
     if frequency_min is None:
         frequency_min = frequency_min_nth
@@ -110,17 +126,17 @@ def tfr_stx_fft(sig_wf: np.ndarray,
             order_Nth, scale_base, scale_band_number, \
             frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
             frequency_start, frequency_end = \
-                scales.band_frequencies_low_high(frequency_order_input=nth_order,
+                scales.band_frequencies_low_high(frequency_order_input=scale_order_input,
                                                  frequency_low_input=f_start,
                                                  frequency_high_input=f_stop,
                                                  frequency_sample_rate_input=frequency_sample_rate,
-                                                 frequency_base_input=scales.Slice.G3,
-                                                 frequency_ref_input=scales.Slice.T1S)
+                                                 frequency_base_input=scale_base_input,
+                                                 frequency_ref_input=scale_ref_input)
             frequency_stx = frequency_center_algebraic
         else:
             num_octaves = np.log2(f_stop/f_start)
-            num_bands = int(num_octaves * nth_order)
-            frequency_stx = np.logspace(np.log2(f_start), np.log2(f_stop), num=num_bands, base=scales.Slice.G3)
+            num_bands = int(num_octaves * scale_order_input)
+            frequency_stx = np.logspace(np.log2(f_start), np.log2(f_stop), num=num_bands, base=scale_base_input)
 
     print("Shape of frequency_stx", frequency_stx.shape)
     print("SX Band edges:", frequency_stx[0], frequency_stx[-1])
@@ -145,8 +161,10 @@ def tfr_stx_fft(sig_wf: np.ndarray,
             windows_fft[isx] = np.ones(len(n_fft_pow2))
         else:
             # Sigma is the standard deviation of the Gaussian
-            # TODO: Build sigma variability
+            # Additional flexibility is added in gamma_sigma_scaling
+            sigma_scaling = (1 + factor_q * (omega_sx ** power_p)) * (omega_sx ** (1-power_r))
             sigma = cycles_M/omega_sx
+            sigma *= sigma_scaling
             windows_fft[isx] = np.exp(-0.5 * (sigma ** 2.) * (omega_fft ** 2.))
 
         # This is the main event

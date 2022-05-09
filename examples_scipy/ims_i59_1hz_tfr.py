@@ -1,11 +1,9 @@
 import os
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from libquantum.stockwell import tfr_array_stockwell_isla
 from libquantum.styx import tfr_stx_fft
-from libquantum.benchmark_signals import plot_tdr_rms, plot_tfr_lin, plot_tfr_bits
+from libquantum.benchmark_signals import plot_tfr_bits
 
 
 DIR_PATH = "/Users/mgarces/Documents/DATA_2022/Tonga/CEA"
@@ -23,6 +21,9 @@ STATION_ID = 'I59H1'
 OUTPUT_PICKLE_PATH = DIR_PATH
 file_name_pickle = "ims_cea_" + STATION_ID + "_df" + ".pickle"
 
+order_nth = 6
+frequency_stx_min_hz = 0.0001
+frequency_stx_max_hz = 0.1
 
 if __name__ == "__main__":
     # Load file, reset index
@@ -35,28 +36,22 @@ if __name__ == "__main__":
     print("Index:", df.index[0])
     sig_wf = df['wf_raw_pa'][df.index[0]][0:NUM_SECONDS]
     sig_epoch_s = df['epoch_s'][df.index[0]][0:NUM_SECONDS]
+    sig_sample_rate_hz = df['sample_rate_hz'][df.index[0]]
+    sig_sample_interval_s = 1/sig_sample_rate_hz
     sig_time_hours = (sig_epoch_s - sig_epoch_s[0])/SECONDS_PER_HOUR
     sig_time_days = (sig_epoch_s - sig_epoch_s[0])/SECONDS_PER_DAY
-    #
+
+    # TODO: Find masked/nan values to run all 10 days
     # plt.figure()
-    # plt.subplot(211)
     # plt.plot(sig_wf)
-    # plt.subplot(212)
-    # plt.plot(sig_time_hours, sig_wf)
-    # plt.xlabel('Days')
     # plt.show()
-
-    # rms_sig_wf, rms_sig_time = calculate_rms_sig_test(sig_wf=sig_wf, sig_time=sig_days, points_per_seg=16)
-
-    fmin = 0.0001
-    fmax = 0.1
 
     [tfr_stx, psd_stx, frequency, frequency_fft, W] = \
         tfr_stx_fft(sig_wf=sig_wf,
-                    time_sample_interval=1,
-                    frequency_min=fmin,
-                    frequency_max=fmax,
-                    nth_order=6,
+                    time_sample_interval=sig_sample_interval_s,
+                    frequency_min=frequency_stx_min_hz,
+                    frequency_max=frequency_stx_max_hz,
+                    scale_order_input=order_nth,
                     is_geometric=True,
                     is_inferno=True)
     print("Number SX frequencies:", frequency.shape)
@@ -65,7 +60,7 @@ if __name__ == "__main__":
 
     # TODO: Fix plots, standardize units - go to libquantum plot templates
     plot_tfr_bits(tfr_power=psd_stx, tfr_frequency=frequency, tfr_time=sig_time_hours,
-                  y_scale='log', signal_time_base="hours")
+                  bits_min=-12, y_scale='log', tfr_x_str="Time, hours")
     plt.show()
 
 

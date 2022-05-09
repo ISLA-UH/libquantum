@@ -68,7 +68,8 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
                   bits_max: float = 0,
                   title_str: str='TFR, top bits',
                   y_scale: str = None,
-                  signal_time_base: str='seconds'):
+                  tfr_x_str: str = 'Time, seconds',
+                  tfr_y_str: str = 'Frequency, hz'):
     """
     TFR in bits
     :param sig_tfr:
@@ -76,7 +77,10 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
     :param sig_tfr_time:
     :param bits_max:
     :param bits_min:
-    :param signal_time_base:
+    :param y_scale:
+    :param title_str:
+    :param tfr_x_str:
+    :param tfr_y_str:
     :return:
     """
 
@@ -91,8 +95,8 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
     else:
         plt.yscale('log')
     plt.title(title_str)
-    plt.ylabel("Frequency, samples per " + signal_time_base)
-    plt.xlabel("Time, " + signal_time_base)
+    plt.ylabel(tfr_y_str)
+    plt.xlabel(tfr_x_str)
 
 
 def plot_st_window_tdr_lin(window, freq_sx, time_fft, signal_time_base: str='seconds'):
