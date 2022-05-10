@@ -32,8 +32,9 @@ def sig_pad_up_to_pow2(sig_wf: np.ndarray, n_fft: int):
         raise ValueError("n_fft cannot be smaller than signal size. "
                          "Got %s < %s." % (n_fft, n_times))
     if n_times < n_fft:
-        print('The input signal is shorter ({}) than "n_fft" ({}). '
-              'Applying zero padding.'.format(sig_wf.shape[-1], n_fft))
+        # TODO: Add verbosity
+        # print('The input signal is shorter ({}) than "n_fft" ({}). '
+        #       'Applying zero padding.'.format(sig_wf.shape[-1], n_fft))
         zero_pad: int = n_fft - n_times
         pad_array = np.zeros(sig_wf.shape[:-1] + (zero_pad,), sig_wf.dtype)
         sig_wf = np.concatenate((sig_wf, pad_array), axis=-1)
@@ -137,9 +138,6 @@ def tfr_stx_fft(sig_wf: np.ndarray,
             num_octaves = np.log2(f_stop/f_start)
             num_bands = int(num_octaves * scale_order_input)
             frequency_stx = np.logspace(np.log2(f_start), np.log2(f_stop), num=num_bands, base=scale_base_input)
-
-    print("Shape of frequency_stx", frequency_stx.shape)
-    print("SX Band edges:", frequency_stx[0], frequency_stx[-1])
 
     # Construct shifting frequency indexes
     frequency_stx_fft = np.empty(len(frequency_stx))
