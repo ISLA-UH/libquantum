@@ -15,16 +15,17 @@ MAKE_PICKLE = False
 
 SECONDS_PER_HOUR = 3600
 SECONDS_PER_DAY = SECONDS_PER_HOUR*24
+EARTH_RADIUS_KM = 6371
 # NUM_DAYS = 0.5
 # NUM_DAYS = 7.5
-NUM_DAYS = 9
+NUM_DAYS = 1
 NUM_SECONDS_EXACT = int(NUM_DAYS*SECONDS_PER_DAY)
 NUM_SECONDS = NUM_SECONDS_EXACT
 
 STATION_ID = 'I59H1'
 OUTPUT_PICKLE_PATH = DIR_PATH
 file_name_pickle = "ims_cea_" + STATION_ID + "_df" + ".pickle"
-OUTPUT_FIGURE_PATH = os.path.join(DIR_PATH, 'STYX_9D')
+OUTPUT_FIGURE_PATH = os.path.join(DIR_PATH, 'STYX_1D')
 
 order_nth = 6
 frequency_stx_min_hz = 0.0001
@@ -41,10 +42,20 @@ if __name__ == "__main__":
     print("Index:", df.index[0])
     station_id_string = df['station_id'][df.index[0]]
     print("Station ID:", station_id_string)
+    station_id_short = station_id_string[3:8]
+
     sig_wf = df['wf_raw_pa'][df.index[0]][0:NUM_SECONDS]
     sig_epoch_s = df['epoch_s'][df.index[0]][0:NUM_SECONDS]
     sig_sample_rate_hz = df['sample_rate_hz'][df.index[0]]
     sig_sample_interval_s = 1/sig_sample_rate_hz
+
+    sig_range = df['range_km'][df.index[0]]
+    print(sig_range)
+    sig_degrees_int = int(sig_range/EARTH_RADIUS_KM*180/np.pi)
+    print(sig_degrees_int)
+
+    exit()
+    fig_title = station_id_short + ", r = " + str(sig_degrees_int) + " degrees"
 
     # TODO: Correct for case of no data at beginning or end
     if np.any(np.isnan(sig_wf)):
@@ -77,7 +88,7 @@ if __name__ == "__main__":
     # TODO: Fix plots, standardize units - go to libquantum plot templates
     fig = plot_tfr_bits(tfr_power=psd_stx, tfr_frequency=period, tfr_time=sig_time_days,
                   bits_min=-12, y_scale='log', tfr_x_str="Days from 2022-01-15 0Z",
-                  tfr_y_str="Period, minutes", title_str=station_id_string, tfr_y_flip=True)
+                  tfr_y_str="Period, minutes", title_str=fig_title, tfr_y_flip=True)
     figure_filename = os.path.join(OUTPUT_FIGURE_PATH, station_id_string)
     figure_format = "png"
     plt.savefig(figure_filename + '.' + figure_format, format=figure_format)

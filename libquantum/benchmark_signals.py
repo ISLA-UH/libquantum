@@ -91,7 +91,7 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
     fig = plt.figure()
     plt.pcolormesh(tfr_time, tfr_frequency, tfr_bits,
                    cmap='RdBu_r',
-                   vmin=bits_min, vmax=bits_max)
+                   vmin=bits_min, vmax=bits_max, shading='nearest')
     if y_scale is None:
         plt.yscale('lin')
     else:

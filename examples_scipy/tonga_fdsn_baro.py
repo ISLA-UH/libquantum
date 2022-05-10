@@ -1,66 +1,80 @@
-"""
-Test Styx against instrument-corrected CEA - all stations
-Crashed at Station ID: IM.I01H8..BDF
-"""
-
 import os
 import numpy as np
 import pandas as pd
+from redpandas.redpd_plot.wiggles import plot_wiggles_pandas
+
+# For STX
 import matplotlib.pyplot as plt
 from libquantum.styx import tfr_stx_fft
 from libquantum.benchmark_signals import plot_tfr_bits
 
-DIR_PATH = "/Users/mgarces/Documents/DATA_2022/Tonga/CEA"
-INPUT_PICKLE_PATH = DIR_PATH
-file_name_pickle = "ims_bdf_1hz_df" + ".pickle"
-MAKE_PICKLE = False
 
+
+# output directory for parquet and pickle
+import_directory: str = "/Users/mgarces/Documents/DATA_2022/Tonga/FDSN_20220115_10D/waveforms/20220115/"
+# import_directory: str = "/Users/meritxell/Desktop/"
+# pickle file name
+plot_wiggles: bool = False
+
+# import pickle
+import_filename: str = "A00_test_bp_decimated.pickle"
+
+# For STX:
 SECONDS_PER_HOUR = 3600
 SECONDS_PER_DAY = SECONDS_PER_HOUR*24
 EARTH_RADIUS_KM = 6371
+NUM_DAYS = 1
 
-# Set number of days to run
-# NUM_DAYS = 7.5
-# NUM_DAYS = 9
-NUM_DAYS = 2
-# TODO: Automatically build directory
-OUTPUT_FIGURE_PATH = os.path.join(DIR_PATH, 'STYX_2D')
+# Figure export
+DIR_PATH = "/Users/mgarces/Documents/DATA_2022/Tonga/FDSN_20220115_10D/figures"
+OUTPUT_FIGURE_PATH = os.path.join(DIR_PATH, 'stx_20220115')
 figure_format = "png"
 
 NUM_SECONDS_EXACT = int(NUM_DAYS*SECONDS_PER_DAY)
 NUM_SECONDS = NUM_SECONDS_EXACT
 
-# STATION_ID = 'I59H1'
-# OUTPUT_PICKLE_PATH = DIR_PATH
-# file_name_pickle = "ims_cea_" + STATION_ID + "_df" + ".pickle"
-
 order_nth = 6
 frequency_stx_min_hz = 0.0001
 frequency_stx_max_hz = 0.1
 
-station_dq = ["IM.I11L4..BDF"]
+station_dq = [""]
 compute_tfr = True
 
 if __name__ == "__main__":
-    # Load file, reset index
-    df = pd.read_pickle(os.path.join(INPUT_PICKLE_PATH, file_name_pickle))
-    print("Columns:", df.columns)
+    """
+    Read and plot pickle
+    """
+    export_full_path = os.path.join(import_directory, import_filename)
+    df = pd.read_pickle(export_full_path)
+    print(df.columns)
 
-    # Extract waveform for specified station
-    # df = df0[df0['station_id'].str.contains(STATION_ID)]
-    # df.index[0] returns the integer index
+    if plot_wiggles:
+        # Plot wiggles
+        n: int = 25
+        list_of_dfs = [df.loc[station:station+n-1, :] for station in range(0, len(df), n)]
+
+        for df_in_list in list_of_dfs:
+            # Plot wiggles
+            # plot_wiggles_pandas(df=df_in_list, sig_wf_label='wf_decimated',
+            #                     sig_id_label='station_id', sig_timestamps_label='wf_epoch_s_decimated')
+            plot_wiggles_pandas(df=df_in_list, sig_wf_label='wf_bandpass',
+                                sig_id_label='station_id', sig_timestamps_label='wf_epoch_s')
+
     for idx in df.index:
         station_id_string = df['station_id'][idx]
         print("Station ID:", station_id_string)
-        station_id_short = station_id_string[3:8]
-        sig_wf = df['wf_raw_pa'][idx][0:NUM_SECONDS]
-        sig_epoch_s = df['epoch_s'][idx][0:NUM_SECONDS]
+        # For CEA
+        # station_id_short = station_id_string[3:8]
+        # print("Short ID:", station_id_short)
+
+        sig_wf = df['wf_bandpass'][idx]  # [0:NUM_SECONDS]
+        sig_epoch_s = df['wf_epoch_s'][idx]  # [0:NUM_SECONDS]
         sig_sample_rate_hz = df['sample_rate_hz'][idx]
         sig_sample_interval_s = 1/sig_sample_rate_hz
         sig_range = df['range_km'][idx]
         sig_degrees_int = int(10*sig_range/EARTH_RADIUS_KM*180/np.pi)/10.
 
-        fig_title = station_id_short + ", r = " + str(sig_degrees_int) + " degrees"
+        fig_title = station_id_string + ", r = " + str(sig_degrees_int) + " degrees"
 
         if station_id_string in station_dq:
             continue
@@ -101,15 +115,10 @@ if __name__ == "__main__":
             fig = plot_tfr_bits(tfr_power=psd_stx, tfr_frequency=period, tfr_time=sig_time_hours,
                                 bits_min=-12, y_scale='log', tfr_x_str="Hours from 2022-01-15 0Z",
                                 tfr_y_str="Period, minutes", title_str=fig_title, tfr_y_flip=True)
+            # plt.show()
 
             range_sta_id = 'R_' + str(int(sig_range)) + '_km_' + station_id_string
             figure_filename = os.path.join(OUTPUT_FIGURE_PATH, range_sta_id)
             plt.savefig(figure_filename + '.' + figure_format, format=figure_format)
             fig.clear()
             plt.close()
-
-            # plt.show()
-
-
-
-
