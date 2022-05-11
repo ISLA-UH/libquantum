@@ -378,3 +378,36 @@ def fft_welch_snr_power(f_center: np.ndarray,
     snr_power = Welch_Sxx2/Welch_Sxx
     snr_frequency = f_center[1:]
     return snr_frequency, snr_power
+
+
+# TODO: Standardize inputs
+def butter_bandpass(sig: np.ndarray,
+                    sample_rate_hz: float,
+                    frequency_cut_low_hz,
+                    frequency_cut_high_hz,
+                    filter_order: int = 4,
+                    tukey_alpha: float = 0.5):
+    """
+    Buterworth bandpass filter
+    :param sig:
+    :param sample_rate_hz:
+    :param frequency_cut_low_hz:
+    :param frequency_cut_high_hz:
+    :param filter_order:
+    :param tukey_alpha:
+    :return:
+    """
+
+    nyquist = 0.5 * sample_rate_hz
+    edge_low = frequency_cut_low_hz / nyquist
+    edge_high = frequency_cut_high_hz / nyquist
+    if edge_high >= 1:
+        edge_high = 0.5  # Half of nyquist
+    [b, a] = signal.butter(N=filter_order,
+                           Wn=[edge_low, edge_high],
+                           btype='bandpass')
+    sig_taper = np.copy(sig)
+    sig_taper = sig_taper * signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
+    sig_bandpass = signal.filtfilt(b, a, sig_taper)
+
+    return sig_bandpass
