@@ -5,6 +5,7 @@ from libquantum.spectra import butter_bandpass
 from libquantum.styx import tfr_stx_fft
 from libquantum.benchmark_signals import plot_tfr_bits
 
+SECONDS_PER_MINUTE = 60
 SECONDS_PER_HOUR = 3600
 SECONDS_PER_DAY = SECONDS_PER_HOUR*24
 
@@ -40,6 +41,7 @@ if __name__ == "__main__":
                                 tukey_alpha=0.1)
 
     sig_time_s = np.arange(sig_wf.shape[-1])*sig_sample_interval_s
+    sig_time_min = sig_time_s/SECONDS_PER_MINUTE
     sig_time_hours = sig_time_s/SECONDS_PER_HOUR
     sig_time_days = sig_time_s/SECONDS_PER_DAY
 
@@ -80,15 +82,15 @@ if __name__ == "__main__":
 
         fig_title = "Kona RedVox Barometer Stack"
         # TODO: Fix plots, standardize units - go to libquantum plot templates
-        fig1 = plot_tfr_bits(tfr_power=psd_stx, tfr_frequency=period_hours, tfr_time=sig_time_days,
-                            bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-14 0Z",
-                            tfr_y_str="Period, hours", title_str=fig_title, tfr_y_flip=True)
+        fig1 = plot_tfr_bits(tfr_power=psd_stx, tfr_frequency=period_min, tfr_time=sig_time_days,
+                            bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-13 0Z",
+                            tfr_y_str="Period, min", title_str=fig_title, tfr_y_flip=True)
         fig2 = plot_tfr_bits(tfr_power=psd_stx, tfr_frequency=frequency_cycles_per_day, tfr_time=sig_time_days,
-                            bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-14 0Z",
+                            bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-13 0Z",
                             tfr_y_str="Cycles per day", title_str=fig_title)
 
         fig3 = plot_tfr_bits(tfr_power=psd_stx2, tfr_frequency=frequency2, tfr_time=sig_time_days,
-                             bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-14 0Z",
+                             bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-13 0Z",
                              tfr_y_str="Hz", title_str=fig_title)
 
     plt.show()
