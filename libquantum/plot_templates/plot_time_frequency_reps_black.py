@@ -234,50 +234,50 @@ def mesh_colormap_limits(mesh_array: np.ndarray,
 
 # # BEGIN PLOTS: THESE ARE THE MAIN TEMPLATES
 def plot_wf_wf_wf_vert(redvox_id: str,
-                       wf_panel_2_sig: np.ndarray,
-                       wf_panel_2_time: np.ndarray,
-                       wf_panel_1_sig: np.ndarray,
-                       wf_panel_1_time: np.ndarray,
-                       wf_panel_0_sig: np.ndarray,
-                       wf_panel_0_time: np.ndarray,
+                       wf_panel_a_sig: np.ndarray,
+                       wf_panel_a_time: np.ndarray,
+                       wf_panel_b_sig: np.ndarray,
+                       wf_panel_b_time: np.ndarray,
+                       wf_panel_c_sig: np.ndarray,
+                       wf_panel_c_time: np.ndarray,
                        start_time_epoch: float = 0,
-                       wf_panel_2_units: str = "Norm",
-                       wf_panel_1_units: str = "Norm",
-                       wf_panel_0_units: str = "Norm",
+                       wf_panel_a_units: str = "Norm",
+                       wf_panel_b_units: str = "Norm",
+                       wf_panel_c_units: str = "Norm",
                        params_tfr=AudioParams(),
                        waveform_color: str = "midnightblue",
                        units_time: str = "s",
                        figure_title: str = "Time Domain Representation",
                        figure_title_show: bool = True,
                        label_panel_show: bool = False,
-                       labels_panel_2: str = "(a)",
-                       labels_panel_1: str = "(b)",
-                       labels_panel_0: str = "(c)",
+                       labels_panel_a: str = "(a)",
+                       labels_panel_b: str = "(b)",
+                       labels_panel_c: str = "(c)",
                        labels_fontweight: str = None,
                        attributes_tfr = FigureAttributes()) -> None:
     """
     Template for aligned time-series display
 
     :param redvox_id: name of station
-    :param wf_panel_0_sig: array with signal waveform for top panel
-    :param wf_panel_0_time: array with signal timestamps for top panel
-    :param wf_panel_1_sig: array with signal waveform for middle panel
-    :param wf_panel_1_time: array with signal timestamps for middle panel
-    :param wf_panel_2_sig: array with signal waveform for bottom panel
-    :param wf_panel_2_time: array with signal timestamps for bottom panel
+    :param wf_panel_c_sig: array with signal waveform for top panel
+    :param wf_panel_c_time: array with signal timestamps for top panel
+    :param wf_panel_b_sig: array with signal waveform for middle panel
+    :param wf_panel_b_time: array with signal timestamps for middle panel
+    :param wf_panel_a_sig: array with signal waveform for bottom panel
+    :param wf_panel_a_time: array with signal timestamps for bottom panel
     :param start_time_epoch: start time in epoch UTC. Default is 0.0
-    :param wf_panel_0_units: units of signal (top panel). Default is "Norm"
-    :param wf_panel_1_units: units of signal (middle panel). Default is "Norm"
-    :param wf_panel_2_units: units of signal (bottom panel). Default is "Norm"
+    :param wf_panel_c_units: units of signal (top panel). Default is "Norm"
+    :param wf_panel_b_units: units of signal (middle panel). Default is "Norm"
+    :param wf_panel_a_units: units of signal (bottom panel). Default is "Norm"
     :param params_tfr: parameters for tfr. Check AudioParams().
     :param waveform_color: color of waveforms. Default is "midnightblue"
     :param units_time: units of time. Default is "s"
     :param figure_title: title of figure. Default is "Time Domain Representation"
     :param figure_title_show: True to display title, False for publications
     :param label_panel_show: show panel labelling. Default is False, True for publication
-    :param labels_panel_2: label for bottom panel. Default is (a)
-    :param labels_panel_1: label for middle panel. Default is (b)
-    :param labels_panel_0: label for top panel. Default is (c)
+    :param labels_panel_a: label for bottom panel. Default is (a)
+    :param labels_panel_b: label for middle panel. Default is (b)
+    :param labels_panel_c: label for top panel. Default is (c)
     :param labels_fontweight: matplotlib.text property
     :return: plot
     """
@@ -285,9 +285,9 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     if start_time_epoch == 0:
         # Time sanitized if no input provided
         time_label: str = f"Time ({units_time})"
-        wf_panel_0_time_zero = wf_panel_0_time - wf_panel_2_time[0]
-        wf_panel_1_time_zero = wf_panel_1_time - wf_panel_2_time[0]
-        wf_panel_2_time_zero = wf_panel_2_time - wf_panel_2_time[0]
+        wf_panel_c_time_zero = wf_panel_c_time - wf_panel_a_time[0]
+        wf_panel_b_time_zero = wf_panel_b_time - wf_panel_a_time[0]
+        wf_panel_a_time_zero = wf_panel_a_time - wf_panel_a_time[0]
     else:
         start_datetime_epoch = dt.datetime.utcfromtimestamp(start_time_epoch)
         dt_str: str = start_datetime_epoch.strftime("%Y-%m-%d %H:%M:%S")
@@ -295,24 +295,24 @@ def plot_wf_wf_wf_vert(redvox_id: str,
         # top_time -= top_time[0]
         # mid_time -= mid_time[0]
         # low_time -= low_time[0]
-        wf_panel_0_time_zero = wf_panel_0_time - start_time_epoch
-        wf_panel_1_time_zero = wf_panel_1_time - start_time_epoch
-        wf_panel_2_time_zero = wf_panel_2_time - start_time_epoch
+        wf_panel_c_time_zero = wf_panel_c_time - start_time_epoch
+        wf_panel_b_time_zero = wf_panel_b_time - start_time_epoch
+        wf_panel_a_time_zero = wf_panel_a_time - start_time_epoch
 
     # Catch cases where there may not be any data
-    time_xmin = wf_panel_2_time_zero[0]
-    time_xmax = wf_panel_2_time_zero[-1]
+    time_xmin = wf_panel_a_time_zero[0]
+    time_xmax = wf_panel_a_time_zero[-1]
     if time_xmin == time_xmax:
-        time_xmin = wf_panel_1_time_zero[0]
-        time_xmax = wf_panel_1_time_zero[-1]
+        time_xmin = wf_panel_b_time_zero[0]
+        time_xmax = wf_panel_b_time_zero[-1]
     if time_xmin == time_xmax:
-        time_xmin = wf_panel_0_time_zero[0]
-        time_xmax = wf_panel_0_time_zero[-1]
+        time_xmin = wf_panel_c_time_zero[0]
+        time_xmax = wf_panel_c_time_zero[-1]
     if time_xmin == time_xmax:
         print("No data to plot for " + figure_title)
         return
 
-    # print("Panel time:", wf_panel_0_time_zero[0], wf_panel_0_time_zero[-1])
+    # print("Panel time:", wf_panel_c_time_zero[0], wf_panel_c_time_zero[-1])
     # Figure starts here
     fig_ax_tuple: Tuple[plt.Figure, List[plt.Axes]] = \
         plt.subplots(3, 1,
@@ -321,48 +321,48 @@ def plot_wf_wf_wf_vert(redvox_id: str,
                      sharex=True)
     fig: plt.Figure = fig_ax_tuple[0]
     axes: List[plt.Axes] = fig_ax_tuple[1]
-    wf_panel_0: plt.Axes = axes[0]
-    wf_panel_1: plt.Axes = axes[1]
-    wf_panel_2: plt.Axes = axes[2]
+    wf_panel_c: plt.Axes = axes[0]
+    wf_panel_b: plt.Axes = axes[1]
+    wf_panel_a: plt.Axes = axes[2]
 
     if figure_title_show:
-        wf_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
+        wf_panel_c.set_title(f"{figure_title} at Station {redvox_id}")
 
-    wf_panel_0.plot(wf_panel_0_time_zero, wf_panel_0_sig, color=waveform_color)
+    wf_panel_c.plot(wf_panel_c_time_zero, wf_panel_c_sig, color=waveform_color)
     if label_panel_show:
-        wf_panel_0.text(0.01, 0.95, labels_panel_0, transform=wf_panel_0.transAxes,
+        wf_panel_c.text(0.01, 0.95, labels_panel_c, transform=wf_panel_c.transAxes,
                         fontsize=params_tfr.figure_parameters.text_size, fontweight=labels_fontweight, va='top')
-    wf_panel_0.set_ylabel(wf_panel_0_units, size=params_tfr.figure_parameters.text_size)
-    wf_panel_0.set_xlim(time_xmin, time_xmax)
-    wf_panel_0.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
-    wf_panel_0.grid(True)
-    wf_panel_0.tick_params(axis='y', labelsize='large')
-    wf_panel_0.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
-    wf_panel_0.yaxis.get_offset_text().set_x(-0.034)
+    wf_panel_c.set_ylabel(wf_panel_c_units, size=params_tfr.figure_parameters.text_size)
+    wf_panel_c.set_xlim(time_xmin, time_xmax)
+    wf_panel_c.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
+    wf_panel_c.grid(True)
+    wf_panel_c.tick_params(axis='y', labelsize='large')
+    wf_panel_c.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
+    wf_panel_c.yaxis.get_offset_text().set_x(-0.034)
 
-    wf_panel_1.plot(wf_panel_1_time_zero, wf_panel_1_sig, color=waveform_color)
+    wf_panel_b.plot(wf_panel_b_time_zero, wf_panel_b_sig, color=waveform_color)
     if label_panel_show:
-        wf_panel_1.text(0.01, 0.95, labels_panel_1, transform=wf_panel_1.transAxes,
+        wf_panel_b.text(0.01, 0.95, labels_panel_b, transform=wf_panel_b.transAxes,
                         fontsize=params_tfr.figure_parameters.text_size, fontweight=labels_fontweight, va='top')
-    wf_panel_1.set_ylabel(wf_panel_1_units, size=params_tfr.figure_parameters.text_size)
-    wf_panel_1.set_xlim(time_xmin, time_xmax)
-    wf_panel_1.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
-    wf_panel_1.grid(True)
-    wf_panel_1.tick_params(axis='y', labelsize='large')
-    wf_panel_1.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
-    wf_panel_1.yaxis.get_offset_text().set_x(-0.034)
+    wf_panel_b.set_ylabel(wf_panel_b_units, size=params_tfr.figure_parameters.text_size)
+    wf_panel_b.set_xlim(time_xmin, time_xmax)
+    wf_panel_b.tick_params(axis='x', which='both', bottom=False, labelbottom=False, labelsize='large')
+    wf_panel_b.grid(True)
+    wf_panel_b.tick_params(axis='y', labelsize='large')
+    wf_panel_b.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
+    wf_panel_b.yaxis.get_offset_text().set_x(-0.034)
 
-    wf_panel_2.plot(wf_panel_2_time_zero, wf_panel_2_sig, color=waveform_color)
+    wf_panel_a.plot(wf_panel_a_time_zero, wf_panel_a_sig, color=waveform_color)
     if label_panel_show:
-        wf_panel_2.text(0.01, 0.95, labels_panel_2, transform=wf_panel_2.transAxes,
+        wf_panel_a.text(0.01, 0.95, labels_panel_a, transform=wf_panel_a.transAxes,
                         fontsize=params_tfr.figure_parameters.text_size, fontweight=labels_fontweight, va='top')
-    wf_panel_2.set_ylabel(wf_panel_2_units, size=params_tfr.figure_parameters.text_size)
-    wf_panel_2.set_xlim(time_xmin, time_xmax)
-    wf_panel_2.tick_params(axis='x', which='both', bottom=False, labelbottom=True, labelsize='large')
-    wf_panel_2.grid(True)
-    wf_panel_2.tick_params(axis='y', labelsize='large')
-    wf_panel_2.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
-    wf_panel_2.yaxis.get_offset_text().set_x(-0.034)
+    wf_panel_a.set_ylabel(wf_panel_a_units, size=params_tfr.figure_parameters.text_size)
+    wf_panel_a.set_xlim(time_xmin, time_xmax)
+    wf_panel_a.tick_params(axis='x', which='both', bottom=False, labelbottom=True, labelsize='large')
+    wf_panel_a.grid(True)
+    wf_panel_a.tick_params(axis='y', labelsize='large')
+    wf_panel_a.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
+    wf_panel_a.yaxis.get_offset_text().set_x(-0.034)
 
     fig.text(.5, .01, time_label, ha='center', size=params_tfr.figure_parameters.text_size)
 
@@ -372,23 +372,23 @@ def plot_wf_wf_wf_vert(redvox_id: str,
 
 
 def plot_wf_mesh_mesh_vert(redvox_id: str,
-                           wf_panel_2_sig: np.ndarray,
-                           wf_panel_2_time: np.ndarray,
+                           wf_panel_a_sig: np.ndarray,
+                           wf_panel_a_time: np.ndarray,
                            mesh_time: np.ndarray,
                            mesh_frequency: np.ndarray,
-                           mesh_panel_1_trf: np.ndarray,
-                           mesh_panel_0_tfr: np.ndarray,
+                           mesh_panel_b_trf: np.ndarray,
+                           mesh_panel_c_tfr: np.ndarray,
                            params_tfr=AudioParams(),
                            frequency_scaling: str = "log",
                            mesh_shading: str = "auto",
-                           mesh_panel_1_colormap_scaling: str = "auto",
-                           mesh_panel_1_color_max: float = 15,
-                           mesh_panel_1_color_range: float = 15,
-                           mesh_panel_1_color_min: float = 0,
-                           mesh_panel_0_colormap_scaling: str = "auto",
-                           mesh_panel_0_color_max: float = 15,
-                           mesh_panel_0_color_range: float = 15,
-                           mesh_panel_0_color_min: float = 0,
+                           mesh_panel_b_colormap_scaling: str = "auto",
+                           mesh_panel_b_color_max: float = 15,
+                           mesh_panel_b_color_range: float = 15,
+                           mesh_panel_b_color_min: float = 0,
+                           mesh_panel_c_colormap_scaling: str = "auto",
+                           mesh_panel_c_color_max: float = 15,
+                           mesh_panel_c_color_range: float = 15,
+                           mesh_panel_c_color_min: float = 0,
                            start_time_epoch: float = 0,
                            frequency_hz_ymin: float = scales.Slice.FU,
                            frequency_hz_ymax: float = scales.Slice.F0,
@@ -396,9 +396,9 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
                            mesh_colormap: str = "inferno",
                            units_time: str = "s",
                            units_frequency: str = "Hz",
-                           wf_panel_2_units: str = "Norm",
-                           mesh_panel_1_cbar_units: str = "bits",
-                           mesh_panel_0_cbar_units: str = "bits",
+                           wf_panel_a_units: str = "Norm",
+                           mesh_panel_b_cbar_units: str = "bits",
+                           mesh_panel_c_cbar_units: str = "bits",
                            figure_title: str = "Time-Frequency Representation",
                            figure_title_show: bool = True) -> None:
 
@@ -406,27 +406,27 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     Plot 3 vertical panels - mesh (top panel), mesh (middle panel) and signal waveform (bottom panel)
 
     :param redvox_id: name of station
-    :param wf_panel_2_sig: array with signal waveform for bottom panel
-    :param wf_panel_2_time: array with signal timestamps for bottom panel
+    :param wf_panel_a_sig: array with signal waveform for bottom panel
+    :param wf_panel_a_time: array with signal timestamps for bottom panel
     :param mesh_time: array with mesh time
     :param mesh_frequency: array with mesh frequencies
-    :param mesh_panel_1_trf: array with mesh tfr data for mesh plot (middle panel)
-    :param mesh_panel_0_tfr: array with mesh tfr data for mesh plot (top panel)
+    :param mesh_panel_b_trf: array with mesh tfr data for mesh plot (middle panel)
+    :param mesh_panel_c_tfr: array with mesh tfr data for mesh plot (top panel)
     :param params_tfr: parameters for tfr. Check AudioParams().
     :param frequency_scaling: "log" or "linear". Default is "log"
     :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
-     :param mesh_panel_1_colormap_scaling: color scaling for mesh plot (middle panel). One of: "auto", "range" or "else"
-        (use inputs given in mesh_panel_1_color_max, mesh_panel_1_color_range, mesh_panel_1_color_min). Default is "auto"
-    :param mesh_panel_1_color_max: maximum value for color scaling for mesh plot (middle panel). Default is 15.0
-    :param mesh_panel_1_color_range: range between maximum and minimum values in color scaling for mesh plot
+     :param mesh_panel_b_colormap_scaling: color scaling for mesh plot (middle panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_b_color_max, mesh_panel_b_color_range, mesh_panel_b_color_min). Default is "auto"
+    :param mesh_panel_b_color_max: maximum value for color scaling for mesh plot (middle panel). Default is 15.0
+    :param mesh_panel_b_color_range: range between maximum and minimum values in color scaling for mesh plot
         (middle panel). Default is 15.0
-    :param mesh_panel_1_color_min: minimum value for color scaling for mesh plot (middle panel). Default is 0.0
-    :param mesh_panel_0_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
-        (use inputs given in mesh_panel_0_color_max, mesh_panel_0_color_range, mesh_panel_0_color_min). Default is "auto"
-    :param mesh_panel_0_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
-    :param mesh_panel_0_color_range:range between maximum and minimum values in color scaling for scatter plot
+    :param mesh_panel_b_color_min: minimum value for color scaling for mesh plot (middle panel). Default is 0.0
+    :param mesh_panel_c_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_c_color_max, mesh_panel_c_color_range, mesh_panel_c_color_min). Default is "auto"
+    :param mesh_panel_c_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
+    :param mesh_panel_c_color_range:range between maximum and minimum values in color scaling for scatter plot
         (top panel). Default is 15.0
-    :param mesh_panel_0_color_min: minimum value for color scaling for mesh plot (top panel). Default is 0.0
+    :param mesh_panel_c_color_min: minimum value for color scaling for mesh plot (top panel). Default is 0.0
     :param start_time_epoch: start time in epoch UTC. Default is 0.0
     :param frequency_hz_ymin: minimum frequency for y-axis
     :param frequency_hz_ymax: maximum frequency for y-axis
@@ -434,9 +434,9 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
     :param units_time: units of time. Default is "s"
     :param units_frequency: units of frequency. Default is "Hz"
-    :param wf_panel_2_units: units of waveform plot (bottom panel). Default is "Norm"
-    :param mesh_panel_1_cbar_units: units of colorbar for mesh plot (middle panel). Default is "bits"
-    :param mesh_panel_0_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
+    :param wf_panel_a_units: units of waveform plot (bottom panel). Default is "Norm"
+    :param mesh_panel_b_cbar_units: units of colorbar for mesh plot (middle panel). Default is "bits"
+    :param mesh_panel_c_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
     :param figure_title: title of figure. Default is "Time-Frequency Representation"
     :param figure_title_show: show title if True. Default is True
     :return: plot
@@ -445,8 +445,8 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     # This is the template for the TFR workhorse. Creating a TFR class would be practical.
 
     # Time zeroing and scrubbing, if needed
-    time_label, wf_panel_2_elapsed_time = \
-        origin_time_correction(wf_panel_2_time, start_time_epoch, units_time)
+    time_label, wf_panel_a_elapsed_time = \
+        origin_time_correction(wf_panel_a_time, start_time_epoch, units_time)
 
     # Time is in the center of the window, frequency is in the fft coefficient center.
     # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
@@ -465,9 +465,9 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
                      sharex=True)
     fig: plt.Figure = fig_ax_tuple[0]
     axes: List[plt.Axes] = fig_ax_tuple[1]
-    mesh_panel_0: plt.Axes = axes[0]
-    mesh_panel_1: plt.Axes = axes[1]
-    wf_panel_2: plt.Axes = axes[2]
+    mesh_panel_c: plt.Axes = axes[0]
+    mesh_panel_b: plt.Axes = axes[1]
+    wf_panel_a: plt.Axes = axes[2]
     # bottom_panel_picker: plt.Axes = axes[3]
 
     # Top panel mesh --------------------------
@@ -476,145 +476,145 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     # frequency and time must be increasing!
 
     # Display preference
-    wf_panel_2_time_xmin: int = wf_panel_2_elapsed_time[0]
-    wf_panel_2_time_xmax: int = t_edge[-1]
+    wf_panel_a_time_xmin: int = wf_panel_a_elapsed_time[0]
+    wf_panel_a_time_xmax: int = t_edge[-1]
 
     # Override, default is autoscaling to min and max values
-    if mesh_panel_1_colormap_scaling == "auto":
-        mesh_panel_1_color_min, mesh_panel_1_color_max = mesh_colormap_limits(mesh_panel_1_trf,
-                                                                              mesh_panel_1_colormap_scaling,
-                                                                              mesh_panel_1_color_range)
-    elif mesh_panel_1_colormap_scaling == "range":
-        mesh_panel_1_color_min, mesh_panel_1_color_max = mesh_colormap_limits(mesh_panel_1_trf,
-                                                                              mesh_panel_1_colormap_scaling,
-                                                                              mesh_panel_1_color_range)
+    if mesh_panel_b_colormap_scaling == "auto":
+        mesh_panel_b_color_min, mesh_panel_b_color_max = mesh_colormap_limits(mesh_panel_b_trf,
+                                                                              mesh_panel_b_colormap_scaling,
+                                                                              mesh_panel_b_color_range)
+    elif mesh_panel_b_colormap_scaling == "range":
+        mesh_panel_b_color_min, mesh_panel_b_color_max = mesh_colormap_limits(mesh_panel_b_trf,
+                                                                              mesh_panel_b_colormap_scaling,
+                                                                              mesh_panel_b_color_range)
     else:
         "Mesh 1 color scaling with user inputs"
 
-    if mesh_panel_0_colormap_scaling == "auto":
-        mesh_panel_0_color_min, mesh_panel_0_color_max = mesh_colormap_limits(mesh_panel_0_tfr,
-                                                                              mesh_panel_0_colormap_scaling,
-                                                                              mesh_panel_0_color_range)
-    elif mesh_panel_0_colormap_scaling == "range":
-        mesh_panel_0_color_min, mesh_panel_0_color_max = mesh_colormap_limits(mesh_panel_0_tfr,
-                                                                              mesh_panel_0_colormap_scaling,
-                                                                              mesh_panel_0_color_range)
+    if mesh_panel_c_colormap_scaling == "auto":
+        mesh_panel_c_color_min, mesh_panel_c_color_max = mesh_colormap_limits(mesh_panel_c_tfr,
+                                                                              mesh_panel_c_colormap_scaling,
+                                                                              mesh_panel_c_color_range)
+    elif mesh_panel_c_colormap_scaling == "range":
+        mesh_panel_c_color_min, mesh_panel_c_color_max = mesh_colormap_limits(mesh_panel_c_tfr,
+                                                                              mesh_panel_c_colormap_scaling,
+                                                                              mesh_panel_c_color_range)
     else:
         "Mesh 0 color scaling with user inputs"
 
     # Setup color map ticks
     all_cbar_ticks_lens: List[int] = [
-        len(str(math.ceil(mesh_panel_0_color_min))),
-        len(str(math.floor(mesh_panel_0_color_max))),
-        len(str(math.ceil(mesh_panel_1_color_min))),
-        len(str(math.floor(mesh_panel_1_color_max)))
+        len(str(math.ceil(mesh_panel_c_color_min))),
+        len(str(math.floor(mesh_panel_c_color_max))),
+        len(str(math.ceil(mesh_panel_b_color_min))),
+        len(str(math.floor(mesh_panel_b_color_max)))
     ]
     max_cbar_tick_len: int = sorted(all_cbar_ticks_lens)[-1]
     cbar_tick_fmt: str = f"%-{max_cbar_tick_len}s"
 
     if mesh_shading == "auto":
-        pcolormesh_top: QuadMesh = mesh_panel_0.pcolormesh(mesh_time,
+        pcolormesh_top: QuadMesh = mesh_panel_c.pcolormesh(mesh_time,
                                                            mesh_frequency,
-                                                           mesh_panel_0_tfr,
-                                                           vmin=mesh_panel_0_color_min,
-                                                           vmax=mesh_panel_0_color_max,
+                                                           mesh_panel_c_tfr,
+                                                           vmin=mesh_panel_c_color_min,
+                                                           vmax=mesh_panel_c_color_max,
                                                            cmap=mesh_colormap,
                                                            shading=mesh_shading,
                                                            snap=True)
     elif mesh_shading == "gouraud":
-        pcolormesh_top: QuadMesh = mesh_panel_0.pcolormesh(mesh_time,
+        pcolormesh_top: QuadMesh = mesh_panel_c.pcolormesh(mesh_time,
                                                            mesh_frequency,
-                                                           mesh_panel_0_tfr,
-                                                           vmin=mesh_panel_0_color_min,
-                                                           vmax=mesh_panel_0_color_max,
+                                                           mesh_panel_c_tfr,
+                                                           vmin=mesh_panel_c_color_min,
+                                                           vmax=mesh_panel_c_color_max,
                                                            cmap=mesh_colormap,
                                                            shading=mesh_shading,
                                                            snap=True)
     else:
-        pcolormesh_top: QuadMesh = mesh_panel_0.pcolormesh(t_edge,
+        pcolormesh_top: QuadMesh = mesh_panel_c.pcolormesh(t_edge,
                                                            f_edge,
-                                                           mesh_panel_0_tfr,
-                                                           vmin=mesh_panel_0_color_min,
-                                                           vmax=mesh_panel_0_color_max,
+                                                           mesh_panel_c_tfr,
+                                                           vmin=mesh_panel_c_color_min,
+                                                           vmax=mesh_panel_c_color_max,
                                                            cmap=mesh_colormap,
                                                            snap=True)
 
-    mesh_panel_0_div: AxesDivider = make_axes_locatable(mesh_panel_0)
-    mesh_panel_0_cax: plt.Axes = mesh_panel_0_div.append_axes("right", size="1%", pad="0.5%")
-    mesh_panel_0_cbar: Colorbar = fig.colorbar(pcolormesh_top, cax=mesh_panel_0_cax,
-                                               ticks=[math.ceil(mesh_panel_0_color_min),
-                                                      math.floor(mesh_panel_0_color_max)],
+    mesh_panel_c_div: AxesDivider = make_axes_locatable(mesh_panel_c)
+    mesh_panel_c_cax: plt.Axes = mesh_panel_c_div.append_axes("right", size="1%", pad="0.5%")
+    mesh_panel_c_cbar: Colorbar = fig.colorbar(pcolormesh_top, cax=mesh_panel_c_cax,
+                                               ticks=[math.ceil(mesh_panel_c_color_min),
+                                                      math.floor(mesh_panel_c_color_max)],
                                                format=cbar_tick_fmt)
-    mesh_panel_0_cbar.set_label(mesh_panel_0_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
-    mesh_panel_0_cax.tick_params(labelsize='large')
+    mesh_panel_c_cbar.set_label(mesh_panel_c_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
+    mesh_panel_c_cax.tick_params(labelsize='large')
     if figure_title_show:
-        mesh_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
-    mesh_panel_0.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
-    mesh_panel_0.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
-    mesh_panel_0.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
-    mesh_panel_0.set_yscale(frequency_scaling)
-    mesh_panel_0.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
-    mesh_panel_0.tick_params(axis='y', labelsize='large')
+        mesh_panel_c.set_title(f"{figure_title} at Station {redvox_id}")
+    mesh_panel_c.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
+    mesh_panel_c.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
+    mesh_panel_c.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
+    mesh_panel_c.set_yscale(frequency_scaling)
+    mesh_panel_c.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
+    mesh_panel_c.tick_params(axis='y', labelsize='large')
 
     # Middle panel mesh --------------------------
 
     if mesh_shading == "auto":
-        pcolormesh_mid: QuadMesh = mesh_panel_1.pcolormesh(mesh_time,
+        pcolormesh_mid: QuadMesh = mesh_panel_b.pcolormesh(mesh_time,
                                                            mesh_frequency,
-                                                           mesh_panel_1_trf,
-                                                           vmin=mesh_panel_1_color_min,
-                                                           vmax=mesh_panel_1_color_max,
+                                                           mesh_panel_b_trf,
+                                                           vmin=mesh_panel_b_color_min,
+                                                           vmax=mesh_panel_b_color_max,
                                                            cmap=mesh_colormap,
                                                            shading=mesh_shading,
                                                            snap=True)
     elif mesh_shading == "gouraud":
-        pcolormesh_mid: QuadMesh = mesh_panel_1.pcolormesh(mesh_time,
+        pcolormesh_mid: QuadMesh = mesh_panel_b.pcolormesh(mesh_time,
                                                            mesh_frequency,
-                                                           mesh_panel_1_trf,
-                                                           vmin=mesh_panel_1_color_min,
-                                                           vmax=mesh_panel_1_color_max,
+                                                           mesh_panel_b_trf,
+                                                           vmin=mesh_panel_b_color_min,
+                                                           vmax=mesh_panel_b_color_max,
                                                            cmap=mesh_colormap,
                                                            shading=mesh_shading,
                                                            snap=True)
     else:
-        pcolormesh_mid: QuadMesh = mesh_panel_1.pcolormesh(t_edge,
+        pcolormesh_mid: QuadMesh = mesh_panel_b.pcolormesh(t_edge,
                                                            f_edge,
-                                                           mesh_panel_1_trf,
-                                                           vmin=mesh_panel_1_color_min,
-                                                           vmax=mesh_panel_1_color_max,
+                                                           mesh_panel_b_trf,
+                                                           vmin=mesh_panel_b_color_min,
+                                                           vmax=mesh_panel_b_color_max,
                                                            cmap=mesh_colormap,
                                                            snap=True)
 
-    mesh_panel_1_div: AxesDivider = make_axes_locatable(mesh_panel_1)
-    mesh_panel_1_cax: plt.Axes = mesh_panel_1_div.append_axes("right", size="1%", pad="0.5%")
-    mesh_panel_1_cbar: Colorbar = fig.colorbar(pcolormesh_mid, cax=mesh_panel_1_cax,
-                                               ticks=[math.ceil(mesh_panel_1_color_min),
-                                                      math.floor(mesh_panel_1_color_max)],
+    mesh_panel_b_div: AxesDivider = make_axes_locatable(mesh_panel_b)
+    mesh_panel_b_cax: plt.Axes = mesh_panel_b_div.append_axes("right", size="1%", pad="0.5%")
+    mesh_panel_b_cbar: Colorbar = fig.colorbar(pcolormesh_mid, cax=mesh_panel_b_cax,
+                                               ticks=[math.ceil(mesh_panel_b_color_min),
+                                                      math.floor(mesh_panel_b_color_max)],
                                                format=cbar_tick_fmt)
-    mesh_panel_1_cbar.set_label(mesh_panel_1_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
-    mesh_panel_1_cax.tick_params(labelsize='large')
+    mesh_panel_b_cbar.set_label(mesh_panel_b_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
+    mesh_panel_b_cax.tick_params(labelsize='large')
 
-    mesh_panel_1.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
-    mesh_panel_1.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
-    mesh_panel_1.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
-    mesh_panel_1.margins(x=0)
-    mesh_panel_1.set_yscale(frequency_scaling)
-    mesh_panel_1.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
-    mesh_panel_1.tick_params(axis='y', labelsize='large')
+    mesh_panel_b.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
+    mesh_panel_b.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
+    mesh_panel_b.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
+    mesh_panel_b.margins(x=0)
+    mesh_panel_b.set_yscale(frequency_scaling)
+    mesh_panel_b.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
+    mesh_panel_b.tick_params(axis='y', labelsize='large')
 
     # Waveform panel
-    wf_panel_2.plot(wf_panel_2_elapsed_time, wf_panel_2_sig, color=waveform_color)
-    wf_panel_2.set_ylabel(wf_panel_2_units, size=params_tfr.figure_parameters.text_size)
-    wf_panel_2.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
-    wf_panel_2.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
-    wf_panel_2.grid(True)
-    wf_panel_2.tick_params(axis='y', labelsize='large')
-    wf_panel_2.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
-    wf_panel_2.yaxis.get_offset_text().set_x(-0.034)
+    wf_panel_a.plot(wf_panel_a_elapsed_time, wf_panel_a_sig, color=waveform_color)
+    wf_panel_a.set_ylabel(wf_panel_a_units, size=params_tfr.figure_parameters.text_size)
+    wf_panel_a.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
+    wf_panel_a.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
+    wf_panel_a.grid(True)
+    wf_panel_a.tick_params(axis='y', labelsize='large')
+    wf_panel_a.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
+    wf_panel_a.yaxis.get_offset_text().set_x(-0.034)
 
-    wf_panel_2_div: AxesDivider = make_axes_locatable(wf_panel_2)
-    wf_panel_2_cax: plt.Axes = wf_panel_2_div.append_axes("right", size="1%", pad="0.5%")
-    wf_panel_2_cax.axis("off")
+    wf_panel_a_div: AxesDivider = make_axes_locatable(wf_panel_a)
+    wf_panel_a_cax: plt.Axes = wf_panel_a_div.append_axes("right", size="1%", pad="0.5%")
+    wf_panel_a_cax.axis("off")
 
     fig.text(.5, .01, time_label, ha='center', size=params_tfr.figure_parameters.text_size)
 
@@ -624,18 +624,18 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
 
 
 def plot_wf_mesh_vert(redvox_id: str,
-                      wf_panel_2_sig: np.ndarray,
-                      wf_panel_2_time: np.ndarray,
+                      wf_panel_a_sig: np.ndarray,
+                      wf_panel_a_time: np.ndarray,
                       mesh_time: np.ndarray,
                       mesh_frequency: np.ndarray,
-                      mesh_panel_0_tfr: np.ndarray,
+                      mesh_panel_b_tfr: np.ndarray,
                       params_tfr=AudioParams(),
                       frequency_scaling: str = "log",
                       mesh_shading: str = "auto",
-                      mesh_panel_0_colormap_scaling: str = "auto",
-                      mesh_panel_0_color_max: float = 15,
-                      mesh_panel_0_color_range: float = 15,
-                      mesh_panel_0_color_min: float = 0,
+                      mesh_panel_b_colormap_scaling: str = "auto",
+                      mesh_panel_b_color_max: float = 15,
+                      mesh_panel_b_color_range: float = 15,
+                      mesh_panel_b_color_min: float = 0,
                       start_time_epoch: float = 0,
                       frequency_hz_ymin: float = scales.Slice.FU,
                       frequency_hz_ymax: float = scales.Slice.F0,
@@ -643,28 +643,28 @@ def plot_wf_mesh_vert(redvox_id: str,
                       mesh_colormap: str = "inferno",
                       units_time: str = "s",
                       units_frequency: str = "Hz",
-                      wf_panel_2_units: str = "Norm",
-                      mesh_panel_0_cbar_units: str = "bits",
+                      wf_panel_a_units: str = "Norm",
+                      mesh_panel_b_cbar_units: str = "bits",
                       figure_title: str = "Time-Frequency Representation",
                       figure_title_show: bool = True) -> None:
     """
     Plot 2 vertical panels - mesh (top panel) and signal waveform (bottom panel)
 
     :param redvox_id: name of station
-    :param wf_panel_2_sig: array with signal waveform for bottom panel
-    :param wf_panel_2_time: array with signal timestamps for bottom panel
+    :param wf_panel_a_sig: array with signal waveform for bottom panel
+    :param wf_panel_a_time: array with signal timestamps for bottom panel
     :param mesh_time: array with mesh time
     :param mesh_frequency: array with mesh frequencies
-    :param mesh_panel_0_tfr: array with mesh tfr data for mesh plot (top panel)
+    :param mesh_panel_b_tfr: array with mesh tfr data for mesh plot (top panel)
     :param params_tfr: parameters for tfr. Check AudioParams().
     :param frequency_scaling: "log" or "linear". Default is "log"
     :param mesh_shading: type of mesh shading, one of "auto", "gouraud" or "else". Default is "auto"
-    :param mesh_panel_0_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
-        (use inputs given in mesh_panel_0_color_max, mesh_panel_0_color_range, mesh_panel_0_color_min). Default is "auto"
-    :param mesh_panel_0_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
-    :param mesh_panel_0_color_range:range between maximum and minimum values in color scaling for scatter plot
+    :param mesh_panel_b_colormap_scaling: color scaling for mesh plot (top panel). One of: "auto", "range" or "else"
+        (use inputs given in mesh_panel_b_color_max, mesh_panel_b_color_range, mesh_panel_b_color_min). Default is "auto"
+    :param mesh_panel_b_color_max: maximum value for color scaling for mesh plot (top panel). Default is 15.0
+    :param mesh_panel_b_color_range:range between maximum and minimum values in color scaling for scatter plot
         (top panel). Default is 15.0
-    :param mesh_panel_0_color_min: minimum value for color scaling for mesh plot (top panel). Default is 0.0
+    :param mesh_panel_b_color_min: minimum value for color scaling for mesh plot (top panel). Default is 0.0
     :param start_time_epoch: start time in epoch UTC. Default is 0.0
     :param frequency_hz_ymin: minimum frequency for y-axis
     :param frequency_hz_ymax: maximum frequency for y-axis
@@ -672,8 +672,8 @@ def plot_wf_mesh_vert(redvox_id: str,
     :param mesh_colormap: a Matplotlib Colormap instance or registered colormap name. Default is "inferno"
     :param units_time: units of time. Default is "s"
     :param units_frequency: units of frequency. Default is "Hz"
-    :param wf_panel_2_units: units of waveform plot (bottom panel). Default is "Norm"
-    :param mesh_panel_0_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
+    :param wf_panel_a_units: units of waveform plot (bottom panel). Default is "Norm"
+    :param mesh_panel_b_cbar_units: units of colorbar for mesh plot (top panel). Default is "bits"
     :param figure_title: title of figure. Default is "Time-Frequency Representation"
     :param figure_title_show: show title if True. Default is True
     :return: plot
@@ -682,8 +682,8 @@ def plot_wf_mesh_vert(redvox_id: str,
     # This is the template for the TFR workhorse. Creating a TFR class may be practical.
 
     # Time zeroing and scrubbing, if needed
-    time_label, wf_panel_2_elapsed_time = \
-        origin_time_correction(wf_panel_2_time, start_time_epoch, units_time)
+    time_label, wf_panel_a_elapsed_time = \
+        origin_time_correction(wf_panel_a_time, start_time_epoch, units_time)
 
     # Time is in the center of the window, frequency is in the fft coefficient center.
     # pcolormesh must provide corner coordinates, so there will be an offset from step noverlap step size.
@@ -702,8 +702,8 @@ def plot_wf_mesh_vert(redvox_id: str,
                      sharex=True)
     fig: plt.Figure = fig_ax_tuple[0]
     axes: List[plt.Axes] = fig_ax_tuple[1]
-    mesh_panel_0: plt.Axes = axes[0]
-    wf_panel_2: plt.Axes = axes[1]
+    mesh_panel_b: plt.Axes = axes[0]
+    wf_panel_a: plt.Axes = axes[1]
     # bottom_panel_picker: plt.Axes = axes[3]
 
     # Top panel mesh --------------------------
@@ -712,88 +712,88 @@ def plot_wf_mesh_vert(redvox_id: str,
     # frequency and time must be increasing!
 
     # Display preference
-    wf_panel_2_time_xmin: int = wf_panel_2_elapsed_time[0]
-    wf_panel_2_time_xmax: int = t_edge[-1]
+    wf_panel_a_time_xmin: int = wf_panel_a_elapsed_time[0]
+    wf_panel_a_time_xmax: int = t_edge[-1]
 
-    if mesh_panel_0_colormap_scaling == "auto":
-        mesh_panel_0_color_min, mesh_panel_0_color_max = mesh_colormap_limits(mesh_panel_0_tfr,
-                                                                              mesh_panel_0_colormap_scaling,
-                                                                              mesh_panel_0_color_range)
-    elif mesh_panel_0_colormap_scaling == "range":
-        mesh_panel_0_color_min, mesh_panel_0_color_max = mesh_colormap_limits(mesh_panel_0_tfr,
-                                                                              mesh_panel_0_colormap_scaling,
-                                                                              mesh_panel_0_color_range)
+    if mesh_panel_b_colormap_scaling == "auto":
+        mesh_panel_b_color_min, mesh_panel_b_color_max = mesh_colormap_limits(mesh_panel_b_tfr,
+                                                                              mesh_panel_b_colormap_scaling,
+                                                                              mesh_panel_b_color_range)
+    elif mesh_panel_b_colormap_scaling == "range":
+        mesh_panel_b_color_min, mesh_panel_b_color_max = mesh_colormap_limits(mesh_panel_b_tfr,
+                                                                              mesh_panel_b_colormap_scaling,
+                                                                              mesh_panel_b_color_range)
     else:
         "Mesh 0 color scaling with user inputs"
 
     # Setup color map ticks
     all_cbar_ticks_lens: List[int] = [
-        len(str(math.ceil(mesh_panel_0_color_min))),
-        len(str(math.floor(mesh_panel_0_color_max)))]
+        len(str(math.ceil(mesh_panel_b_color_min))),
+        len(str(math.floor(mesh_panel_b_color_max)))]
     max_cbar_tick_len: int = sorted(all_cbar_ticks_lens)[-1]
     cbar_tick_fmt: str = f"%-{max_cbar_tick_len}s"
 
     if mesh_shading == "auto":
-        pcolormesh_top: QuadMesh = mesh_panel_0.pcolormesh(mesh_time,
+        pcolormesh_top: QuadMesh = mesh_panel_b.pcolormesh(mesh_time,
                                                            mesh_frequency,
-                                                           mesh_panel_0_tfr,
-                                                           vmin=mesh_panel_0_color_min,
-                                                           vmax=mesh_panel_0_color_max,
+                                                           mesh_panel_b_tfr,
+                                                           vmin=mesh_panel_b_color_min,
+                                                           vmax=mesh_panel_b_color_max,
                                                            cmap=mesh_colormap,
                                                            shading=mesh_shading,
                                                            snap=True)
     elif mesh_shading == "gouraud":
-        pcolormesh_top: QuadMesh = mesh_panel_0.pcolormesh(mesh_time,
+        pcolormesh_top: QuadMesh = mesh_panel_b.pcolormesh(mesh_time,
                                                            mesh_frequency,
-                                                           mesh_panel_0_tfr,
-                                                           vmin=mesh_panel_0_color_min,
-                                                           vmax=mesh_panel_0_color_max,
+                                                           mesh_panel_b_tfr,
+                                                           vmin=mesh_panel_b_color_min,
+                                                           vmax=mesh_panel_b_color_max,
                                                            cmap=mesh_colormap,
                                                            shading=mesh_shading,
                                                            snap=True)
     else:
-        pcolormesh_top: QuadMesh = mesh_panel_0.pcolormesh(t_edge,
+        pcolormesh_top: QuadMesh = mesh_panel_b.pcolormesh(t_edge,
                                                            f_edge,
-                                                           mesh_panel_0_tfr,
-                                                           vmin=mesh_panel_0_color_min,
-                                                           vmax=mesh_panel_0_color_max,
+                                                           mesh_panel_b_tfr,
+                                                           vmin=mesh_panel_b_color_min,
+                                                           vmax=mesh_panel_b_color_max,
                                                            cmap=mesh_colormap,
                                                            snap=True)
 
-    mesh_panel_0_div: AxesDivider = make_axes_locatable(mesh_panel_0)
-    mesh_panel_0_cax: plt.Axes = mesh_panel_0_div.append_axes("right", size="1%", pad="0.5%")
-    mesh_panel_0_cbar: Colorbar = fig.colorbar(pcolormesh_top, cax=mesh_panel_0_cax,
-                                               ticks=[math.ceil(mesh_panel_0_color_min),
-                                                      math.floor(mesh_panel_0_color_max)],
+    mesh_panel_b_div: AxesDivider = make_axes_locatable(mesh_panel_b)
+    mesh_panel_b_cax: plt.Axes = mesh_panel_b_div.append_axes("right", size="1%", pad="0.5%")
+    mesh_panel_b_cbar: Colorbar = fig.colorbar(pcolormesh_top, cax=mesh_panel_b_cax,
+                                               ticks=[math.ceil(mesh_panel_b_color_min),
+                                                      math.floor(mesh_panel_b_color_max)],
                                                format=cbar_tick_fmt)
-    # mesh_panel_0_cbar: Colorbar = fig.colorbar(pcolormesh, cax=mesh_panel_0_cax,
+    # mesh_panel_b_cbar: Colorbar = fig.colorbar(pcolormesh, cax=mesh_panel_b_cax,
     #                                         ticks=[colormin_top, colormax_top],
     #                                         format=cbar_tick_fmt)
-    mesh_panel_0_cbar.set_label(mesh_panel_0_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
-    mesh_panel_0_cax.tick_params(labelsize='large')
+    mesh_panel_b_cbar.set_label(mesh_panel_b_cbar_units, rotation=270, size=params_tfr.figure_parameters.text_size)
+    mesh_panel_b_cax.tick_params(labelsize='large')
     if figure_title_show:
-        mesh_panel_0.set_title(f"{figure_title} at Station {redvox_id}")
-    mesh_panel_0.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
-    mesh_panel_0.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
-    mesh_panel_0.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
-    # mesh_panel_0.get_xaxis().set_ticklabels([])
-    mesh_panel_0.set_yscale(frequency_scaling)
-    mesh_panel_0.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
-    mesh_panel_0.tick_params(axis='y', labelsize='large')
+        mesh_panel_b.set_title(f"{figure_title} at Station {redvox_id}")
+    mesh_panel_b.set_ylabel(units_frequency, size=params_tfr.figure_parameters.text_size)
+    mesh_panel_b.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
+    mesh_panel_b.set_ylim(frequency_fix_ymin, frequency_fix_ymax)
+    # mesh_panel_b.get_xaxis().set_ticklabels([])
+    mesh_panel_b.set_yscale(frequency_scaling)
+    mesh_panel_b.tick_params(axis='x', which='both', bottom=False, labelbottom=False)
+    mesh_panel_b.tick_params(axis='y', labelsize='large')
 
     # Waveform panel
-    wf_panel_2.plot(wf_panel_2_elapsed_time, wf_panel_2_sig, color=waveform_color)
-    wf_panel_2.set_ylabel(wf_panel_2_units, size=params_tfr.figure_parameters.text_size)
-    wf_panel_2.set_xlim(wf_panel_2_time_xmin, wf_panel_2_time_xmax)
-    wf_panel_2.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
-    wf_panel_2.grid(True)
-    wf_panel_2.tick_params(axis='y', labelsize='large')
-    wf_panel_2.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
-    wf_panel_2.yaxis.get_offset_text().set_x(-0.034)
+    wf_panel_a.plot(wf_panel_a_elapsed_time, wf_panel_a_sig, color=waveform_color)
+    wf_panel_a.set_ylabel(wf_panel_a_units, size=params_tfr.figure_parameters.text_size)
+    wf_panel_a.set_xlim(wf_panel_a_time_xmin, wf_panel_a_time_xmax)
+    wf_panel_a.tick_params(axis='x', which='both', bottom=True, labelbottom=True, labelsize='large')
+    wf_panel_a.grid(True)
+    wf_panel_a.tick_params(axis='y', labelsize='large')
+    wf_panel_a.ticklabel_format(style="sci", scilimits=(0, 0), axis="y")
+    wf_panel_a.yaxis.get_offset_text().set_x(-0.034)
 
-    wf_panel_2_div: AxesDivider = make_axes_locatable(wf_panel_2)
-    wf_panel_2_cax: plt.Axes = wf_panel_2_div.append_axes("right", size="1%", pad="0.5%")
-    wf_panel_2_cax.axis("off")
+    wf_panel_a_div: AxesDivider = make_axes_locatable(wf_panel_a)
+    wf_panel_a_cax: plt.Axes = wf_panel_a_div.append_axes("right", size="1%", pad="0.5%")
+    wf_panel_a_cax.axis("off")
 
     fig.text(.5, .01, time_label, ha='center', size=params_tfr.figure_parameters.text_size)
 

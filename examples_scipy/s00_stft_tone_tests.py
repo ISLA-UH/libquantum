@@ -1,6 +1,8 @@
 """
-libquantum example 2: 02_tone_amplitude_check.py
-Illustrate TFRs on tones and compare amplitudes
+libquantum example 2: s00_stft_tone_test.py
+Compute STFT TFRs on tones to verify amplitudes
+Introduce the concept of a Q-driven STFT
+
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,8 +12,10 @@ from libquantum import atoms, entropy, scales, synthetics, utils  # spectra,
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 from typing import Tuple
 
+print(__doc__)
 
 
+# TODO: Move to separate function; integrate Stockwell methods
 def duration_points(sample_rate_hz: float, time_s: float) -> Tuple[int, int, int]:
     """
     Compute number of points
@@ -38,7 +42,7 @@ def duration_ceil(sample_rate_hz: float, time_s: float) -> Tuple[int, int, float
     points_ceil_log2: int = int(np.ceil(np.log2(points_float)))
     points_ceil_pow2: int = 2**points_ceil_log2
     time_ceil_pow2_s: float = points_ceil_pow2 / sample_rate_hz
-    
+
     return points_ceil_log2, points_ceil_pow2, time_ceil_pow2_s
 
 
@@ -61,6 +65,7 @@ if __name__ == "__main__":
     """
     # The primary goal of standardization is to permit multimodal sensor analysis for different sample rates
     # For a specified signal duration, there is only one key parameter: Order
+    
     """
 
     print('Tone synthetic')
@@ -120,15 +125,6 @@ if __name__ == "__main__":
     fmin = np.ceil(min_frequency_hz)
     fmax = sig_sample_rate_hz/2  # Nyquist
 
-    # TFR SECTION
-    # Compute complex wavelet transform (cwt) from signal duration
-    mic_cwt, mic_cwt_bits, mic_cwt_time_s, mic_cwt_frequency_hz = \
-        atoms.cwt_chirp_from_sig(sig_wf=mic_sig,
-                                 frequency_sample_rate_hz=sig_sample_rate_hz,
-                                 band_order_Nth=order_number_input,
-                                 dictionary_type="tone")
-
-    mic_cwt_snr, mic_cwt_snr_bits, mic_cwt_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_cwt)
 
     # Scipy TFR
     # compute raw spectrogram with scipy package
@@ -146,38 +142,20 @@ if __name__ == "__main__":
                            mode='magnitude')
 
     mic_stft_bits = np.log2(np.abs(mic_stft))
-    mic_stft_snr, mic_stft_snr_bits, mic_stft_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_stft)
 
-    pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
-                                wf_panel_2_sig=mic_sig,
-                                wf_panel_2_time=mic_sig_epoch_s,
-                                mesh_time=mic_cwt_time_s,
-                                mesh_frequency=mic_cwt_frequency_hz,
-                                mesh_panel_1_trf=mic_cwt_bits,
-                                mesh_panel_1_colormap_scaling="range",
-                                mesh_panel_0_tfr=mic_cwt_snr_entropy,
-                                wf_panel_2_units="Norm",
-                                mesh_panel_1_cbar_units="bits",
-                                mesh_panel_0_cbar_units="eSNR bits",
-                                start_time_epoch=0,
-                                figure_title="CWT for " + EVENT_NAME,
-                                frequency_hz_ymin=fmin,
-                                frequency_hz_ymax=fmax)
 
-    pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
-                                wf_panel_2_sig=mic_sig,
-                                wf_panel_2_time=mic_sig_epoch_s,
-                                mesh_time=mic_stft_time_s,
-                                mesh_frequency=mic_stft_frequency_hz,
-                                mesh_panel_1_trf=mic_stft_bits,
-                                mesh_panel_1_colormap_scaling="range",
-                                mesh_panel_0_tfr=mic_stft_snr_entropy,
-                                wf_panel_2_units="Norm",
-                                mesh_panel_1_cbar_units="bits",
-                                mesh_panel_0_cbar_units="eSNR bits",
-                                start_time_epoch=0,
-                                figure_title="stft for " + EVENT_NAME,
-                                frequency_hz_ymin=fmin,
-                                frequency_hz_ymax=fmax)
+    pltq.plot_wf_mesh_vert(redvox_id=station_id_str,
+                           wf_panel_a_sig=mic_sig,
+                           wf_panel_a_time=mic_sig_epoch_s,
+                           mesh_time=mic_stft_time_s,
+                           mesh_frequency=mic_stft_frequency_hz,
+                           mesh_panel_b_tfr=mic_stft_bits,
+                           mesh_panel_b_colormap_scaling="range",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="stft for " + EVENT_NAME,
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax)
 
     plt.show()
