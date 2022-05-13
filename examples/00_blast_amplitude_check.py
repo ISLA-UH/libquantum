@@ -86,29 +86,8 @@ if __name__ == "__main__":
                                 frequency_hz_ymin=fmin,
                                 frequency_hz_ymax=fmax)
 
-    # Compute constant Q transform (CQT) from segmented signal duration
-    mic_cqt, mic_cqt_bits, mic_cqt_time_s, mic_cqt_frequency_hz = \
-        spectra.cqt_from_sig(sig_wf=mic_sig,
-                             frequency_sample_rate_hz=mic_sig_sample_rate_hz,
-                             band_order_Nth=order_number_input)
 
-    mic_cqt_snr, mic_cqt_snr_bits, mic_cqt_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_cqt)
-    pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
-                                wf_panel_2_sig=mic_sig,
-                                wf_panel_2_time=mic_sig_epoch_s,
-                                mesh_time=mic_cqt_time_s,
-                                mesh_frequency=mic_cqt_frequency_hz,
-                                mesh_panel_1_trf=mic_cqt_bits,
-                                mesh_panel_1_colormap_scaling="range",
-                                mesh_panel_0_tfr=mic_cqt_snr_entropy,
-                                wf_panel_2_units="Norm",
-                                mesh_panel_1_cbar_units="bits",
-                                mesh_panel_0_cbar_units="eSNR bits",
-                                figure_title="CQT Hann for " + EVENT_NAME,
-                                frequency_hz_ymin=fmin,
-                                frequency_hz_ymax=fmax)
-
-    # Compute constant Q transform (CQT) from segmented signal duration using Gaussian window
+    # Compute quantized Stockwell transform (STYX) with a Gaussian window
     mic_cqtg, mic_cqtg_bits, mic_cqt_time_s, mic_cqt_frequency_hz = \
         spectra.cqt_from_sig(sig_wf=mic_sig,
                              frequency_sample_rate_hz=mic_sig_sample_rate_hz,
