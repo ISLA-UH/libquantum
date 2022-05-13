@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 def plot_tdr_sig(sig_wf, sig_time,
-                 signal_time_base:str='seconds'):
+                 signal_time_base: str='seconds'):
     """
     Waveform
     :param sig_wf:
@@ -26,7 +26,7 @@ def plot_tdr_sig(sig_wf, sig_time,
 
 def plot_tdr_rms(sig_wf, sig_time,
                  sig_rms_wf, sig_rms_time,
-                 signal_time_base:str='seconds'):
+                 signal_time_base: str='seconds'):
     """
     Waveform
     :param sig_wf:
@@ -83,7 +83,7 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
     :param title_str:
     :param tfr_x_str:
     :param tfr_y_str:
-    :return:
+    :return: figure
     """
 
     tfr_bits = 0.5*np.log2(tfr_power/np.max(tfr_power))

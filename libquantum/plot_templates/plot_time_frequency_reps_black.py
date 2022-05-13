@@ -53,6 +53,31 @@ class FigureAttributes:
         self.fig = None
 
 
+class FigureAttributesBackInBlack(FigureAttributes):
+    """
+    This is the most basic parent class -- sets the plot canvas as well as figure handling functions. This is where
+    figure size, font style and sizes, line weights and colors, etc. are established. All subsequent plot classes
+    will inherit these attributes, overriding them if necessary.
+
+    Attributes
+    __________
+
+    fig_size_ratio: 2d array of figure width, height ratio
+    fontsize1_scale: int, scale for fontsize level 1 (titles, axes labels...)
+    fontsize2: int, scale for fontsize level 2 (legend labels, ticks...)
+    line_color: string, color for line in plot
+    line_style: string, style of line in plot
+    """
+
+    def __init__(self, fig_size_ratio=np.array([640, 400]), fontsize1_scale=5, fontsize2_scale=4, line_color='w',
+                 line_style='-'):
+
+        super().__init__(fig_size_ratio, fontsize1_scale, fontsize2_scale, line_color, line_style)
+        self.fig_face_color = "k"
+        self.fig_edge_color = self.fig_face_color
+        self.font_color = "w"
+
+
 class AspectRatioType(enum.Enum):
     """
     Enumeration denoting aspect ratios
@@ -228,7 +253,8 @@ def plot_wf_wf_wf_vert(redvox_id: str,
                        labels_panel_2: str = "(a)",
                        labels_panel_1: str = "(b)",
                        labels_panel_0: str = "(c)",
-                       labels_fontweight: str = None) -> None:
+                       labels_fontweight: str = None,
+                       attributes_tfr = FigureAttributes()) -> None:
     """
     Template for aligned time-series display
 
