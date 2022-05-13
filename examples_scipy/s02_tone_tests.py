@@ -6,9 +6,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from libquantum import atoms, entropy, scales, synthetics, utils  # spectra,
-import libquantum.plot_templates.plot_time_frequency_reps as pltq
+# import libquantum.plot_templates.plot_time_frequency_reps as pltq  # white background
+import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 from typing import Tuple
-# import libwwz
+
 
 
 def duration_points(sample_rate_hz: float, time_s: float) -> Tuple[int, int, int]:
