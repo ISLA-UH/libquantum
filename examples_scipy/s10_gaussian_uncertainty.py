@@ -20,9 +20,9 @@ if __name__ == "__main__":
     order_nth = 12.
 
     # Prepare to iterate
-    q = 1
-    p = 2
-    r = 1
+    a = 0
+    b = 0
+    c = 0
 
     # Stage is set
     number_cycles = 3*np.pi/4*order_nth
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     time_nd = time_nd - time_nd[-1]/2
 
     scale_atom = (3*order_nth/8)*period_center
-    scale_beta = (1 + q * frequency_center**p)*frequency_center**(1-r)
+    scale_beta = (frequency_center**a)*(1 + b * frequency_center**c)
 
     scale_stx = scale_atom*scale_beta
 
