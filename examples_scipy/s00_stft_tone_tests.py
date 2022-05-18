@@ -1,5 +1,5 @@
 """
-libquantum example 2: s00_stft_tone_test.py
+libquantum example: s00_stft_tone_test.py
 Compute STFT TFRs on tones to verify amplitudes
 Introduce the concept of a Q-driven STFT
 
