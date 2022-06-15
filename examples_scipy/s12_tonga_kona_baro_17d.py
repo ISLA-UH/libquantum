@@ -83,11 +83,11 @@ if __name__ == "__main__":
         fig_title = "Kona RedVox Barometer Stack"
         # TODO: Fix plots, standardize units - go to libquantum plot templates
         fig1 = plot_tfr_bits(tfr_power=psd_stx, tfr_frequency=period_min, tfr_time=sig_time_days,
-                            bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-13 0Z",
-                            tfr_y_str="Period, min", title_str=fig_title, tfr_y_flip=True)
+                             bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-13 0Z",
+                             tfr_y_str="Period, min", title_str=fig_title, tfr_y_flip=True)
         fig2 = plot_tfr_bits(tfr_power=psd_stx, tfr_frequency=frequency_cycles_per_day, tfr_time=sig_time_days,
-                            bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-13 0Z",
-                            tfr_y_str="Cycles per day", title_str=fig_title)
+                             bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-13 0Z",
+                             tfr_y_str="Cycles per day", title_str=fig_title)
 
         fig3 = plot_tfr_bits(tfr_power=psd_stx2, tfr_frequency=frequency2, tfr_time=sig_time_days,
                              bits_min=-10, y_scale='log', tfr_x_str="Days from 2022-01-13 0Z",
