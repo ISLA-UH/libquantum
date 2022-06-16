@@ -1,5 +1,5 @@
 """
-libquantum example: s00_stft_tone_test.py
+libquantum example: s00_stft_tone_intro.py
 Compute STFT TFRs on tones to verify amplitudes
 Introduce the concept of a Q-driven STFT
 
@@ -7,12 +7,12 @@ Introduce the concept of a Q-driven STFT
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from libquantum import atoms, entropy, scales, synthetics, utils  # spectra,
-# import libquantum.plot_templates.plot_time_frequency_reps as pltq  # white background
+from libquantum import synthetics, utils, entropy
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 
 print(__doc__)
-
+EVENT_NAME = 'tone test'
+alpha = 1
 
 if __name__ == "__main__":
     """
@@ -32,82 +32,105 @@ if __name__ == "__main__":
         Sxx = np.abs(Sxx)
     """
 
-    print('Tone synthetic')
-    order_number_input = 12
-    EVENT_NAME = "Tone Test"
-    station_id_str = 'Dyad_Sig'
-    sig_is_pow2 = True
+    # In practice, our quest begins either with a signal duration or a frequency of interest
+    frequency_sample_rate_hz = 1000.
+    frequency_center_hz = 80.
+    # Lowest frequency of interest; averaging frequency sets record duration and spectral resolution
+    frequency_averaging_hz = 10.
+    order_nth = 12.
 
-    sig_frequency_hz = 10.
-    sig_sample_rate_hz = 1000.
-    sig_duration_nominal_s = 100.
-
-    ref_frequency_hz = 1.
-    ref_period_nominal_s = 1./ref_frequency_hz
-
-    ref_period_points_ceil_log2, ref_period_points_ceil_pow2, ref_period_ceil_pow2_s = \
-        utils.duration_ceil(sample_rate_hz=sig_sample_rate_hz, time_s=ref_period_nominal_s)
-
-    # TODO: Convert to function calls
+    # Stage is set
     # Gabor Multiplier
-    m_factor = 2*np.sqrt(2*np.log(2))
-    sig_cycles_M = m_factor*order_number_input
-    print("Exact M factor:", m_factor)
-    print("Approximate factor:", 3*np.pi/4)
+    m_factor = 2*np.sqrt(2*np.log(2))  # M/N
+    print("Exact M/N factor:", m_factor)
+    print("Approximation to 3pi/pi:", 3*np.pi/4)
+    # Use 3pi/4
+    number_cycles_per_order = 3*np.pi/4*order_nth
 
-    sig_duration_min_s = sig_cycles_M/sig_frequency_hz
+    # Dimensionless time frequency
+    frequency_center = frequency_center_hz/frequency_sample_rate_hz
+    period_center = 1./frequency_center
+    frequency_averaging = frequency_averaging_hz/frequency_sample_rate_hz
+    period_averaging = 1./frequency_averaging
 
-    # Verify request
-    if sig_duration_nominal_s < sig_duration_min_s:
-        sig_duration_nominal_s = 2*sig_duration_min_s
+    # Set the record duration by the averaging frequency; make a power of 2
+    time_duration_nd = 2**(int(np.log2(number_cycles_per_order*period_averaging)))
+    # Set the fft duration by the order, make a power of 2
+    time_fft_nd = 2**(int(np.log2(number_cycles_per_order*period_center)))
+    # Note: int rounds down
 
-    sig_duration_points_log2, sig_duration_points_pow2, sig_duration_pow2_s = \
-        utils.duration_ceil(sample_rate_hz=sig_sample_rate_hz, time_s=sig_duration_nominal_s)
+    time_nd = np.arange(time_duration_nd)
 
-    # Construct synthetic tone with 2^^n points and max unit rms amplitude
-    mic_sig_epoch_s = np.arange(sig_duration_points_pow2) / sig_sample_rate_hz
-    mic_sig = np.sqrt(2)*np.sin(2*np.pi*sig_frequency_hz*mic_sig_epoch_s)
+    # Construct synthetic tone with 2^n points and max unit rms amplitude
+    mic_sig = np.sqrt(2)*np.sin(2*np.pi*frequency_center*time_nd)
     # Add noise
-    mic_sig += synthetics.white_noise_fbits(sig=mic_sig, std_bit_loss=4.)
+    mic_sig += synthetics.white_noise_fbits(sig=mic_sig, std_bit_loss=12.)
     # Taper before AA
-    mic_sig *= utils.taper_tukey(mic_sig_epoch_s, fraction_cosine=0.1)
+    mic_sig *= utils.taper_tukey(mic_sig, fraction_cosine=0.1)
     # Antialias (AA)
     synthetics.antialias_halfNyquist(mic_sig)
 
-    # STFT spectral resolution, or linear S transform spectral resolution
-    # tfr_lin_frequency_step_hz = 1.
-    # tfr_time_step = 0.5
-
-    #
-    # Q atom lowest scale from duration
-    _, min_frequency_hz = scales.from_duration(band_order_Nth=order_number_input,
-                                               sig_duration_s=sig_duration_pow2_s)
-
-    ref_period_points_ceil_pow2 = 2**14
-    print('\nRequest Order N =', order_number_input)
-    print('Reference frequency, hz:', 1/ref_period_ceil_pow2_s)
-    print('Lowest frequency in hz that can support this order for this signal duration:', min_frequency_hz)
-    print('Nyquist frequency:', sig_sample_rate_hz/2)
+    nfft_center = time_fft_nd
+    print('\nRequest Order N =', order_nth)
+    print('Nyquist frequency:', frequency_sample_rate_hz/2)
+    print('Signal frequency, hz:', frequency_center_hz)
+    print('Averaging frequency, hz:', frequency_averaging_hz)
     print('Scale with signal duration and to Nyquist, default G2 base re F1')
-    print('NFFT:', ref_period_points_ceil_pow2)
+    print('log2(NDuration):', np.log2(time_duration_nd))
+    print('log2(NFFT):', np.log2(nfft_center))
 
+    plt.plot(time_nd/frequency_sample_rate_hz, mic_sig)
+    plt.title('Synthetic sinusoid')
+
+    mic_stft_frequency_hz, mic_stft_time_s, mic_stft_psd_spec = \
+        signal.spectrogram(x=mic_sig,
+                           fs=frequency_sample_rate_hz,
+                           window=('tukey', alpha),
+                           nperseg=nfft_center,
+                           noverlap=nfft_center // 2,
+                           nfft=nfft_center,
+                           detrend='constant',
+                           return_onesided=True,
+                           axis=-1,
+                           scaling='spectrum',
+                           mode='psd')
+
+    mic_stft_bits = utils.log2epsilon(np.abs(mic_stft_psd_spec))
     # Select plot frequencies
-    fmin = min_frequency_hz
-    fmax = sig_sample_rate_hz/2  # Nyquist
+    fmin = frequency_averaging
+    fmax = frequency_sample_rate_hz/2  # Nyquist
+    pltq.plot_wf_mesh_vert(redvox_id='tone test',
+                           wf_panel_a_sig=mic_sig,
+                           wf_panel_a_time=time_nd/frequency_sample_rate_hz,
+                           mesh_time=mic_stft_time_s,
+                           mesh_frequency=mic_stft_frequency_hz,
+                           mesh_panel_b_tfr=mic_stft_bits,
+                           mesh_panel_b_colormap_scaling="range",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="stft for " + EVENT_NAME,
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax)
+
+    plt.show()
+
+    exit()
+
 
     # Scipy TFR
     # compute raw spectrogram with scipy package
     # Iterate over the various options
     # scaling = 'density', 'spectrum'
     # mode = [‘psd’, ‘complex’, ‘magnitude’, ‘angle’, ‘phase’]
-    alpha = 1
+
 
     welch_frequency_hz, Pxx = signal.welch(x=mic_sig,
-                                           fs=sig_sample_rate_hz,
+                                           fs=frequency_sample_rate_hz,
                                            window=('tukey', alpha),
-                                           nperseg=ref_period_points_ceil_pow2,
-                                           noverlap=ref_period_points_ceil_pow2//2,
-                                           nfft=ref_period_points_ceil_pow2,
+                                           nperseg=nfft_center,
+                                           noverlap=nfft_center // 2,
+                                           nfft=nfft_center,
                                            detrend='constant',
                                            return_onesided=True,
                                            axis=-1,
@@ -115,11 +138,11 @@ if __name__ == "__main__":
                                            average='mean')
 
     _, Pxx_spec =             signal.welch(x=mic_sig,
-                                           fs=sig_sample_rate_hz,
+                                           fs=frequency_sample_rate_hz,
                                            window=('tukey', alpha),
-                                           nperseg=ref_period_points_ceil_pow2,
-                                           noverlap=ref_period_points_ceil_pow2//2,
-                                           nfft=ref_period_points_ceil_pow2,
+                                           nperseg=nfft_center,
+                                           noverlap=nfft_center // 2,
+                                           nfft=nfft_center,
                                            detrend='constant',
                                            return_onesided=True,
                                            axis=-1,
@@ -128,11 +151,11 @@ if __name__ == "__main__":
 
     mic_stft_frequency_hz, mic_stft_time_s, mic_stft_psd = \
         signal.spectrogram(x=mic_sig,
-                           fs=sig_sample_rate_hz,
+                           fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
-                           nperseg=ref_period_points_ceil_pow2,
-                           noverlap=ref_period_points_ceil_pow2//2,
-                           nfft=ref_period_points_ceil_pow2,
+                           nperseg=nfft_center,
+                           noverlap=nfft_center // 2,
+                           nfft=nfft_center,
                            detrend='constant',
                            return_onesided=True,
                            axis=-1,
@@ -141,11 +164,11 @@ if __name__ == "__main__":
 
     _, _, mic_stft_complex = \
         signal.spectrogram(x=mic_sig,
-                           fs=sig_sample_rate_hz,
+                           fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
-                           nperseg=ref_period_points_ceil_pow2,
-                           noverlap=ref_period_points_ceil_pow2//2,
-                           nfft=ref_period_points_ceil_pow2,
+                           nperseg=nfft_center,
+                           noverlap=nfft_center // 2,
+                           nfft=nfft_center,
                            detrend='constant',
                            return_onesided=True,
                            axis=-1,
@@ -154,11 +177,11 @@ if __name__ == "__main__":
 
     _, _, mic_stft_magnitude = \
         signal.spectrogram(x=mic_sig,
-                           fs=sig_sample_rate_hz,
+                           fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
-                           nperseg=ref_period_points_ceil_pow2,
-                           noverlap=ref_period_points_ceil_pow2//2,
-                           nfft=ref_period_points_ceil_pow2,
+                           nperseg=nfft_center,
+                           noverlap=nfft_center // 2,
+                           nfft=nfft_center,
                            detrend='constant',
                            return_onesided=True,
                            axis=-1,
@@ -167,11 +190,11 @@ if __name__ == "__main__":
 
     _, _, mic_stft_psd_spec = \
         signal.spectrogram(x=mic_sig,
-                           fs=sig_sample_rate_hz,
+                           fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
-                           nperseg=ref_period_points_ceil_pow2,
-                           noverlap=ref_period_points_ceil_pow2//2,
-                           nfft=ref_period_points_ceil_pow2,
+                           nperseg=nfft_center,
+                           noverlap=nfft_center // 2,
+                           nfft=nfft_center,
                            detrend='constant',
                            return_onesided=True,
                            axis=-1,
@@ -180,11 +203,11 @@ if __name__ == "__main__":
 
     _, _, mic_stft_complex_spec = \
         signal.spectrogram(x=mic_sig,
-                           fs=sig_sample_rate_hz,
+                           fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
-                           nperseg=ref_period_points_ceil_pow2,
-                           noverlap=ref_period_points_ceil_pow2//2,
-                           nfft=ref_period_points_ceil_pow2,
+                           nperseg=nfft_center,
+                           noverlap=nfft_center // 2,
+                           nfft=nfft_center,
                            detrend='constant',
                            return_onesided=True,
                            axis=-1,
@@ -193,11 +216,11 @@ if __name__ == "__main__":
 
     _, _, mic_stft_magnitude_spec = \
         signal.spectrogram(x=mic_sig,
-                           fs=sig_sample_rate_hz,
+                           fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
-                           nperseg=ref_period_points_ceil_pow2,
-                           noverlap=ref_period_points_ceil_pow2//2,
-                           nfft=ref_period_points_ceil_pow2,
+                           nperseg=nfft_center,
+                           noverlap=nfft_center // 2,
+                           nfft=nfft_center,
                            detrend='constant',
                            return_onesided=True,
                            axis=-1,
@@ -217,7 +240,7 @@ if __name__ == "__main__":
     # plt.plot(mic_stft_frequency_hz, utils.mean_columns(np.abs(mic_stft_complex)), label='density, complex')
     plt.plot(mic_stft_frequency_hz, np.sqrt(2)*np.average(np.abs(mic_stft_complex_spec), axis=1), label='spec, complex')
 
-    plt.xlim(sig_frequency_hz-10, sig_frequency_hz+10)
+    plt.xlim(frequency_sample_rate_hz-10, frequency_sample_rate_hz+10)
     plt.grid(True)
     plt.legend()
 

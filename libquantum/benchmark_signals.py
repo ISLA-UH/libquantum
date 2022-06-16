@@ -93,7 +93,7 @@ def plot_tfr_bits(tfr_power, tfr_frequency, tfr_time,
                    cmap='RdBu_r',
                    vmin=bits_min, vmax=bits_max, shading='nearest')
     if y_scale is None:
-        plt.yscale('lin')
+        plt.yscale('linear')
     else:
         plt.yscale('log')
 
