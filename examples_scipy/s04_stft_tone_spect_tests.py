@@ -15,7 +15,8 @@ EVENT_NAME = 'tone test'
 # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
 # If zero, the Tukey window is equivalent to a rectangular window.
 # If one, the Tukey window is equivalent to a Hann window.
-alpha = 1
+alpha = 0.20
+# Changing alpha changes the 'alternate' scalings, so the weights depend on the window
 
 if __name__ == "__main__":
     """
@@ -191,20 +192,29 @@ if __name__ == "__main__":
     plt.plot(welch_frequency_hz, np.sqrt(2*Pxx_spec), '-.', label='spec, Pxx psd')
     plt.plot(mic_stft_frequency_hz, np.sqrt(2*np.average(mic_stft_magnitude_spec, axis=1)), label='spec, mag')
     # The next are the positive FFT coefficients, and need a factor of 2 in amplitude
-    plt.plot(mic_stft_frequency_hz, 2*np.average(np.abs(mic_stft_complex_spec), axis=1), label='spec, complex')
+    plt.plot(mic_stft_frequency_hz, np.average(2*np.abs(mic_stft_complex_spec), axis=1), label='spec, complex')
     plt.title('Scaled PSD amplitude returns near-unity at peak: preferred forms')
     plt.xlim(frequency_center_fft_hz-10, frequency_center_fft_hz+10)
+    plt.xlabel('Frequency, hz')
+    plt.ylabel('Scaled FFT RMS')
     plt.grid(True)
     plt.legend()
 
     # The next ones have other scaling factors which can be explored
     plt.figure()
-    plt.plot(mic_stft_frequency_hz, np.sqrt(np.average(mic_stft_psd, axis=1)), label='density, psd')
-    plt.plot(welch_frequency_hz, np.sqrt(Pxx), '-.', label='density, Pxx psd')
-    plt.plot(mic_stft_frequency_hz, np.sqrt(np.average(mic_stft_magnitude, axis=1)), label='density, mag')
-    plt.plot(mic_stft_frequency_hz, utils.mean_columns(np.abs(mic_stft_complex)), label='density, complex')
-    plt.title('Alternate PSD scalings')
+    plt.plot(mic_stft_frequency_hz,
+             np.sqrt(frequency_resolution_fft_hz)*np.sqrt(2*np.average(mic_stft_psd, axis=1)), label='density, psd')
+    plt.plot(welch_frequency_hz,
+             np.sqrt(frequency_resolution_fft_hz)*np.sqrt(2*Pxx), '-.', label='density, Pxx psd')
+    plt.plot(mic_stft_frequency_hz,
+             np.sqrt(frequency_resolution_fft_hz*2*np.average(mic_stft_magnitude, axis=1)), label='density, mag')
+    # # The next are the positive FFT coefficients, and need a factor of 2 in amplitude
+    plt.plot(mic_stft_frequency_hz,
+             frequency_resolution_fft_hz*np.average(2*np.abs(mic_stft_complex), axis=1), label='density, complex')
+    plt.title('Alternate PSD scalings depend on Tukey alpha')
     plt.xlim(frequency_center_fft_hz-10, frequency_center_fft_hz+10)
+    plt.xlabel('Frequency, hz')
+    plt.ylabel('Scaled FFT RMS')
     plt.grid(True)
     plt.legend()
 
