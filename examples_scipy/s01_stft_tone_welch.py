@@ -1,6 +1,11 @@
 """
-libquantum example: s00_stft_tone_intro.py
-Compute Welch power spectral density (PSD) on simple tones to verify amplitudes
+libquantum example: s01_stft_tone_welch.py
+Compute Welch power spectral density (PSD) on simple tone to verify amplitudes
+Case study:
+Sinusoid input with unit amplitude
+Validate:
+Welch power averaged over the signal duration is 1/2
+RMS amplitude = 1/sqrt(2)
 
 """
 import numpy as np
@@ -8,7 +13,6 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 
 print(__doc__)
-EVENT_NAME = 'tone test'
 
 # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
 # If zero, the Tukey window is equivalent to a rectangular window.
@@ -80,7 +84,7 @@ if __name__ == "__main__":
                                                 scaling='spectrum',
                                                 average='mean')
 
-    # # The density option does not return the rms amplitude for a CW
+    # # The density option does not return the rms amplitude for a CW unless it is multiplied by the spectral resolution
     # frequency_welch_hz, Pxx_spec = signal.welch(x=mic_sig,
     #                                             fs=frequency_sample_rate_hz,
     #                                             window=('tukey', alpha),

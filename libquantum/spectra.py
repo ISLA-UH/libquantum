@@ -324,7 +324,7 @@ def fft_real_bits(sig: np.ndarray,
     # returns correct RMS power level sqrt(2) -> 1
     fft_sig_pos /= fft_points
     fft_frequency_pos = np.fft.rfftfreq(fft_points, d=sample_interval_s)
-    # TODO: Should this be sqrt(2)?
+    # TODO: Should this be sqrt(2) for consistency?
     fft_spectral_power_pos_bits = utils.log2epsilon(2.*np.abs(fft_sig_pos))
     fft_spectral_phase_radians = np.angle(fft_sig_pos)
     return fft_frequency_pos, fft_sig_pos, fft_spectral_power_pos_bits, fft_spectral_phase_radians

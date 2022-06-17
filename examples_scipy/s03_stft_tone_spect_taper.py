@@ -1,6 +1,13 @@
 """
-libquantum example: s00_stft_tone_intro.py
-Compute Welch power spectral density (PSD) on simple tones to verify amplitudes
+libquantum example: s03_stft_tone_spect_taper.py
+Compute and display spectrogram on simple tone with no taper window.
+However, there is an independent Tukey taper (w/ alpha) on each Welch and Spectrogram subwindow.
+Contract over the columns and compare to Welch power spectral density (PSD) to verify amplitudes.
+Case study:
+Sinusoid input with unit amplitude
+Validate:
+Welch power averaged over the signal duration is 1/2
+RMS amplitude = 1/sqrt(2)
 
 """
 import numpy as np

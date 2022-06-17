@@ -1,19 +1,22 @@
 """
 libquantum example: s00_stft_tone_intro.py
-Compute FFT on simple tones to verify amplitudes
+Introduction to Time-Frequency Representations (TFRs).
+Compute Fast Fourier Transform (FFT) on simple tones to verify amplitudes
+The foundation  of efficient TFR computation is the FFT.
+For N = number of points, computation scales as N log N instead of N**2
+Case study:
+Sinusoid input with unit amplitude
+Validate:
+FFT power averaged over the signal duration is 1/2
+RMS amplitude = 1/sqrt(2)
 
 """
 import numpy as np
 import matplotlib.pyplot as plt
-
+from libquantum.utils import is_power_of_two
 print(__doc__)
-EVENT_NAME = 'tone test'
 
 if __name__ == "__main__":
-    """
-    # The first step is understanding the foundation: The Fast Fourier Transform
-    """
-
     # In practice, our quest begins with a signal within a record of fixed duration.
     # Construct a tone of fixed frequency with a constant sample rate
     frequency_sample_rate_hz = 800.
@@ -68,10 +71,17 @@ if __name__ == "__main__":
     print('len(RFFT):', len(fft_sig_pos))
     print('RFFT[fc]:', fft_sig_pos[fft_index])
 
-    # By scaling by number of points, the RFFT returns unit amplitude for unit input
-    # when the frequencies are matched to the FFT frequencies
-    fft_sig_pos /= len(fft_sig_pos)
+    # By scaling by number of points, the RFFT returns the Fourier coefficient of the positive
+    # frequency averaged over the signal duration.
+    # The positive frequency contributes only half the amplitude.
+    # The negative frequency contributes the other half.
+    fft_sig_pos *= 1/len(mic_sig)
     fft_abs = np.abs(fft_sig_pos)
+    print('|RFFT(fc)|/N:', fft_abs[fft_index])
+    print('*** SUMMARY: For a constant frequency tone ***')
+    print('Positive frequency FFT amplitude is 1/2, negative frequency FFT amplitude is 1/2')
+    print('Power averaged over the signal duration is P**2 = 2 |RFFT|**2 = 1/2')
+    print('RMS amplitude is sqrt(P**2) = 1/sqrt(2)')
 
     # Show the waveform and its FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(8, 5))

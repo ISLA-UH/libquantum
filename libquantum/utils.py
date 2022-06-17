@@ -12,6 +12,13 @@ from scipy.integrate import cumulative_trapezoid
 from libquantum.scales import EPSILON
 from redvox.common import date_time_utils as dt
 
+""" Logical power of two flag """
+
+
+def is_power_of_two(n):
+    """ Returns not if not positive and a power of two """
+    return not (n > 0 and (n & (n - 1)))
+
 
 """ Time/Sample Duration Utils """
 

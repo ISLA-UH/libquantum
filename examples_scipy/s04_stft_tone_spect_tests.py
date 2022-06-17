@@ -1,29 +1,31 @@
 """
-libquantum example: s00_stft_tone_intro.py
-Compute Welch power spectral density (PSD) on simple tones to verify amplitudes
+libquantum example: s04_stft_tone_spect_tests.py
+Compute spectrogram with different scaling and mode options.
+scaling{ ‘density’, ‘spectrum’ }
+mode{‘psd’, ‘complex’, ‘magnitude’}
+Contract over the columns and compare to Welch power spectral density (PSD) to verify amplitudes.
+Tukey taper (w/ alpha) on each Welch and Spectrogram subwindow.
+Case study:
+Sinusoid input with unit amplitude
+Validate:
+Welch power averaged over the signal duration is 1/2
+RMS amplitude = 1/sqrt(2)
 
 """
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from libquantum import utils, synthetics
-import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 
 print(__doc__)
-EVENT_NAME = 'tone test'
 
 # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
 # If zero, the Tukey window is equivalent to a rectangular window.
 # If one, the Tukey window is equivalent to a Hann window.
-alpha = 0.20
+alpha = 0.1
 # Changing alpha changes the 'alternate' scalings, so the weights depend on the window
 
 if __name__ == "__main__":
-    """
-    Compute the spectrogram over sliding windows.
-    The Welch method is equivalent to averaging the spectrogram over the columns.
-    """
-
     # Construct a tone of fixed frequency with a constant sample rate
     frequency_sample_rate_hz = 800.
     frequency_center_hz = 60.
@@ -188,15 +190,19 @@ if __name__ == "__main__":
 
     plt.figure()
     # These appear to be the most predictable. The first two are power of the positive frequencies
-    plt.plot(mic_stft_frequency_hz, np.sqrt(2*np.average(mic_stft_psd_spec, axis=1)), label='spec, psd')
-    plt.plot(welch_frequency_hz, np.sqrt(2*Pxx_spec), '-.', label='spec, Pxx psd')
-    plt.plot(mic_stft_frequency_hz, np.sqrt(2*np.average(mic_stft_magnitude_spec, axis=1)), label='spec, mag')
-    # The next are the positive FFT coefficients, and need a factor of 2 in amplitude
-    plt.plot(mic_stft_frequency_hz, np.average(2*np.abs(mic_stft_complex_spec), axis=1), label='spec, complex')
+    plt.plot(mic_stft_frequency_hz,
+             np.sqrt(2*np.average(mic_stft_psd_spec, axis=1)), label='spec, psd')
+    plt.plot(welch_frequency_hz,
+             np.sqrt(2*Pxx_spec), '-.', label='spec, Pxx psd')
+    plt.plot(mic_stft_frequency_hz,
+             np.sqrt(2*np.average(mic_stft_magnitude_spec, axis=1)), '.-', label='spec, mag')
+    # # The next are the positive spectral coefficients with no padding or boundary extension
+    plt.plot(mic_stft_frequency_hz,
+             np.sqrt(2*np.average(np.abs(mic_stft_complex_spec), axis=1)), label='spec, complex')
     plt.title('Scaled PSD amplitude returns near-unity at peak: preferred forms')
     plt.xlim(frequency_center_fft_hz-10, frequency_center_fft_hz+10)
     plt.xlabel('Frequency, hz')
-    plt.ylabel('Scaled FFT RMS')
+    plt.ylabel('FFT RMS * sqrt(2)')
     plt.grid(True)
     plt.legend()
 
@@ -207,14 +213,15 @@ if __name__ == "__main__":
     plt.plot(welch_frequency_hz,
              np.sqrt(frequency_resolution_fft_hz)*np.sqrt(2*Pxx), '-.', label='density, Pxx psd')
     plt.plot(mic_stft_frequency_hz,
-             np.sqrt(frequency_resolution_fft_hz*2*np.average(mic_stft_magnitude, axis=1)), label='density, mag')
-    # # The next are the positive FFT coefficients, and need a factor of 2 in amplitude
+             np.sqrt(frequency_resolution_fft_hz*2*np.average(mic_stft_magnitude, axis=1)), '.-', label='density, mag')
+    # # The next are the positive spectral coefficients with no padding or boundary extension
     plt.plot(mic_stft_frequency_hz,
-             frequency_resolution_fft_hz*np.average(2*np.abs(mic_stft_complex), axis=1), label='density, complex')
+             np.sqrt(frequency_resolution_fft_hz*2*np.average(np.abs(mic_stft_complex), axis=1)),
+             label='density, complex')
     plt.title('Alternate PSD scalings depend on Tukey alpha')
     plt.xlim(frequency_center_fft_hz-10, frequency_center_fft_hz+10)
     plt.xlabel('Frequency, hz')
-    plt.ylabel('Scaled FFT RMS')
+    plt.ylabel('FFT RMS * sqrt(2 df)')
     plt.grid(True)
     plt.legend()
 
