@@ -107,6 +107,22 @@ if __name__ == "__main__":
 
     fft_rms_stft = np.sqrt(2)*np.sqrt(np.average(mic_stft_psd_spec, axis=1))
 
+    # Compute the spectrogram with the stft option
+    sig_stft_frequency_hz, sig_stft_time_s, sig_stft = \
+        signal.stft(x=mic_sig,
+                    fs=frequency_sample_rate_hz,
+                    window=('tukey', alpha),
+                    nperseg=time_fft_nd,
+                    noverlap=time_fft_nd // 2,
+                    nfft=time_fft_nd,
+                    detrend='constant',
+                    return_onesided=True,
+                    axis=-1,
+                    boundary='zeros',
+                    padded=True)
+
+    fft_rms_stft_2 = np.sqrt(2)*np.sqrt(np.average(2*np.abs(sig_stft)**2, axis=1))
+
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_nd/frequency_sample_rate_hz, mic_sig)
