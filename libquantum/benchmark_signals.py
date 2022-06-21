@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.signal as signal
 from libquantum.scales import EPSILON
-from scipy.integrate import cumulative_trapezoid
+from libquantum import synthetics, utils
 from typing import Optional, Tuple, Union
 import matplotlib.pyplot as plt
 
@@ -308,6 +308,79 @@ def synth_03(a: float = 30,
     synth_time = np.arange(len(synth_wf))*time_sample_interval
 
     return synth_wf, synth_time
+
+
+def well_tempered_tone(frequency_sample_rate_hz: float = 800.,
+                       frequency_center_hz: float = 60.,
+                       time_duration_s: float = 16,
+                       time_fft_s: float = 1.,
+                       use_fft_frequency: bool = True,
+                       add_noise_taper_aa: bool = False) -> Tuple[np.ndarray, np.ndarray, int, float, float, float]:
+    """
+    Return a tone of unit amplitude and fixed frequency
+    with a constant sample rate
+    :param frequency_sample_rate_hz:
+    :param frequency_center_hz:
+    :param time_duration_s:
+    :param time_fft_s: Split the record into segments. Previous example showed 1s duration was adequate
+    :param use_fft_frequency:
+    :param add_noise_taper_aa:
+    :return:
+    """
+
+    # The segments determine the spectral resolution
+    frequency_resolution_hz = 1/time_fft_s
+
+    # The FFT efficiency is based on powers of 2; it is always possible to pad with zeros.
+    # Set the record duration, make a power of 2. Note that int rounds down
+    time_duration_nd = 2**(int(np.log2(time_duration_s*frequency_sample_rate_hz)))
+    # Set the fft duration, make a power of 2
+    time_fft_nd = 2**(int(np.log2(time_fft_s*frequency_sample_rate_hz)))
+
+    # The fft frequencies are set by the duration of the fft
+    # In this example we only need the positive frequencies
+    frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1/frequency_sample_rate_hz)
+    fft_index = np.argmin(np.abs(frequency_fft_pos_hz-frequency_center_hz))
+    frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
+    frequency_resolution_fft_hz = frequency_sample_rate_hz/time_fft_nd
+
+    # Convert to dimensionless time and frequency, which is typically used in mathematical formulas.
+    # Scale by the sample rate.
+    # Dimensionless center frequency
+    frequency_center = frequency_center_hz/frequency_sample_rate_hz
+    frequency_center_fft = frequency_center_fft_hz/frequency_sample_rate_hz
+    # Dimensionless time (samples)
+    time_nd = np.arange(time_duration_nd)
+    time_s = time_nd/frequency_sample_rate_hz
+
+    if use_fft_frequency:
+        # Construct synthetic tone with 2^n points and max FFT amplitude at exact fft frequency
+        mic_sig = np.cos(2*np.pi*frequency_center_fft*time_nd)
+    else:
+        # # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
+        # # It does NOT return unit amplitude (but it's close)
+        mic_sig = np.cos(2*np.pi*frequency_center*time_nd)
+
+    if add_noise_taper_aa:
+        # Add noise
+        mic_sig += synthetics.white_noise_fbits(sig=mic_sig, std_bit_loss=8.)
+        # Taper before AA
+        mic_sig *= utils.taper_tukey(mic_sig, fraction_cosine=0.1)
+        # Antialias (AA)
+        synthetics.antialias_halfNyquist(mic_sig)
+
+    print('WELL TEMPERED TONE SYNTHETIC')
+    print('Nyquist frequency:', frequency_sample_rate_hz/2)
+    print('Nominal signal frequency, hz:', frequency_center_hz)
+    print('FFT signal frequency, hz:', frequency_center_fft_hz)
+    print('Nominal spectral resolution, hz', frequency_resolution_hz)
+    print('FFT spectral resolution, hz', frequency_resolution_fft_hz)
+    print('Number of signal points:', time_duration_nd)
+    print('log2(points):', np.log2(time_duration_nd))
+    print('Number of FFT points:', time_fft_nd)
+    print('log2(FFT points):', np.log2(time_fft_nd))
+
+    return mic_sig, time_s, time_fft_nd, frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz
 
 
 if __name__ == "__main__":
