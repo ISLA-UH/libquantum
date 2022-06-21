@@ -78,7 +78,6 @@ def calculate_rms_sig_test(sig_wf: np.array,
     if points_hop is None:
         points_hop: int = int(0.5 * points_per_seg)
 
-
     # https://numpy.org/devdocs/reference/generated/numpy.lib.stride_tricks.sliding_window_view.html
     sig_wf_windowed = \
         np.lib.stride_tricks.sliding_window_view(sig_wf, window_shape=points_per_seg)[0::points_hop, :].copy()

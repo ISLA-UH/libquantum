@@ -133,7 +133,7 @@ def tfr_stx_fft(sig_wf: np.ndarray,
                                                  frequency_sample_rate_input=frequency_sample_rate,
                                                  frequency_base_input=scale_base_input,
                                                  frequency_ref_input=scale_ref_input)
-            frequency_stx = frequency_center_algebraic
+            frequency_stx = frequency_center_geometric
         else:
             num_octaves = np.log2(f_stop/f_start)
             num_bands = int(num_octaves * scale_order_input)
