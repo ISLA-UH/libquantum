@@ -35,7 +35,7 @@ if __name__ == "__main__":
     """
 
     sig_wf = np.load(os.path.join(input_dir, file_name_stack))
-    sig_wf_bp = butter_bandpass(sig=sig_wf, sample_rate_hz=sample_rate_sps,
+    sig_wf_bp = butter_bandpass(sig_wf=sig_wf, sample_rate_hz=sample_rate_sps,
                                 frequency_cut_low_hz=1/cutoff_low_s,
                                 frequency_cut_high_hz=1/cutoff_high_s,
                                 tukey_alpha=0.1)
