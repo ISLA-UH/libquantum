@@ -1,5 +1,5 @@
 """
-libquantum example: s04_stft_tone_spect_tests.py
+libquantum example: s04_tone_stft_variations.py
 Compute spectrogram with different scaling and mode options.
 scaling{ ‘density’, ‘spectrum’ }
 mode{‘psd’, ‘complex’, ‘magnitude’}

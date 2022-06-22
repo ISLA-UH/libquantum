@@ -1,6 +1,8 @@
 """
-libquantum example: s01_stft_tone_welch.py
-Compute Welch power spectral density (PSD) on simple tone to verify amplitudes
+libquantum example: s02_tone_stft_spect.py
+Compute and display spectrogram on simple tone with no taper window.
+However, there is an independent Tukey taper (w/ alpha) on each Welch and Spectrogram subwindow.
+Contract over the columns and compare to Welch power spectral density (PSD) to verify amplitudes.
 Case study:
 Sinusoid input with unit amplitude
 Validate:
@@ -11,8 +13,11 @@ RMS amplitude = 1/sqrt(2)
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
+from libquantum import utils
+import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 
 print(__doc__)
+EVENT_NAME = 'tone test'
 
 # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
 # If zero, the Tukey window is equivalent to a rectangular window.
@@ -21,8 +26,8 @@ alpha = 1
 
 if __name__ == "__main__":
     """
-    Average the Fast Fourier Transform (FFT) over sliding windows
-    using the Welch method
+    Compute the spectrogram over sliding windows.
+    The Welch method is equivalent to averaging the spectrogram over the columns.
     """
 
     # Construct a tone of fixed frequency with a constant sample rate
@@ -58,7 +63,7 @@ if __name__ == "__main__":
     # Construct synthetic tone with 2^n points and max FFT amplitude at exact fft frequency
     mic_sig = np.cos(2*np.pi*frequency_center_fft*time_nd)
     # # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
-    # # It does NOT return unit amplitude
+    # # It does NOT return unit amplitude (but it's close)
     # mic_sig = np.sin(2*np.pi*frequency_center*time_nd)
 
     print('Nyquist frequency:', frequency_sample_rate_hz/2)
@@ -84,37 +89,70 @@ if __name__ == "__main__":
                                                 scaling='spectrum',
                                                 average='mean')
 
-    # # The density option does not return the rms amplitude for a CW unless it is multiplied by the spectral resolution
-    # frequency_welch_hz, Pxx_spec = signal.welch(x=mic_sig,
-    #                                             fs=frequency_sample_rate_hz,
-    #                                             window=('tukey', alpha),
-    #                                             nperseg=time_fft_nd,
-    #                                             noverlap=time_fft_nd // 2,
-    #                                             nfft=time_fft_nd,
-    #                                             detrend='constant',
-    #                                             return_onesided=True,
-    #                                             axis=-1,
-    #                                             scaling='density',
-    #                                             average='mean')
-
-    print('Welch returns only the positive frequencies')
-    print('len(Pxx):', len(frequency_welch_hz))
-
-    # The spectrum option returns the rms, which for a tone will be scaled by sqrt(2)
     fft_rms_abs = np.sqrt(2)*np.sqrt(np.abs(Pxx_spec))
-    print('fft_rms_abs[fc]:', fft_rms_abs[fft_index])
+
+    # Compute the spectrogram with the spectrum option
+    mic_stft_frequency_hz, mic_stft_time_s, mic_stft_psd_spec = \
+        signal.spectrogram(x=mic_sig,
+                           fs=frequency_sample_rate_hz,
+                           window=('tukey', alpha),
+                           nperseg=time_fft_nd,
+                           noverlap=time_fft_nd // 2,
+                           nfft=time_fft_nd,
+                           detrend='constant',
+                           return_onesided=True,
+                           axis=-1,
+                           scaling='spectrum',
+                           mode='psd')
+
+    fft_rms_stft = np.sqrt(2)*np.sqrt(np.average(mic_stft_psd_spec, axis=1))
+
+    # Compute the spectrogram with the stft option
+    sig_stft_frequency_hz, sig_stft_time_s, sig_stft = \
+        signal.stft(x=mic_sig,
+                    fs=frequency_sample_rate_hz,
+                    window=('tukey', alpha),
+                    nperseg=time_fft_nd,
+                    noverlap=time_fft_nd // 2,
+                    nfft=time_fft_nd,
+                    detrend='constant',
+                    return_onesided=True,
+                    axis=-1,
+                    boundary='zeros',
+                    padded=True)
+
+    fft_rms_stft_2 = np.sqrt(2)*np.sqrt(np.average(2*np.abs(sig_stft)**2, axis=1))
 
     # Show the waveform and the averaged FFT over the whole record:
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(8, 5))
+    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_nd/frequency_sample_rate_hz, mic_sig)
     ax1.set_title('Synthetic CW, no taper')
     ax1.set_xlabel('Time, s')
     ax1.set_ylabel('Norm')
     ax2.semilogx(frequency_fft_pos_hz, fft_rms_abs)
-    ax2.set_title('Welch FFT (RMS), f = ' + str(round(frequency_center_fft_hz*100)/100) + ' Hz')
+    ax2.semilogx(mic_stft_frequency_hz, fft_rms_stft)
+    ax2.set_title('Welch and Spect FFT (RMS), f = ' + str(round(frequency_center_fft_hz*100)/100) + ' Hz')
     ax2.set_xlabel('Frequency, hz')
     ax2.set_ylabel('FFT RMS * sqrt(2)')
     ax2.grid(True)
+
+    mic_stft_bits = utils.log2epsilon(np.sqrt(np.abs(mic_stft_psd_spec)))
+    # Select plot frequencies
+    fmin = 2*frequency_resolution_fft_hz
+    fmax = frequency_sample_rate_hz/2  # Nyquist
+    pltq.plot_wf_mesh_vert(redvox_id='00',
+                           wf_panel_a_sig=mic_sig,
+                           wf_panel_a_time=time_nd/frequency_sample_rate_hz,
+                           mesh_time=mic_stft_time_s,
+                           mesh_frequency=mic_stft_frequency_hz,
+                           mesh_panel_b_tfr=mic_stft_bits,
+                           mesh_panel_b_colormap_scaling="range",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="stft for " + EVENT_NAME,
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax)
 
     plt.show()
 

@@ -1,5 +1,5 @@
 """
-libquantum example: s02_stft_tone_spect.py
+libquantum example: s03_tone_stft_taper.py
 Compute and display spectrogram on simple tone with no taper window.
 However, there is an independent Tukey taper (w/ alpha) on each Welch and Spectrogram subwindow.
 Contract over the columns and compare to Welch power spectral density (PSD) to verify amplitudes.
@@ -13,7 +13,7 @@ RMS amplitude = 1/sqrt(2)
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from libquantum import utils
+from libquantum import utils, synthetics
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 
 print(__doc__)
@@ -65,6 +65,12 @@ if __name__ == "__main__":
     # # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
     # # It does NOT return unit amplitude (but it's close)
     # mic_sig = np.sin(2*np.pi*frequency_center*time_nd)
+    # Add noise
+    mic_sig += synthetics.white_noise_fbits(sig=mic_sig, std_bit_loss=12.)
+    # Taper before AA
+    mic_sig *= utils.taper_tukey(mic_sig, fraction_cosine=0.1)
+    # Antialias (AA)
+    synthetics.antialias_halfNyquist(mic_sig)
 
     print('Nyquist frequency:', frequency_sample_rate_hz/2)
     print('Nominal signal frequency, hz:', frequency_center_hz)
@@ -107,26 +113,10 @@ if __name__ == "__main__":
 
     fft_rms_stft = np.sqrt(2)*np.sqrt(np.average(mic_stft_psd_spec, axis=1))
 
-    # Compute the spectrogram with the stft option
-    sig_stft_frequency_hz, sig_stft_time_s, sig_stft = \
-        signal.stft(x=mic_sig,
-                    fs=frequency_sample_rate_hz,
-                    window=('tukey', alpha),
-                    nperseg=time_fft_nd,
-                    noverlap=time_fft_nd // 2,
-                    nfft=time_fft_nd,
-                    detrend='constant',
-                    return_onesided=True,
-                    axis=-1,
-                    boundary='zeros',
-                    padded=True)
-
-    fft_rms_stft_2 = np.sqrt(2)*np.sqrt(np.average(2*np.abs(sig_stft)**2, axis=1))
-
     # Show the waveform and the averaged FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_nd/frequency_sample_rate_hz, mic_sig)
-    ax1.set_title('Synthetic CW, no taper')
+    ax1.set_title('Synthetic CW, with taper')
     ax1.set_xlabel('Time, s')
     ax1.set_ylabel('Norm')
     ax2.semilogx(frequency_fft_pos_hz, fft_rms_abs)

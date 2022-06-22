@@ -1,5 +1,5 @@
 """
-libquantum example: s00_stft_tone_intro.py
+libquantum example: s00_tone_fft_intro.py
 Introduction to Time-Frequency Representations (TFRs).
 Compute Fast Fourier Transform (FFT) on simple tones to verify amplitudes
 The foundation  of efficient TFR computation is the FFT.
