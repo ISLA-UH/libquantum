@@ -1,7 +1,6 @@
 """
-libquantum example: s06_stft_tone_stft_atom_styx
-Compute stft spectrogram with libquantum
-TODO: Turn into functions with hard-coded defaults
+libquantum example: s07_grain_tfr
+
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,15 +10,18 @@ import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 from libquantum.styx import tfr_stx_fft
 
 print(__doc__)
-EVENT_NAME = 'tone test'
+EVENT_NAME = 'grain test'
 station_id_str = 'synth'
 # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
 # If zero, the Tukey window is equivalent to a rectangular window.
 # If one, the Tukey window is equivalent to a Hann window.
 alpha = 1
 
-frequency_tone_hz = 60
+frequency_center_hz = 60
+frequency_sample_rate_hz = 800
 order_number_input = 12
+time_nd = 2**11
+time_fft_nd = 2**7
 
 if __name__ == "__main__":
     """
@@ -27,13 +29,21 @@ if __name__ == "__main__":
     The Welch method is equivalent to averaging the spectrogram over the columns.
     """
 
-    # Construct a tone of unit amplitude and fixed frequency with a constant sample rate
-    [mic_sig, time_s, time_fft_nd,
-     frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz] = \
-        benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz, add_noise_taper_aa=True)
+    # Construct gabor grain of unit amplitude and fixed frequency with a constant sample rate
+    mic_sig_complex, time_s = synthetics.gabor_loose_grain(band_order_Nth:=order_number_input,
+                                                           number_points=time_nd,
+                                                           scale_frequency_center_hz=frequency_center_hz,
+                                                           frequency_sample_rate_hz=frequency_sample_rate_hz)
+    mic_sig = np.real(mic_sig_complex)
+
+    frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1/frequency_sample_rate_hz)
+    fft_index = np.argmin(np.abs(frequency_fft_pos_hz-frequency_center_hz))
+    frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
+    frequency_resolution_fft_hz = frequency_sample_rate_hz/time_fft_nd
 
     # Computed and nominal values
     mic_sig_rms = np.std(mic_sig)
+    # TODO: Get RMS
     mic_sig_rms_nominal = 1/np.sqrt(2)
 
     # Compute the Welch PSD; averaged spectrum over sliding windows
@@ -82,7 +92,7 @@ if __name__ == "__main__":
                     frequency_min=frequency_resolution_fft_hz,
                     frequency_max=frequency_sample_rate_hz/2,
                     scale_order_input=order_number_input,
-                    scale_ref_input=1/59.66796875,
+                    scale_ref_input=1/frequency_center_fft_hz,
                     is_geometric=True,
                     is_inferno=False)
 
@@ -120,7 +130,7 @@ if __name__ == "__main__":
 
     ax2.set_title('Welch and Spect FFT (RMS), f = ' + str(round(frequency_center_fft_hz*100)/100) + ' Hz')
     ax2.set_xlabel('Frequency, hz')
-    ax2.set_ylabel('FFT RMS * sqrt(2)')
+    ax2.set_ylabel('FFT RMS / std(sig)')
     ax2.grid(True)
     ax2.legend()
 
