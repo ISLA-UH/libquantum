@@ -19,12 +19,14 @@ print(__doc__)
 if __name__ == "__main__":
     # In practice, our quest begins with a signal within a record of fixed duration.
     # Construct a tone of fixed frequency with a constant sample rate
+    # <o - Later examples use a functional version of the synthetic: leave the steps here! - o>
+
     frequency_sample_rate_hz = 800.
     frequency_center_hz = 60.
-    time_duration_s = 1
-    # Use the whole record
+    time_duration_s = 1  # Nominal value
+    # Use the whole record to compute the fft
     time_fft_s = time_duration_s
-    # It determines the spectral resolution
+    # It determines the target spectral resolution
     frequency_resolution_hz = 1/time_fft_s
 
     # The FFT efficiency is based on powers of 2; it is always possible to pad with zeros.
@@ -33,8 +35,9 @@ if __name__ == "__main__":
     # Set the fft duration, make a power of 2
     time_fft_nd = 2**(int(np.log2(time_fft_s*frequency_sample_rate_hz)))
 
-    # The fft frequencies are set by the duration of the fft
-    # In this example we only need the positive frequencies
+    # The new duration (power of two) defines the new spectral resolution.
+    # The fft frequencies are set by the duration of the fft.
+    # In this example we only need the positive frequencies.
     frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1/frequency_sample_rate_hz)
     fft_index = np.argmin(np.abs(frequency_fft_pos_hz-frequency_center_hz))
     frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
@@ -42,17 +45,17 @@ if __name__ == "__main__":
 
     # Convert to dimensionless time and frequency, which is typically used in mathematical formulas.
     # Scale by the sample rate.
-    # Dimensionless center frequency
+    # Dimensionless center frequency:
     frequency_center = frequency_center_hz/frequency_sample_rate_hz
     frequency_center_fft = frequency_center_fft_hz/frequency_sample_rate_hz
-    # Dimensionless time (samples)
+    # Dimensionless time (samples):
     time_nd = np.arange(time_duration_nd)
 
-    # Construct synthetic tone with 2^n points and max FFT amplitude at exact fft frequency
+    # Construct synthetic tone with 2^n points and max FFT amplitude at EXACT fft frequency
     mic_sig = np.cos(2*np.pi*frequency_center_fft*time_nd)
     # # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
     # # It does NOT return unit amplitude
-    # mic_sig = np.sin(2*np.pi*frequency_center*time_nd)
+    # mic_sig = np.cos(2*np.pi*frequency_center*time_nd)
 
     print('Nyquist frequency:', frequency_sample_rate_hz/2)
     print('Nominal signal frequency, hz:', frequency_center_hz)
@@ -78,7 +81,7 @@ if __name__ == "__main__":
     fft_sig_pos *= 1/len(mic_sig)
     fft_abs = np.abs(fft_sig_pos)
     print('|RFFT(fc)|/N:', fft_abs[fft_index])
-    print('*** SUMMARY: For a constant frequency tone ***')
+    print('*** SUMMARY: For a constant frequency tone FFT ***')
     print('Positive frequency FFT amplitude is 1/2, negative frequency FFT amplitude is 1/2')
     print('Power averaged over the signal duration is P**2 = 2 |RFFT|**2 = 1/2')
     print('RMS amplitude is sqrt(P**2) = 1/sqrt(2)')

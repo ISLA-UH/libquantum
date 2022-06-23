@@ -1,5 +1,5 @@
 """
-libquantum example: s04_tone_stft_variations.py
+libquantum example: s04_tone_spect_variations.py
 Compute spectrogram with different scaling and mode options.
 scaling{ ‘density’, ‘spectrum’ }
 mode{‘psd’, ‘complex’, ‘magnitude’}
@@ -15,73 +15,33 @@ RMS amplitude = 1/sqrt(2)
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from libquantum import utils, synthetics
+from libquantum import benchmark_signals
 
 print(__doc__)
 
 # alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
 # If zero, the Tukey window is equivalent to a rectangular window.
 # If one, the Tukey window is equivalent to a Hann window.
-alpha = 0.1
+alpha = 0.25
 # Changing alpha changes the 'alternate' scalings, so the weights depend on the window
 
 if __name__ == "__main__":
-    # Construct a tone of fixed frequency with a constant sample rate
-    frequency_sample_rate_hz = 800.
-    frequency_center_hz = 60.
-    time_duration_s = 16
-    # Split the record into segments. Previous example showed 1s duration was adequate
-    time_fft_s = time_duration_s/16  # 1 second nominal
-    # The segments determine the spectral resolution
-    frequency_resolution_hz = 1/time_fft_s
+    # Construct a tone of fixed frequency with a constant sample rate as in previous
+    # The nominal signal duration is 16s, with averaging (fft) window duration of 1s.
+    frequency_tone_hz = 60
+    [mic_sig, time_s, time_fft_nd,
+     frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz] = \
+        benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz,
+                                             add_noise_taper_aa=True)
 
-    # The FFT efficiency is based on powers of 2; it is always possible to pad with zeros.
-    # Set the record duration, make a power of 2. Note that int rounds down
-    time_duration_nd = 2**(int(np.log2(time_duration_s*frequency_sample_rate_hz)))
-    # Set the fft duration, make a power of 2
-    time_fft_nd = 2**(int(np.log2(time_fft_s*frequency_sample_rate_hz)))
-
-    # The fft frequencies are set by the duration of the fft
-    # In this example we only need the positive frequencies
-    frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1/frequency_sample_rate_hz)
-    fft_index = np.argmin(np.abs(frequency_fft_pos_hz-frequency_center_hz))
-    frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
-    frequency_resolution_fft_hz = frequency_sample_rate_hz/time_fft_nd
-
-    # Convert to dimensionless time and frequency, which is typically used in mathematical formulas.
-    # Scale by the sample rate.
-    # Dimensionless center frequency
-    frequency_center = frequency_center_hz/frequency_sample_rate_hz
-    frequency_center_fft = frequency_center_fft_hz/frequency_sample_rate_hz
-    # Dimensionless time (samples)
-    time_nd = np.arange(time_duration_nd)
-
-    # Construct synthetic tone with 2^n points and max FFT amplitude at exact fft frequency
-    mic_sig = np.cos(2*np.pi*frequency_center_fft*time_nd)
-    # # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
-    # # It does NOT return unit amplitude (but it's close)
-    # mic_sig = np.sin(2*np.pi*frequency_center*time_nd)
-    # Add noise
-    mic_sig += synthetics.white_noise_fbits(sig=mic_sig, std_bit_loss=12.)
-    # Taper before AA
-    mic_sig *= utils.taper_tukey(mic_sig, fraction_cosine=0.1)
-    # Antialias (AA)
-    synthetics.antialias_halfNyquist(mic_sig)
-
-    print('Nyquist frequency:', frequency_sample_rate_hz/2)
-    print('Nominal signal frequency, hz:', frequency_center_hz)
-    print('FFT signal frequency, hz:', frequency_center_fft_hz)
-    print('Nominal spectral resolution, hz', frequency_resolution_hz)
-    print('FFT spectral resolution, hz', frequency_resolution_fft_hz)
-    print('Number of signal points:', time_duration_nd)
-    print('log2(points):', np.log2(time_duration_nd))
-    print('Number of FFT points:', time_fft_nd)
-    print('log2(FFT points):', np.log2(time_fft_nd))
+    # Computed and nominal values
+    mic_sig_rms = np.std(mic_sig)
+    mic_sig_rms_nominal = 1/np.sqrt(2)
 
     nfft_center = time_fft_nd
 
     plt.figure()
-    plt.plot(time_nd/frequency_sample_rate_hz, mic_sig)
+    plt.plot(time_s, mic_sig)
     plt.title('Synthetic sinusoid with unit amplitude')
 
     # Welch
@@ -110,7 +70,7 @@ if __name__ == "__main__":
                                average='mean')
 
     # Spectrogram
-    mic_stft_frequency_hz, mic_stft_time_s, mic_stft_psd = \
+    mic_spect_frequency_hz, mic_spect_time_s, mic_spect_psd = \
         signal.spectrogram(x=mic_sig,
                            fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
@@ -123,7 +83,7 @@ if __name__ == "__main__":
                            scaling='density',
                            mode='psd')
 
-    _, _, mic_stft_complex = \
+    _, _, mic_spect_complex = \
         signal.spectrogram(x=mic_sig,
                            fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
@@ -136,7 +96,7 @@ if __name__ == "__main__":
                            scaling='density',
                            mode='complex')
 
-    _, _, mic_stft_magnitude = \
+    _, _, mic_spect_magnitude = \
         signal.spectrogram(x=mic_sig,
                            fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
@@ -149,7 +109,7 @@ if __name__ == "__main__":
                            scaling='density',
                            mode='magnitude')
 
-    _, _, mic_stft_psd_spec = \
+    _, _, mic_spect_psd_spec = \
         signal.spectrogram(x=mic_sig,
                            fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
@@ -162,7 +122,7 @@ if __name__ == "__main__":
                            scaling='spectrum',
                            mode='psd')
 
-    _, _, mic_stft_complex_spec = \
+    _, _, mic_spect_complex_spec = \
         signal.spectrogram(x=mic_sig,
                            fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
@@ -175,7 +135,7 @@ if __name__ == "__main__":
                            scaling='spectrum',
                            mode='complex')
 
-    _, _, mic_stft_magnitude_spec = \
+    _, _, mic_spect_magnitude_spec = \
         signal.spectrogram(x=mic_sig,
                            fs=frequency_sample_rate_hz,
                            window=('tukey', alpha),
@@ -189,39 +149,40 @@ if __name__ == "__main__":
                            mode='magnitude')
 
     plt.figure()
-    # These appear to be the most predictable. The first two are power of the positive frequencies
-    plt.plot(mic_stft_frequency_hz,
-             np.sqrt(2*np.average(mic_stft_psd_spec, axis=1)), label='spec, psd')
+    # Scales with the signal variance
+    plt.plot(mic_spect_frequency_hz,
+             np.sqrt(np.average(mic_spect_psd_spec, axis=1))/mic_sig_rms, label='spec, psd')
     plt.plot(welch_frequency_hz,
-             np.sqrt(2*Pxx_spec), '-.', label='spec, Pxx psd')
-    plt.plot(mic_stft_frequency_hz,
-             np.sqrt(2*np.average(mic_stft_magnitude_spec, axis=1)), '.-', label='spec, mag')
+             np.sqrt(Pxx_spec)/mic_sig_rms, '-.', label='spec, Welch')
+    plt.plot(mic_spect_frequency_hz,
+             np.sqrt(np.average(2*mic_spect_magnitude_spec**2, axis=1))/mic_sig_rms, '.-', label='spec, mag')
     # # The next are the positive spectral coefficients with no padding or boundary extension
-    plt.plot(mic_stft_frequency_hz,
-             np.sqrt(2*np.average(np.abs(mic_stft_complex_spec), axis=1)), label='spec, complex')
+    plt.plot(mic_spect_frequency_hz,
+             np.sqrt(np.average(2*np.abs(mic_spect_complex_spec)**2, axis=1))/mic_sig_rms, '--', label='spec, complex')
     plt.title('Scaled PSD amplitude returns near-unity at peak: preferred forms')
     plt.xlim(frequency_center_fft_hz-10, frequency_center_fft_hz+10)
     plt.xlabel('Frequency, hz')
-    plt.ylabel('FFT RMS * sqrt(2)')
+    plt.ylabel('FFT RMS/SIG RMS')
     plt.grid(True)
     plt.legend()
 
-    # The next ones have other scaling factors which can be explored
+    # Power spectral density is scaled by spectral resolution in Hz.
     plt.figure()
-    plt.plot(mic_stft_frequency_hz,
-             np.sqrt(frequency_resolution_fft_hz)*np.sqrt(2*np.average(mic_stft_psd, axis=1)), label='density, psd')
+    plt.plot(mic_spect_frequency_hz,
+             np.sqrt(frequency_resolution_fft_hz*np.average(mic_spect_psd, axis=1))/mic_sig_rms, label='density, psd')
     plt.plot(welch_frequency_hz,
-             np.sqrt(frequency_resolution_fft_hz)*np.sqrt(2*Pxx), '-.', label='density, Pxx psd')
-    plt.plot(mic_stft_frequency_hz,
-             np.sqrt(frequency_resolution_fft_hz*2*np.average(mic_stft_magnitude, axis=1)), '.-', label='density, mag')
+             np.sqrt(frequency_resolution_fft_hz*Pxx)/mic_sig_rms, '-.', label='density, Welch')
+    plt.plot(mic_spect_frequency_hz,
+             np.sqrt(frequency_resolution_fft_hz*np.average(2*mic_spect_magnitude**2, axis=1))/mic_sig_rms,
+             '.-', label='density, mag')
     # # The next are the positive spectral coefficients with no padding or boundary extension
-    plt.plot(mic_stft_frequency_hz,
-             np.sqrt(frequency_resolution_fft_hz*2*np.average(np.abs(mic_stft_complex), axis=1)),
-             label='density, complex')
-    plt.title('Alternate PSD scalings depend on Tukey alpha')
+    plt.plot(mic_spect_frequency_hz,
+             np.sqrt(frequency_resolution_fft_hz*np.average(2*np.abs(mic_spect_complex)**2, axis=1))/mic_sig_rms,
+             '--', label='density, complex')
+    plt.title('Alternate PSD scalings may depend on Tukey alpha')
     plt.xlim(frequency_center_fft_hz-10, frequency_center_fft_hz+10)
     plt.xlabel('Frequency, hz')
-    plt.ylabel('FFT RMS * sqrt(2 df)')
+    plt.ylabel('sqrt(df) * FFT RMS/SIG RMS')
     plt.grid(True)
     plt.legend()
 
