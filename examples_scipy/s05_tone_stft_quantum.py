@@ -19,8 +19,10 @@ alpha = 1
 
 if __name__ == "__main__":
     """
-    Compute the spectrogram over sliding windows.
-    The Welch method is equivalent to averaging the spectrogram over the columns.
+    Compute the spectrogram over sliding windows using Order as a tuning parameter.
+    
+    Invoke libquantum functions.
+    
     """
 
     frequency_tone_hz = 60

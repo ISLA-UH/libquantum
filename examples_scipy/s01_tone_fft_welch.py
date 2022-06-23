@@ -1,5 +1,5 @@
 """
-libquantum example: s01_tone_welch_stft.py
+libquantum example: s01_tone_fft_welch.py
 Compute Welch power spectral density (PSD) on simple tone to verify amplitudes
 Case study:
 Sinusoid input with unit amplitude
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     fft_rms_welch = np.sqrt(power_welch_spectrum) / mic_sig_rms
     fft_rms_welch_psd = np.sqrt(frequency_resolution_fft_hz*power_welch_density) / mic_sig_rms
 
-    print('*** SUMMARY: Welch spectral power estimates for a constant-frequency tone  ***')
+    print('\n*** SUMMARY: Welch spectral power estimates for a constant-frequency tone  ***')
     print('The Welch spectral estimate averages the FFT over overlapping windows.')
     print('For the Welch spectrum scaling, the RMS amplitude of a tone is sqrt(P**2) = 1/sqrt(2) = STD(signal)')
     print('The Welch density scaling is divided by the spectral resolution')

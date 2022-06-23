@@ -81,7 +81,8 @@ if __name__ == "__main__":
     fft_sig_pos *= 1/len(mic_sig)
     fft_abs = np.abs(fft_sig_pos)
     print('|RFFT(fc)|/N:', fft_abs[fft_index])
-    print('*** SUMMARY: For a constant frequency tone FFT ***')
+
+    print('\n*** SUMMARY: FFT of a constant frequency tone with unit peak amplitude ***')
     print('Positive frequency FFT amplitude is 1/2, negative frequency FFT amplitude is 1/2')
     print('Power averaged over the signal duration is P**2 = 2 |RFFT|**2 = 1/2')
     print('RMS amplitude is sqrt(P**2) = 1/sqrt(2)')
@@ -89,7 +90,7 @@ if __name__ == "__main__":
     # Show the waveform and its FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(8, 5))
     ax1.plot(time_nd/frequency_sample_rate_hz, mic_sig)
-    ax1.set_title('Synthetic CW, no taper')
+    ax1.set_title('Synthetic tone, no taper')
     ax1.set_xlabel('Time, s')
     ax1.set_ylabel('Norm')
     ax2.semilogx(frequency_fft_pos_hz, fft_abs)

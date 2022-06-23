@@ -128,7 +128,7 @@ if __name__ == "__main__":
                                                 time_axis=-1,
                                                 freq_axis=-2)
 
-    print('*** SUMMARY: STFT Time-Frequency Representation (TFR) estimates for a constant-frequency tone  ***')
+    print('\n*** SUMMARY: STFT Time-Frequency Representation (TFR) estimates for a constant-frequency tone  ***')
     print('The signal.stft and signal.spectrogram with scaling=spectrum and mode=psd are comparable.')
     print('The spectrogram returns power, whereas the stft returns invertible, complex Fourier coefficients.')
     print('The Welch spectrum is reproduced by averaging the stft over the time dimension.')

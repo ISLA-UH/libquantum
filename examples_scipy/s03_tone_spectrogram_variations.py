@@ -148,6 +148,12 @@ if __name__ == "__main__":
                            scaling='spectrum',
                            mode='magnitude')
 
+    print('\n*** SUMMARY: Spectrogram and Welch comparisons for a constant-frequency tone  ***')
+    print('Scipy STFT, when properly conditioned, is invertible and the preferred form.')
+    print('Scipy signal.welch and signal.spectrogram provide compatible estimates.')
+    print('Mode psd returns Welch power, whereas mode magnitude complex returns STFT coefficients.')
+    print('The Welch power is reproduced by averaging the spectrogram over the time dimension.')
+
     plt.figure()
     # Scales with the signal variance
     plt.plot(mic_spect_frequency_hz,
