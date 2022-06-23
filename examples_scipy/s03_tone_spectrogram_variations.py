@@ -179,7 +179,7 @@ if __name__ == "__main__":
     plt.plot(mic_spect_frequency_hz,
              np.sqrt(frequency_resolution_fft_hz*np.average(2*np.abs(mic_spect_complex)**2, axis=1))/mic_sig_rms,
              '--', label='density, complex')
-    plt.title('Alternate PSD scalings may depend on Tukey alpha')
+    plt.title('Spectral Density Scalings')
     plt.xlim(frequency_center_fft_hz-10, frequency_center_fft_hz+10)
     plt.xlabel('Frequency, hz')
     plt.ylabel('sqrt(df) * FFT RMS/SIG RMS')
