@@ -1,5 +1,6 @@
 """
 This module contains functions to construct quantized, standardized information packets using binary metrics.
+Rewrite for Stockwell transform, 20220623
 """
 
 import numpy as np
@@ -390,7 +391,7 @@ def cwt_chirp_complex(band_order_Nth: float,
     if frequency_high_hz > frequency_sample_rate_hz/2.:
         frequency_high_hz = frequency_sample_rate_hz/2.
 
-    order_Nth, cycles_M, quality_Q, _,\
+    order_Nth, cycles_M, quality_Q, _, \
     frequency_cwt_hz_flipped, frequency_start_flipped, frequency_end_flipped = \
         chirp_frequency_bands(scale_order_input=band_order_Nth,
                               frequency_low_input=frequency_low_hz,

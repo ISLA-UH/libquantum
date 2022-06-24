@@ -14,7 +14,7 @@ def gabor_loose_grain(band_order_Nth: float,
                       scale_frequency_center_hz: float,
                       frequency_sample_rate_hz: float,
                       index_shift: float = 0,
-                      frequency_base_input: float = scales.Slice.G2) -> np.ndarray:
+                      frequency_base_input: float = scales.Slice.G2) -> Tuple[np.ndarray, np.ndarray, float]:
     """
     Loose grain with tight Tukey wrap to ensure zero at edges
 
@@ -22,7 +22,7 @@ def gabor_loose_grain(band_order_Nth: float,
     :param number_points: Number of points in the signal
     :param scale_frequency_center_hz: center frequency fc in Hz
     :param frequency_sample_rate_hz: sample rate of frequency in Hz
-    :param index_shift: index of shift
+    :param index_shift: index of shift for the Gabor chirp, default of zero
     :param frequency_base_input: G2 or G3. Default is G2
     :return: numpy array with Tukey grain
     """
@@ -45,7 +45,7 @@ def gabor_loose_grain(band_order_Nth: float,
     loose_grain_taper = utils.taper_tukey(wavelet_gabor, 0.1)
     loose_grain = np.copy(wavelet_gabor) * loose_grain_taper
 
-    return loose_grain, time_s
+    return loose_grain, time_s, scale_atom
 
 
 def gabor_tight_grain(band_order_Nth: float,

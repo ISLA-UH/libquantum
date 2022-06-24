@@ -19,7 +19,7 @@ station_id_str = 'synth'
 alpha = 1
 
 frequency_tone_hz = 60
-order_number_input = 12
+order_number_input = 3
 
 if __name__ == "__main__":
     """
@@ -70,10 +70,10 @@ if __name__ == "__main__":
         atoms.cwt_chirp_from_sig(sig_wf=mic_sig,
                                  frequency_sample_rate_hz=frequency_sample_rate_hz,
                                  band_order_Nth=order_number_input,
-                                 dictionary_type="tone",
+                                 dictionary_type="spect",
                                  frequency_ref=frequency_center_fft_hz)
 
-    cwt_power = np.abs(cwt_complex) ** 2
+    cwt_power = 2 * np.abs(cwt_complex) ** 2
 
     # Compute Stockwell transform
     [stx_complex, _, frequency_stx_hz, frequency_stx_fft_hz, W] = \
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
     stx_power = 2 * np.abs(stx_complex) ** 2
 
-    print("STX Frequency:", frequency_stx_fft_hz)
+    # print("STX Frequency:", frequency_stx_fft_hz)
     # TODO: Reconcile STX frequency with STFT
     # Compute the 'equivalent' fft rms amplitude
     fft_rms_welch = np.sqrt(np.abs(psd_welch_power)) / mic_sig_rms
@@ -124,8 +124,8 @@ if __name__ == "__main__":
     ax2.grid(True)
     ax2.legend()
 
-    # plt.show()
-    # exit()
+    plt.show()
+    exit()
     # Select plot frequencies
     fmin = 2*frequency_resolution_fft_hz
     fmax = frequency_sample_rate_hz/2  # Nyquist

@@ -95,7 +95,7 @@ if __name__ == "__main__":
         atoms.cwt_chirp_from_sig(sig_wf=mic_sig,
                                  frequency_sample_rate_hz=frequency_sample_rate_hz,
                                  band_order_Nth=order_number_input,
-                                 dictionary_type="tone",
+                                 dictionary_type="spect",
                                  frequency_ref=frequency_center_fft_hz)
 
     cwt_power = np.abs(cwt_complex) ** 2
