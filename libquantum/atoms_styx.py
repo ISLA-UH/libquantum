@@ -1,6 +1,6 @@
 """
 This module contains functions to construct quantized, standardized information packets using binary metrics.
-Rewrite for Stockwell transform, 20220623
+No-chirp/sweep (index_shift=0, variable removed), simplified for the base stockwell transform.
 """
 
 import numpy as np
@@ -15,17 +15,80 @@ using binary metrics. Based on Garces (2020).
 Cleaned up and compartmentalized for debugging
 """
 
-
-def chirp_complex(band_order_Nth: float,
-                  time_s: np.ndarray,
-                  offset_time_s: float,
-                  scale_frequency_center_hz: float,
-                  frequency_sample_rate_hz: float,
-                  index_shift: float = 0,
-                  scale_base: float = scales.Slice.G2) -> Tuple[np.ndarray, np.ndarray, float, float]:
+def cycles_from_order(band_order_Nth: float) -> float:
     """
-    Quantum chirp for specified band_order_Nth and arbitrary time duration
-    Unscaled, to be used by both Dictionary 1 and Dictionary 2
+    Compute the number of cycles M for a specified band order N
+    N is the quantization parameter for the constant Q wavelet filters
+
+    :param band_order_Nth: Band order, must be > 0.75 or reverts to N=3
+    :return: cycles_M, number of cycled per normalized angular frequency
+    """
+    if band_order_Nth < 0.7:
+        print('N<0.7 specified, using N = ', 3)
+        band_order_Nth = 3.
+    cycles_M = 3.*np.pi/4.*band_order_Nth  # Practical implementation, estimated from 1/2 power points
+    return cycles_M
+
+
+def scale_from_frequency_hz(band_order_Nth: float,
+                            scale_frequency_center_hz: Union[np.ndarray, float],
+                            frequency_sample_rate_hz: float) -> \
+        Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
+    """
+    Nondimensional scale and angular frequency for canonical Gabor/Morlet wavelet
+
+    :param cycles_M: number of cycles per band period
+    :param scale_frequency_center_hz: scale frequency in hz
+    :param frequency_sample_rate_hz: sample rate in hz
+    :return: scale_atom, scaled angular frequency
+    """
+    cycles_M = cycles_from_order(band_order_Nth)
+    scale_angular_frequency = 2. * np.pi * scale_frequency_center_hz/frequency_sample_rate_hz
+    scale_atom = cycles_M/scale_angular_frequency
+    return scale_atom, scale_angular_frequency
+
+
+def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
+        Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
+    """
+    Return chirp amplitude
+    amp_dict_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
+    amp_dict_unit_spectrum = return unit peak spectrum; for practical implementation.
+    amp_dict_unity = 1. Default (no scaling), for testing and validation against real and imaginary wavelets.
+
+    :param scale_atom: atom/logon scale
+    :return: amp_canonical, amp_unit_spectrum
+    """
+
+    amp_canonical = (np.pi * scale_atom ** 2) ** (-1/4)
+    amp_unit_spectrum = (4*np.pi*scale_atom**2) ** (-1/4) * amp_canonical
+    return amp_canonical, amp_unit_spectrum
+
+
+def wavelet_time(time_s: np.ndarray,
+                 offset_time_s: float,
+                 frequency_sample_rate_hz: float) -> np.ndarray:
+    """
+    Scaled time-shifted time
+
+    :param time_s: array with time
+    :param offset_time_s: offset time in seconds
+    :param frequency_sample_rate_hz: sample rate in Hz
+    :return: numpy array with time-shifted time
+    """
+    xtime_shifted = frequency_sample_rate_hz*(time_s-offset_time_s)
+    return xtime_shifted
+
+
+def wavelet_complex(band_order_Nth: float,
+                    time_s: np.ndarray,
+                    offset_time_s: float,
+                    scale_frequency_center_hz: Union[np.ndarray, float],
+                    frequency_sample_rate_hz: float) -> Tuple[np.ndarray, np.ndarray, float, float]:
+    """
+    Quantized atom for specified band_order_Nth and arbitrary time duration.
+    Unscaled, to be modified by the dictionary type and use case.
+    Returns a frequency x time dimension wavelet vector
 
     :param band_order_Nth: Nth order of constant Q bands
     :param time_s: time in seconds, duration should be greater than or equal to M/fc
@@ -37,20 +100,24 @@ def chirp_complex(band_order_Nth: float,
     :return: waveform_complex, time_shifted_s
     """
 
-    xtime_shifted = chirp_time(time_s, offset_time_s, frequency_sample_rate_hz)
+    # Center and nondimensionalize time
+    xtime_shifted = wavelet_time(time_s, offset_time_s, frequency_sample_rate_hz)
+
+    # Nondimensionalized chirp parameters
+    scale_atom, scale_angular_frequency = scale_from_frequency_hz(band_order_Nth, scale_frequency_center_hz, frequency_sample_rate_hz)
+
+    # Convert scale, frequency and time vectors to [frequency x time] matrices
+    xtime_2d =
+    scale_2d =
+    omega_2d =
+
+    wavelet_gauss = np.exp(-0.5*(xtime_shifted/scale_atom)**2)
+    wavelet_gabor = wavelet_gauss * np.exp(1j * scale_angular_frequency*xtime_shifted)
+
+    amp_canonical, amp_unit_spectrum = wavelet_amplitude(scale_atom)
+
     time_shifted_s = xtime_shifted/frequency_sample_rate_hz
-
-    # Fundamental chirp parameters
-    cycles_M, quality_factor_Q, gamma = \
-        chirp_MQG_from_N(band_order_Nth, index_shift, scale_base)
-    scale_atom = chirp_scale(cycles_M, scale_frequency_center_hz, frequency_sample_rate_hz)
-    p_complex = chirp_p_complex(scale_atom, gamma, index_shift)
-    amp_dict_0, amp_dict_1 = chirp_amplitude(scale_atom, gamma, index_shift)
-
-    wavelet_gauss = np.exp(-p_complex * xtime_shifted**2)
-    wavelet_gabor = wavelet_gauss * np.exp(1j * cycles_M*xtime_shifted/scale_atom)
-
-    return wavelet_gabor, time_shifted_s, amp_dict_0, amp_dict_1
+    return wavelet_gabor, time_shifted_s, amp_canonical, amp_unit_spectrum
 
 
 def chirp_spectrum(frequency_hz: np.ndarray,
@@ -127,68 +194,6 @@ def chirp_spectrum_centered(band_order_Nth: float,
     spectrum_gabor = spectrum_amplitude * spectrum_gauss
 
     return spectrum_gabor, frequency_shifted_hz
-
-
-def chirp_MQG_from_N(band_order_Nth: float,
-                     index_shift: float = 0,
-                     scale_base: float = scales.Slice.G2) -> Tuple[float, float, float]:
-    """
-    Compute the quality factor Q and multiplier M for a specified band order N
-    N is THE quantization parameter for the binary constant Q wavelet filters
-
-    :param band_order_Nth: Band order, must be > 0.75 or reverts to N=3
-    :param index_shift: index fo shift. Default is 0.
-    :param scale_base: positive reference Base G > 1. Default is G2
-    :return: cycles M, quality factor Q, gamma
-    """
-    if band_order_Nth < 0.7:
-        print('N<0.7 specified, using N = ', 3)
-        band_order_Nth = 3.
-    order_bandedge = scale_base ** (1. / 2. / band_order_Nth)  # kN in Garces 2013
-    order_scaled_bandwidth = order_bandedge - 1. / order_bandedge
-    quality_factor_Q = 1./order_scaled_bandwidth  # Exact for Nth octave bands
-    # Gamma is M/(2Q)
-    gamma = np.sqrt(np.log(2))*(1-np.log(2)*(index_shift/np.pi)**2)**(-0.5)
-    cycles_M = 2*quality_factor_Q*gamma  # Exact, from 1/2 power points
-
-    return cycles_M, quality_factor_Q, gamma
-
-
-def chirp_scale(cycles_M: float,
-                scale_frequency_center_hz: Union[np.ndarray, float],
-                frequency_sample_rate_hz: float) -> float:
-    """
-    Nondimensional scale for canonical Morlet wavelet
-
-    :param cycles_M: number of cycles per band period
-    :param scale_frequency_center_hz: scale frequency in hz
-    :param frequency_sample_rate_hz: sample rate in hz
-    :return: scale atom
-    """
-    scale_atom = cycles_M*frequency_sample_rate_hz/scale_frequency_center_hz/(2. * np.pi)
-    return scale_atom
-
-
-def chirp_scale_from_order(band_order_Nth: float,
-                           scale_frequency_center_hz: float,
-                           frequency_sample_rate_hz: float,
-                           index_shift: float = 0,
-                           scale_base: float = scales.Slice.G2) -> float:
-    """
-    Nondimensional scale for canonical Morlet wavelet
-
-    :param cycles_M: number of cycles per band period
-    :param scale_frequency_center_hz: scale frequency in hz
-    :param frequency_sample_rate_hz: sample rate in hz
-    :param index_shift: index fo shift. Default is 0.0
-    :param scale_base: positive reference Base G > 1. Default is G2
-    :return: scale atom
-    """
-    cycles_M, _, _ = chirp_MQG_from_N(band_order_Nth,
-                                      index_shift,
-                                      scale_base)
-    scale_atom = cycles_M*frequency_sample_rate_hz/scale_frequency_center_hz/(2. * np.pi)
-    return scale_atom
 
 
 def chirp_uncertainty(scale_atom: float,
