@@ -38,11 +38,11 @@ if __name__ == "__main__":
     frequency_center_fft_hz = frequency_fft_pos_hz[fft_index-1:fft_index+2]
 
     mic_sig_complex, time_s, scale, omega, amp = \
-        atoms_styx.chirp_centered_4cwt(band_order_Nth=order_number_input,
-                                       duration_points=time_nd,
-                                       scale_frequency_center_hz=frequency_center_fft_hz,
-                                       frequency_sample_rate_hz=frequency_sample_rate_hz,
-                                       dictionary_type="norm")
+        atoms_styx.wavelet_centered_4cwt(band_order_Nth=order_number_input,
+                                         duration_points=time_nd,
+                                         scale_frequency_center_hz=frequency_center_fft_hz,
+                                         frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                         dictionary_type="unit")
 
     mic_sig_real = np.real(mic_sig_complex)
     mic_sig_imag = np.imag(mic_sig_complex)
