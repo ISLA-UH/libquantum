@@ -139,7 +139,7 @@ if __name__ == "__main__":
     print('The signal.stft and signal.spectrogram with scaling=spectrum and mode=psd are comparable.')
     print('The spectrogram returns power, whereas the stft returns invertible, complex Fourier coefficients.')
     print('The Welch spectrum is reproduced by averaging the stft over the time dimension.')
-    print('** NOTE: EXACT RECONSTRUCTION NOT EXPECTED WITH TAPER AND OTHER DEVIATIONS FROM IDEAL. '
+    print('** NOTE: EXACT RECONSTRUCTION NOT EXPECTED WITH TAPER AND OTHER DEVIATIONS FROM IDEAL. PLAY WITH alpha.'
           'ACCEPT AND QUANTIFY COMPROMISE **')
 
     # Show the waveform and the averaged FFT over the whole record:

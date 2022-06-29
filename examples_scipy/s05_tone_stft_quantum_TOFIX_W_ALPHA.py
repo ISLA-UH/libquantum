@@ -16,6 +16,7 @@ EVENT_NAME = 'tone test'
 # If zero, the Tukey window is equivalent to a rectangular window.
 # If one, the Tukey window is equivalent to a Hann window.
 alpha = 1
+frequency_tone_hz = 60
 
 if __name__ == "__main__":
     """
@@ -25,8 +26,8 @@ if __name__ == "__main__":
     
     """
 
-    frequency_tone_hz = 60
-    # Construct a tone of unit amplitude and fixed frequency with a constant sample rate
+    # Construct a tone of fixed frequency with a constant sample rate as in previous
+    # The nominal signal duration is 16s, with nominal averaging (fft) window duration of 1s.
     [mic_sig, time_s, time_fft_nd,
      frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz] = \
         benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz, add_noise_taper_aa=True)
