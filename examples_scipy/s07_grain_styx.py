@@ -32,7 +32,7 @@ if __name__ == "__main__":
     frequency_resolution_fft_hz = frequency_sample_rate_hz/time_fft_nd
     frequency_fft_pos_hz = np.fft.rfftfreq(time_fft_nd, d=1/frequency_sample_rate_hz)
     fft_index = np.argmin(np.abs(frequency_fft_pos_hz-frequency_center_hz))
-    # frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
+    # frequency_center_stft_hz = frequency_stft_pos_hz[stft_fft_index]
     #
     # Construct wavelets around the center
     frequency_center_fft_hz = frequency_fft_pos_hz[fft_index-1:fft_index+2]

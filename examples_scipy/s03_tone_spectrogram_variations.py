@@ -19,11 +19,6 @@ from libquantum import benchmark_signals
 
 print(__doc__)
 
-# alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
-# If zero, the Tukey window is equivalent to a rectangular window.
-# If one, the Tukey window is equivalent to a Hann window.
-alpha = 0.25
-# Changing alpha changes the 'alternate' scalings, so the weights depend on the window
 
 if __name__ == "__main__":
     # Construct a tone of fixed frequency with a constant sample rate as in previous
@@ -33,6 +28,12 @@ if __name__ == "__main__":
      frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz] = \
         benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz,
                                              add_noise_taper_aa=True)
+
+    # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window inside the cosine tapered region.
+    # If zero, the Tukey window is equivalent to a rectangular window.
+    # If one, the Tukey window is equivalent to a Hann window.
+    alpha = 0.25  # 25% Tukey (Cosine) window
+    # Changing alpha can change the 'alternate' scalings, where the weights depend on the window
 
     # Computed and nominal values
     mic_sig_rms = np.std(mic_sig)

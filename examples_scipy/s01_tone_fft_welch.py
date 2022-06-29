@@ -12,13 +12,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 from libquantum import benchmark_signals
-
 print(__doc__)
 
-# alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
-# If zero, the Tukey window is equivalent to a rectangular window.
-# If one, the Tukey window is equivalent to a Hann window.
-alpha = 0
 
 if __name__ == "__main__":
     """
@@ -39,6 +34,11 @@ if __name__ == "__main__":
                                              time_fft_s=1,
                                              use_fft_frequency=True,
                                              add_noise_taper_aa=False)
+
+    # alpha: Shape parameter of the Welch Tukey window, representing the fraction of the window inside the cosine tapered region.
+    # If zero, the Tukey window is equivalent to a rectangular window.
+    # If one, the Tukey window is equivalent to a Hann window.
+    alpha = 0
 
     # Computed and nominal values
     mic_sig_rms = np.std(mic_sig)

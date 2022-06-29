@@ -33,7 +33,6 @@ from typing import Union, Tuple
 #     gauss_envelope = gauss_amp*signal.get_window(('gaussian', gauss_stdev), points_number)
 #     return gauss_envelope
 
-
 def stft_from_sig(sig_wf: np.ndarray,
                   frequency_sample_rate_hz: float,
                   frequency_averaging_hz: float = 1.,

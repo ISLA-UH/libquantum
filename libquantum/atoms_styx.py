@@ -235,7 +235,7 @@ def cwt_complex_inferno(band_order_Nth: float,
                         cwt_type: str = "fft",
                         frequency_ref: float = scales.Slice.F1,
                         scale_base: float = scales.Slice.G2,
-                        dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+                        dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate CWT for chirp
 
@@ -253,7 +253,7 @@ def cwt_complex_inferno(band_order_Nth: float,
     """
 
     wavelet_points = len(sig_wf)
-    time_s = np.arange(wavelet_points)/frequency_sample_rate_hz
+    time_cwt_s = np.arange(wavelet_points)/frequency_sample_rate_hz
 
     if frequency_high_hz is None:
         frequency_high_hz = frequency_sample_rate_hz/2.
@@ -303,9 +303,8 @@ def cwt_complex_inferno(band_order_Nth: float,
     # Time scales are increasing, which is the opposite of what is expected for the frequency. Flip.
     frequency_cwt_hz = np.flip(frequency_cwt_hz_flipped)
     cwt = np.flipud(cwt_flipped)
-    cwt_bits = utils.log2epsilon(cwt)
 
-    return cwt, cwt_bits, time_s, frequency_cwt_hz
+    return frequency_cwt_hz, time_cwt_s, cwt
 
 
 def cwt_complex_any_scale(band_order_Nth: float,
@@ -314,7 +313,7 @@ def cwt_complex_any_scale(band_order_Nth: float,
                           frequency_cwt_hz: np.ndarray,
                           cwt_type: str = "fft",
 
-                          dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+                          dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate CWT for chirp
 
@@ -331,7 +330,7 @@ def cwt_complex_any_scale(band_order_Nth: float,
     """
 
     wavelet_points = len(sig_wf)
-    time_s = np.arange(wavelet_points)/frequency_sample_rate_hz
+    time_cwt_s = np.arange(wavelet_points)/frequency_sample_rate_hz
     scale_points = len(frequency_cwt_hz)
     cycles_M = cycles_from_order(band_order_Nth=band_order_Nth)
 
@@ -365,10 +364,33 @@ def cwt_complex_any_scale(band_order_Nth: float,
         cw_complex_fliplr = np.fliplr(cw_complex)
         cwt = signal.fftconvolve(sig_wf_2d, np.conj(cw_complex_fliplr), mode='same', axes=-1)
 
-    cwt_bits = utils.log2epsilon(cwt)
+    return frequency_cwt_hz, time_cwt_s, cwt
 
-    return cwt, cwt_bits, time_s, frequency_cwt_hz
 
+def power_and_information_shannon_cwt(cwt_complex):
+    """
+    Computes power and information metrics
+    :param cwt_complex:
+    :return:
+    """
+    power = 2 * np.abs(np.copy(cwt_complex)) ** 2
+    power_per_band = np.sum(power, axis=-1)
+    power_per_sample = np.sum(power, axis=0)
+    power_total = np.sum(power) + scales.EPSILON
+    power_scaled = power/power_total
+    information_bits = power_scaled*np.log2(power_scaled + scales.EPSILON)
+    information_bits_per_band = np.sum(information_bits, axis=-1)
+    information_bits_per_sample = np.sum(information_bits, axis=0)
+    information_bits_total = np.sum(information_bits) + scales.EPSILON
+    information_scaled = information_bits/information_bits_total
+    return power, power_per_band, power_per_sample, power_total, power_scaled, \
+           information_bits, information_bits_per_band, information_bits_per_sample, \
+           information_bits_total, information_scaled
+
+
+
+
+# TODO: WRITE METHODS FOR POWER AND INFORMATION/BITS
 # def chirp_spectrum(frequency_hz: np.ndarray,
 #                    offset_time_s: float,
 #                    band_order_Nth: float,

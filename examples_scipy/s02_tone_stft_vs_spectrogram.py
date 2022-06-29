@@ -15,14 +15,7 @@ import matplotlib.pyplot as plt
 import scipy.signal as signal
 from libquantum import utils, benchmark_signals
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
-
 print(__doc__)
-EVENT_NAME = 'tone test'
-
-# alpha: Shape parameter of the Tukey window, representing the fraction of the window inside the cosine tapered region.
-# If zero, the Tukey window is equivalent to a rectangular window.
-# If one, the Tukey window is equivalent to a Hann window.
-alpha = 0.25
 
 if __name__ == "__main__":
     """
@@ -31,6 +24,7 @@ if __name__ == "__main__":
     The Welch method is equivalent to averaging the spectrogram over the columns.
     """
 
+    EVENT_NAME = 'tone test'
     # Construct a tone of fixed frequency with a constant sample rate
     # In this example, added noise, taper, and anti-aliasing filter.
     # In the first example (FFT), the nominal signal duration was 1s.
@@ -46,16 +40,22 @@ if __name__ == "__main__":
                                              add_noise_taper_aa=True)
 
 
+
     # # Compare to synthetic tone with 2^n points and max FFT amplitude NOT at exact fft frequency
     # # It does not return unit amplitude (but it's close)
     # [mic_sig, time_s, time_fft_nd,
-    #  frequency_sample_rate_hz, frequency_center_fft_hz, frequency_resolution_fft_hz] = \
+    #  frequency_sample_rate_hz, frequency_center_stft_hz, frequency_resolution_stft_hz] = \
     #     benchmark_signals.well_tempered_tone(frequency_center_hz=frequency_tone_hz,
     #                                          frequency_sample_rate_hz=800,
     #                                          time_duration_s=16,
     #                                          time_fft_s=1,
     #                                          use_fft_frequency=False,
     #                                          add_noise_taper_aa=True)
+
+    # alpha: Shape parameter of the Welch and STFT Tukey window, representing the fraction of the window inside the cosine tapered region.
+    # If zero, the Tukey window is equivalent to a rectangular window.
+    # If one, the Tukey window is equivalent to a Hann window.
+    alpha = 0.25  # 25% Tukey (Cosine) window
 
     # Computed and nominal values
     mic_sig_rms = np.std(mic_sig)
