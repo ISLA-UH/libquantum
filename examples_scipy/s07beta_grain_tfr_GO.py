@@ -17,7 +17,7 @@ station_id_str = 'synth'
 # If one, the Tukey window is equivalent to a Hann window.
 alpha = 1
 
-frequency_center_hz = 60
+frequency_center_hz = 20
 frequency_sample_rate_hz = 800
 order_number_input = 12
 time_nd = 2**11
@@ -34,27 +34,40 @@ if __name__ == "__main__":
     frequency_center_fft_hz = frequency_fft_pos_hz[fft_index]
     frequency_resolution_fft_hz = frequency_sample_rate_hz/time_fft_nd
 
-    # Construct gabor grain of unit amplitude and fixed frequency with a constant sample rate
-    mic_sig_complex, time_s, scale = synthetics.gabor_loose_grain(band_order_Nth=order_number_input,
-                                                                  number_points=time_nd,
-                                                                  scale_frequency_center_hz=frequency_center_fft_hz,
-                                                                  frequency_sample_rate_hz=frequency_sample_rate_hz)
-    mic_sig = np.real(mic_sig_complex)
-    # scale /= frequency_sample_rate_hz
+    frequency_cwt_fft_hz = frequency_fft_pos_hz[1:]
 
+    mic_sig_complex, time_s, scale, omega, amp = \
+        atoms_styx.wavelet_centered_4cwt(band_order_Nth=order_number_input,
+                                         duration_points=time_nd,
+                                         scale_frequency_center_hz=frequency_center_fft_hz,
+                                         frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                         dictionary_type="unit")
+    mic_sig_real = np.real(mic_sig_complex)
+    mic_sig_imag = np.imag(mic_sig_complex)
 
-    # Computed and nominal values
+    # Computed Variance; divides by the number of points
+    mic_sig_real_var = np.var(mic_sig_real)
+    mic_sig_imag_var = np.var(mic_sig_imag)
+
+    # Computed Variance * Number of Samples ~ integral. The dictionary type = "norm" returns 1/2.
+    mic_sig_real_integral = np.var(mic_sig_real)*len(mic_sig_real)
+    mic_sig_imag_integral = np.var(mic_sig_imag)*len(mic_sig_real)
+
+    # Theoretical variance
+    mic_sig_real_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
+                               (1 + np.exp(-(scale*omega)**2))
+    mic_sig_imag_var_nominal = amp**2/len(time_s) * 0.5*np.sqrt(np.pi)*scale * \
+                               (1 - np.exp(-(scale*omega)**2))
+
+    print('mic_sig_real_variance:', mic_sig_real_var)
+    print('real_variance_nominal:', mic_sig_real_var_nominal)
+    print('mic_sig_imag_variance:', mic_sig_imag_var)
+    print('imag_variance_nominal:', mic_sig_imag_var_nominal)
+
+    mic_sig = np.copy(mic_sig_real)
     mic_sig_rms = np.std(mic_sig)
-    # grain scaling - this should be correct
-    # mic_sig_var = 0.5*np.sqrt(np.pi)*scale * 1/frequency_sample_rate_hz *\
-    #               (1 + np.exp(-(scale*2*np.pi*frequency_center_hz/frequency_sample_rate_hz)**2))
-    mic_sig_var = np.sqrt(np.pi)*scale/frequency_sample_rate_hz
-    mic_sig_rms_nominal = np.sqrt(mic_sig_var)/2
 
-    print('mic_sig_rms:', mic_sig_rms)
-    print('mic_sig_rms_nominal:', mic_sig_rms_nominal)
-
-
+    time_s -= time_s[0]
     # Compute the Welch PSD; averaged spectrum over sliding windows
     frequency_welch_hz, psd_welch_power = signal.welch(x=mic_sig,
                                                        fs=frequency_sample_rate_hz,
@@ -86,14 +99,15 @@ if __name__ == "__main__":
 
     # Compute complex wavelet transform (cwt) from signal duration using the Gabor atoms
     cwt_complex, _, time_cwt_s, frequency_cwt_hz = \
-        atoms.cwt_chirp_from_sig(sig_wf=mic_sig,
-                                 frequency_sample_rate_hz=frequency_sample_rate_hz,
-                                 band_order_Nth=order_number_input,
-                                 dictionary_type="spect",
-                                 frequency_ref=frequency_center_fft_hz)
+        atoms_styx.cwt_complex_any_scale(sig_wf=mic_sig,
+                                         frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                         frequency_cwt_hz=frequency_cwt_fft_hz,
+                                         band_order_Nth=order_number_input,
+                                         dictionary_type="spect")
 
     cwt_power = 2 * np.abs(cwt_complex) ** 2
-
+    # TODO: Resolve scaling constant
+    cwt_power *= np.sqrt(2)
     # Compute Stockwell transform
     [stx_complex, _, frequency_stx_hz, frequency_stx_fft_hz, W] = \
         tfr_stx_fft(sig_wf=mic_sig,
@@ -106,7 +120,10 @@ if __name__ == "__main__":
                     is_inferno=False)
 
     stx_power = 2 * np.abs(stx_complex) ** 2
+    # TODO: Resolve scaling constant
+    stx_power *= np.sqrt(2)
 
+    # TODO: Convert to variance!!
     # print("STX Frequency:", frequency_stx_fft_hz)
     # TODO: Reconcile STX frequency with STFT
     # Compute the 'equivalent' fft rms amplitude
@@ -136,7 +153,6 @@ if __name__ == "__main__":
     ax2.semilogx(frequency_stft_hz, fft_rms_stft, '.-', label="STFT")
     ax2.semilogx(frequency_cwt_hz, fft_rms_cwt, '-.', label='CWT')
     ax2.semilogx(frequency_stx_hz, fft_rms_stx, '--', label='STX')
-
     ax2.set_title('Welch and Spect FFT (RMS), f = ' + str(round(frequency_center_fft_hz*100)/100) + ' Hz')
     ax2.set_xlabel('Frequency, hz')
     ax2.set_ylabel('FFT RMS / std(sig)')
@@ -145,6 +161,7 @@ if __name__ == "__main__":
 
     plt.show()
     exit()
+
     # Select plot frequencies
     fmin = 2*frequency_resolution_fft_hz
     fmax = frequency_sample_rate_hz/2  # Nyquist

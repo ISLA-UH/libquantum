@@ -66,6 +66,25 @@ def wavelet_amplitude(scale_atom: Union[np.ndarray, float]) -> \
     return amp_canonical, amp_unit_spectrum
 
 
+def amplitude_convert_norm_to_spect(scale_atom: Union[np.ndarray, float]) -> \
+        Tuple[Union[np.ndarray, float], Union[np.ndarray, float]]:
+    """
+    Return chirp amplitude
+    amp_dict_canonical = return unit integrated power and spectral energy. Good for math, ref William et al. 1991.
+    amp_dict_unit_spectrum = return unit peak spectrum; for practical implementation.
+    amp_dict_unity = 1. Default (no scaling), for testing and validation against real and imaginary wavelets.
+
+    :param scale_atom: atom/logon scale
+    :return: amp_canonical, amp_unit_spectrum
+    """
+
+    amp_canonical = (np.pi * scale_atom ** 2) ** (-1/4)
+    amp_unit_spectrum = (4*np.pi*scale_atom**2) ** (-1/4) * amp_canonical
+    amp_norm2spect = amp_unit_spectrum/amp_canonical
+
+    return amp_norm2spect
+
+
 def wavelet_time(time_s: np.ndarray,
                  offset_time_s: float,
                  frequency_sample_rate_hz: float) -> np.ndarray:
@@ -132,7 +151,7 @@ def wavelet_complex(band_order_Nth: float,
 
 def wavelet_centered_4cwt(band_order_Nth: float,
                           duration_points: int,
-                          scale_frequency_center_hz: float,
+                          scale_frequency_center_hz: Union[np.ndarray, float],
                           frequency_sample_rate_hz: float,
                           dictionary_type: str = "norm") -> \
         Tuple[np.ndarray, np.ndarray, Union[np.ndarray, float], Union[np.ndarray, float], Union[np.ndarray, float]]:
@@ -159,7 +178,10 @@ def wavelet_centered_4cwt(band_order_Nth: float,
     elif dictionary_type == "spect":
         amp = amp_unit_spectrum
     elif dictionary_type == "unit":
-        amp = np.ones(wavelet_gabor.shape)
+        if np.isscalar(scale):
+            amp = 1.
+        else:
+            amp = np.ones(scale.shape)
     else:
         amp = amp_canonical
 
@@ -169,13 +191,12 @@ def wavelet_centered_4cwt(band_order_Nth: float,
     return wavelet_chirp, time_centered_s, scale, omega, amp
 
 
-# TODO: Remove index, gamma
-def chirp_frequency_bands(scale_order_input: float,
+def scale_frequency_bands(scale_order_input: float,
                           frequency_low_input: float,
                           frequency_sample_rate_input: float,
                           frequency_high_input: float,
                           frequency_ref: float = scales.Slice.F1,
-                          scale_base: float = scales.Slice.G2) -> Tuple[float, float, float, float,
+                          scale_base: float = scales.Slice.G2) -> Tuple[float, float,
                                                                         np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate frequency bands for chirp
@@ -187,10 +208,11 @@ def chirp_frequency_bands(scale_order_input: float,
     :param index_shift: index of shift
     :param frequency_ref: reference frequency
     :param scale_base: positive reference Base G > 1. Default is G2
-    :return: Nth order, cycles M, quality factor Q, gamma, geometric center of frequencies, start frequency,
+    :return: Nth order, cycles M, geometric center of frequencies, start frequency,
         end frequency
     """
 
+    # Order Nth may be overwitten is a silly request is made
     order_Nth, scale_base, scale_band_number, \
     frequency_ref, frequency_center_algebraic, frequency_center_geometric, \
     frequency_start, frequency_end = \
@@ -200,22 +222,20 @@ def chirp_frequency_bands(scale_order_input: float,
                                          frequency_low_input=frequency_low_input,
                                          frequency_high_input=frequency_high_input,
                                          frequency_sample_rate_input=frequency_sample_rate_input)
-    cycles_M, quality_Q, gamma = chirp_MQG_from_N(order_Nth, index_shift, scale_base)
+    cycles_M = cycles_from_order(scale_order_input)
 
-    return order_Nth, cycles_M, quality_Q, gamma, frequency_center_geometric, frequency_start, frequency_end
+    return order_Nth, cycles_M, frequency_center_geometric, frequency_start, frequency_end
 
 
-
-# TODO: use new vectorized version!
-def cwt_complex(band_order_Nth: float,
-                sig_wf: np.ndarray,
-                frequency_low_hz: float,
-                frequency_sample_rate_hz: float,
-                frequency_high_hz: float = scales.Slice.F0,
-                cwt_type: str = "fft",
-                frequency_ref: float = scales.Slice.F1,
-                scale_base: float = scales.Slice.G2,
-                dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def cwt_complex_inferno(band_order_Nth: float,
+                        sig_wf: np.ndarray,
+                        frequency_sample_rate_hz: float,
+                        frequency_low_hz: float,
+                        frequency_high_hz: float = None,
+                        cwt_type: str = "fft",
+                        frequency_ref: float = scales.Slice.F1,
+                        scale_base: float = scales.Slice.G2,
+                        dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate CWT for chirp
 
@@ -224,8 +244,7 @@ def cwt_complex(band_order_Nth: float,
     :param frequency_low_hz: lowest frequency in Hz
     :param frequency_sample_rate_hz: sample rate in Hz
     :param frequency_high_hz: highest frequency in Hz
-    :param cwt_type: one of "conv", "fft", or "morlet2". Default is "fft"
-           Address ghost folding in "fft", compared to "conv"
+    :param cwt_type: one of "fft", or "morlet2". Default is "fft"
     :param index_shift: index of shift. Default is 0.0
     :param frequency_ref: reference frequency in Hz. Default is F1
     :param scale_base: G2 or G3. Default is G2
@@ -236,59 +255,50 @@ def cwt_complex(band_order_Nth: float,
     wavelet_points = len(sig_wf)
     time_s = np.arange(wavelet_points)/frequency_sample_rate_hz
 
-    if cwt_type == "morlet2":
-        index_shift = 0
-
-    # Planck frequency is absolute upper limit
-    if frequency_high_hz > frequency_sample_rate_hz/2.:
+    if frequency_high_hz is None:
         frequency_high_hz = frequency_sample_rate_hz/2.
 
-    order_Nth, cycles_M, quality_Q, _, \
-    frequency_cwt_hz_flipped, frequency_start_flipped, frequency_end_flipped = \
-        chirp_frequency_bands(scale_order_input=band_order_Nth,
+    order_Nth, cycles_M, frequency_cwt_hz_flipped, frequency_start_flipped, frequency_end_flipped = \
+        scale_frequency_bands(scale_order_input=band_order_Nth,
                               frequency_low_input=frequency_low_hz,
                               frequency_sample_rate_input=frequency_sample_rate_hz,
                               frequency_high_input=frequency_high_hz,
-                              index_shift=index_shift,
                               frequency_ref=frequency_ref,
                               scale_base=scale_base)
 
     scale_points = len(frequency_cwt_hz_flipped)
 
+    cw_complex, _, _, _, amp = \
+        wavelet_centered_4cwt(band_order_Nth=order_Nth,
+                              duration_points=wavelet_points,
+                              scale_frequency_center_hz=frequency_cwt_hz_flipped,
+                              frequency_sample_rate_hz=frequency_sample_rate_hz,
+                              dictionary_type=dictionary_type)
+
     if cwt_type == "morlet2":
-        scale_atom = chirp_scale(cycles_M, frequency_cwt_hz_flipped, frequency_sample_rate_hz)
+        # Use scipy morlet2
+        scale_atom, _ = \
+            scale_from_frequency_hz(band_order_Nth=order_Nth,
+                                    frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                    scale_frequency_center_hz=frequency_cwt_hz_flipped)
+
         cwt_flipped = signal.cwt(data=sig_wf, wavelet=signal.morlet2,
                                  widths=scale_atom,
                                  w=cycles_M,
                                  dtype=np.complex128)
-    elif cwt_type == "fft":
-        sig_fft = np.fft.fft(sig_wf)
-        cwt_flipped = np.empty((scale_points, wavelet_points), dtype=np.complex128)
-        for ii in range(scale_points):
-            atom, _ = wavelet_centered_4cwt(band_order_Nth=order_Nth,
-                                            sig_or_time=sig_wf,
-                                            scale_frequency_center_hz=frequency_cwt_hz_flipped[ii],
-                                            frequency_sample_rate_hz=frequency_sample_rate_hz,
-                                            index_shift=index_shift,
-                                            scale_base=scale_base,
-                                            dictionary_type=dictionary_type)
-            atom_fft = np.fft.fft(atom)
-            cwt_raw = np.fft.ifft(sig_fft*np.conj(atom_fft))
-            cwt_flipped[ii, :] = np.append(cwt_raw[wavelet_points//2:], cwt_raw[0:wavelet_points//2])
+        if dictionary_type == 'spect':
+            cwt_amp_norm2spec = amplitude_convert_norm_to_spect(scale_atom=scale_atom)
+            # Convert to 2d matrix
+            spec_scale = np.tile(cwt_amp_norm2spec, (wavelet_points, 1)).T
+            cwt_flipped *= spec_scale
 
-    elif cwt_type == "conv":
-        cwt_flipped = np.empty((scale_points, wavelet_points), dtype=np.complex128)
-        for ii in range(scale_points):
-            atom, _ = wavelet_centered_4cwt(band_order_Nth=order_Nth,
-                                            sig_or_time=sig_wf,
-                                            scale_frequency_center_hz=frequency_cwt_hz_flipped[ii],
-                                            frequency_sample_rate_hz=frequency_sample_rate_hz,
-                                            index_shift=index_shift,
-                                            scale_base=scale_base,
-                                            dictionary_type=dictionary_type)
-            cwt_flipped[ii, :] = signal.convolve(sig_wf, np.conj(atom)[::-1], mode='same')
     else:
-        print("Incorrect cwt_type specification in cwt_chirp_complex")
+        # Convolution using the fft method
+        # Convert to a 2d matrix
+        sig_wf_2d = np.tile(sig_wf, (scale_points, 1))
+        # Flip time
+        cw_complex_fliplr = np.fliplr(cw_complex)
+        cwt_flipped = signal.fftconvolve(sig_wf_2d, np.conj(cw_complex_fliplr), mode='same', axes=-1)
 
     # Time scales are increasing, which is the opposite of what is expected for the frequency. Flip.
     frequency_cwt_hz = np.flip(frequency_cwt_hz_flipped)
@@ -297,6 +307,67 @@ def cwt_complex(band_order_Nth: float,
 
     return cwt, cwt_bits, time_s, frequency_cwt_hz
 
+
+def cwt_complex_any_scale(band_order_Nth: float,
+                          sig_wf: np.ndarray,
+                          frequency_sample_rate_hz: float,
+                          frequency_cwt_hz: np.ndarray,
+                          cwt_type: str = "fft",
+
+                          dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Calculate CWT for chirp
+
+    :param band_order_Nth: Nth order of constant Q bands
+    :param sig_wf: array with input signal
+    :param frequency_sample_rate_hz: sample rate in Hz, ordered from low to high frequency
+    :param frequency_cwt_hz: center frequency vector
+    :param cwt_type: one of "fft", or "morlet2". Default is "fft"
+    :param index_shift: index of shift. Default is 0.0
+    :param frequency_ref: reference frequency in Hz. Default is F1
+    :param scale_base: G2 or G3. Default is G2
+    :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect"). Default is "norm"
+    :return: cwt, cwt_bits, time_s, frequency_cwt_hz
+    """
+
+    wavelet_points = len(sig_wf)
+    time_s = np.arange(wavelet_points)/frequency_sample_rate_hz
+    scale_points = len(frequency_cwt_hz)
+    cycles_M = cycles_from_order(band_order_Nth=band_order_Nth)
+
+    cw_complex, _, _, _, amp = \
+        wavelet_centered_4cwt(band_order_Nth=band_order_Nth,
+                              duration_points=wavelet_points,
+                              scale_frequency_center_hz=frequency_cwt_hz,
+                              frequency_sample_rate_hz=frequency_sample_rate_hz,
+                              dictionary_type=dictionary_type)
+
+    if cwt_type == "morlet2":
+        scale_atom, _ = \
+            scale_from_frequency_hz(band_order_Nth=band_order_Nth,
+                                    frequency_sample_rate_hz=frequency_sample_rate_hz,
+                                    scale_frequency_center_hz=frequency_cwt_hz)
+        cwt = signal.cwt(data=sig_wf, wavelet=signal.morlet2,
+                         widths=scale_atom,
+                         w=cycles_M,
+                         dtype=np.complex128)
+        if dictionary_type == 'spect':
+            cwt_amp_norm2spec = amplitude_convert_norm_to_spect(scale_atom=scale_atom)
+            # Convert to 2d matrix
+            spec_scale = np.tile(cwt_amp_norm2spec, (wavelet_points, 1)).T
+            cwt *= spec_scale
+
+    else:
+        # Convolution using the fft method
+        # Convert to a 2d matrix
+        sig_wf_2d = np.tile(sig_wf, (scale_points, 1))
+        # Flip time
+        cw_complex_fliplr = np.fliplr(cw_complex)
+        cwt = signal.fftconvolve(sig_wf_2d, np.conj(cw_complex_fliplr), mode='same', axes=-1)
+
+    cwt_bits = utils.log2epsilon(cwt)
+
+    return cwt, cwt_bits, time_s, frequency_cwt_hz
 
 # def chirp_spectrum(frequency_hz: np.ndarray,
 #                    offset_time_s: float,
@@ -500,41 +571,7 @@ def cwt_complex(band_order_Nth: float,
 #     return order_Nth, cycles_M, quality_Q, gamma, frequency_center_geometric, frequency_start, frequency_end
 #
 #
-# def chirp_centered_4cwt(band_order_Nth: float,
-#                         sig_or_time: np.ndarray,
-#                         scale_frequency_center_hz: float,
-#                         frequency_sample_rate_hz: float,
-#                         index_shift: float = 0,
-#                         scale_base: float = scales.Slice.G2,
-#                         dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray]:
-#     """
-#     Gabor atoms for CWT computation centered on the duration of signal
-#
-#     :param sig_or_time: time or time series, wavelet matches this duration
-#     :param band_order_Nth: Nth order of constant Q bands
-#     :param scale_frequency_center_hz: center frequency fc in Hz
-#     :param frequency_sample_rate_hz: sample rate is Hz
-#     :param index_shift: index of shift
-#     :param scale_base: G2 or G3
-#     :param dictionary_type: Canonical unit-norm ("norm") or unit spectrum ("spect")
-#     :return: waveform_complex, time_shifted_s
-#     """
-#
-#     duration_points = len(sig_or_time)
-#     time_s = np.arange(duration_points)/frequency_sample_rate_hz
-#     offset_time_s = time_s[-1]/2.
-#
-#     wavelet_gabor, time_centered_s, amp_dict_0, amp_dict_1 = \
-#         chirp_complex(band_order_Nth,
-#                       time_s, offset_time_s, scale_frequency_center_hz, frequency_sample_rate_hz,
-#                       index_shift, scale_base)
-#
-#     if dictionary_type == "norm":
-#         wavelet_chirp = amp_dict_0*wavelet_gabor
-#     else:  # spectrum
-#         wavelet_chirp = amp_dict_1*wavelet_gabor
-#
-#     return wavelet_chirp, time_centered_s
+
 #
 #
 # def cwt_chirp_complex(band_order_Nth: float,
