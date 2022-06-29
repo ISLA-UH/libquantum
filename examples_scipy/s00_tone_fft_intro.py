@@ -78,14 +78,17 @@ if __name__ == "__main__":
     # frequency averaged over the signal duration.
     # The positive frequency contributes only half the amplitude.
     # The negative frequency contributes the other half.
-    fft_sig_pos *= 1/len(mic_sig)
-    fft_abs = np.abs(fft_sig_pos)
-    print('|RFFT(fc)|/N:', fft_abs[fft_index])
+    fft_abs_pos_over_N = np.abs(fft_sig_pos)/len(mic_sig)
+    fft_abs_power = 2*fft_abs_pos_over_N**2
+
+    print('|RFFT(fc)/N|:', fft_abs_pos_over_N[fft_index])
+    print('2*|RFFT(fc)/N|**2:', fft_abs_power[fft_index])
 
     print('\n*** SUMMARY: FFT of a constant frequency tone with unit peak amplitude ***')
     print('Positive frequency FFT amplitude is 1/2, negative frequency FFT amplitude is 1/2')
     print('Power averaged over the signal duration is P**2 = 2 |RFFT|**2 = 1/2')
     print('RMS amplitude is sqrt(P**2) = 1/sqrt(2)')
+    print('** IMPORTANT NOTE: EXACT RECONSTRUCTION ONLY OCCURS AT FFT FREQUENCY **')
 
     # Show the waveform and its FFT over the whole record:
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(8, 5))
@@ -93,10 +96,10 @@ if __name__ == "__main__":
     ax1.set_title('Synthetic tone, no taper')
     ax1.set_xlabel('Time, s')
     ax1.set_ylabel('Norm')
-    ax2.semilogx(frequency_fft_pos_hz, fft_abs)
-    ax2.set_title('FFT, f = ' + str(round(frequency_center_fft_hz*100)/100) + ' Hz')
+    ax2.semilogx(frequency_fft_pos_hz, fft_abs_power)
+    ax2.set_title('FFT Power, f = ' + str(round(frequency_center_fft_hz*100)/100) + ' Hz')
     ax2.set_xlabel('Frequency, hz')
-    ax2.set_ylabel('FFT amplitude')
+    ax2.set_ylabel('2*|RFFT/N|**2')
     ax2.grid(True)
 
     plt.show()

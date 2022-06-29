@@ -44,6 +44,10 @@ if __name__ == "__main__":
     mic_sig_rms = np.std(mic_sig)
     mic_sig_rms_nominal = 1/np.sqrt(2)
 
+    # Computed Variance; divides by the number of points
+    mic_sig_var = np.var(mic_sig)
+    mic_sig_var_nominal = 1/2.
+
     # Compute the Welch PSD; averaged spectrum over sliding windows
     frequency_welch_hz, power_welch_spectrum = signal.welch(x=mic_sig,
                                                             fs=frequency_sample_rate_hz,
@@ -74,26 +78,45 @@ if __name__ == "__main__":
     print('Welch returns only the positive frequencies')
     print('len(Pxx):', len(frequency_welch_hz))
 
-    # The spectrum option returns the rms, which for a tone will be 1/sqrt(2)
+    # The spectrum option returns the var at the peak, which for a tone will have an rms of 1/sqrt(2)
     fft_rms_welch = np.sqrt(power_welch_spectrum) / mic_sig_rms
     fft_rms_welch_psd = np.sqrt(frequency_resolution_fft_hz*power_welch_density) / mic_sig_rms
 
+    fft_welch_over_var = power_welch_spectrum / mic_sig_var
+    fft_welch_psd_times_df_over_var = frequency_resolution_fft_hz*power_welch_density / mic_sig_var
+
     print('\n*** SUMMARY: Welch spectral power estimates for a constant-frequency tone  ***')
     print('The Welch spectral estimate averages the FFT over overlapping windows.')
-    print('For the Welch spectrum scaling, the RMS amplitude of a tone is sqrt(P**2) = 1/sqrt(2) = STD(signal)')
+    print('For the Welch spectrum scaling, '
+          'the amplitude variance of a tone with no DC offset is P**2 = 1/2 = var(signal)')
     print('The Welch density scaling is divided by the spectral resolution')
+    print('** IMPORTANT NOTE: THE WELCH METHOD IMPLEMENTS x2 POWER CORRECTION FOR NEGATIVE FREQUENCIES **')
 
     # Show the waveform and the averaged FFT over the whole record:
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
+    fig1, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
     ax1.plot(time_s, mic_sig)
     ax1.set_title('Synthetic CW, with taper')
     ax1.set_xlabel('Time, s')
     ax1.set_ylabel('Norm')
-    ax2.semilogx(frequency_welch_hz, fft_rms_welch, label='Welch spectrum')
-    ax2.semilogx(frequency_welch_hz, fft_rms_welch_psd, '.-', label='Welch density')
+    ax2.semilogx(frequency_welch_hz, fft_welch_over_var, label='Welch spectrum/var')
+    ax2.semilogx(frequency_welch_hz, fft_welch_psd_times_df_over_var, '.-', label='df*Welch density/var')
+    ax2.set_title('Welch PSD/VAR(SIG), f = ' + str(round(frequency_center_fft_hz*100)/100) + ' Hz')
+    ax2.set_xlabel('Frequency, hz')
+    ax2.set_ylabel('Power/VAR(signal)')
+    ax2.grid(True)
+    ax2.legend()
+
+    # Show the waveform and the averaged FFT over the whole record:
+    fig2, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, constrained_layout=True, figsize=(9, 4))
+    ax1.plot(time_s, mic_sig)
+    ax1.set_title('Synthetic CW, with taper')
+    ax1.set_xlabel('Time, s')
+    ax1.set_ylabel('Norm')
+    ax2.semilogx(frequency_welch_hz, power_welch_spectrum, label='Welch spectrum')
+    ax2.semilogx(frequency_welch_hz, frequency_resolution_fft_hz*power_welch_density, '.-', label='df*Welch density')
     ax2.set_title('Welch PSD, f = ' + str(round(frequency_center_fft_hz*100)/100) + ' Hz')
     ax2.set_xlabel('Frequency, hz')
-    ax2.set_ylabel('SQRT(power ave)/STD(signal)')
+    ax2.set_ylabel('Power')
     ax2.grid(True)
     ax2.legend()
 
