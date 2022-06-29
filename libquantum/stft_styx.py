@@ -62,7 +62,7 @@ def power_and_information_shannon_stft(stft_complex):
     power_per_sample = np.sum(power, axis=0)
     power_total = np.sum(power) + scales.EPSILON
     power_scaled = power/power_total
-    information_bits = power_scaled*np.log2(power_scaled + scales.EPSILON)
+    information_bits = -power_scaled*np.log2(power_scaled + scales.EPSILON)
     information_bits_per_band = np.sum(information_bits, axis=-1)
     information_bits_per_sample = np.sum(information_bits, axis=0)
     information_bits_total = np.sum(information_bits) + scales.EPSILON
@@ -83,7 +83,7 @@ def power_and_information_shannon_welch(welch_power):
     power_per_sample = np.sum(power, axis=0)
     power_total = np.sum(power) + scales.EPSILON
     power_scaled = power/power_total
-    information_bits = power_scaled*np.log2(power_scaled + scales.EPSILON)
+    information_bits = -power_scaled*np.log2(power_scaled + scales.EPSILON)
     information_bits_per_band = np.sum(information_bits, axis=-1)
     information_bits_per_sample = np.sum(information_bits, axis=0)
     information_bits_total = np.sum(information_bits) + scales.EPSILON

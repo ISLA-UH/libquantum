@@ -5,7 +5,7 @@ libquantum example: s07_grain_tfr
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from libquantum import atoms_styx, stft_styx
+from libquantum import atoms_styx, stft_styx, scales
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 from libquantum.styx import tfr_stx_fft
 print(__doc__)
@@ -179,54 +179,56 @@ if __name__ == "__main__":
     ax2.grid(True)
     ax2.legend()
 
-    plt.show()
-    exit()
+    plt.figure()
+    plt.plot(cwt_information_bits_per_sample)
 
-    # # Select plot frequencies
-    # fmin = 2 * frequency_resolution_stft_hz
-    # fmax = frequency_sample_rate_hz/2  # Nyquist
-    #
-    # pltq.plot_wf_mesh_vert(redvox_id='00',
-    #                        wf_panel_a_sig=mic_sig,
-    #                        wf_panel_a_time=time_s,
-    #                        mesh_time=time_stft_s,
-    #                        mesh_frequency=frequency_stft_hz,
-    #                        mesh_panel_b_tfr=stft_information_scaled,
-    #                        mesh_panel_b_colormap_scaling="range",
-    #                        wf_panel_a_units="Norm",
-    #                        mesh_panel_b_cbar_units="bits",
-    #                        start_time_epoch=0,
-    #                        figure_title="stft for " + EVENT_NAME,
-    #                        frequency_hz_ymin=fmin,
-    #                        frequency_hz_ymax=fmax)
-    #
-    # pltq.plot_wf_mesh_vert(redvox_id='00',
-    #                        wf_panel_a_sig=mic_sig,
-    #                        wf_panel_a_time=time_cwt_s,
-    #                        mesh_time=time_cwt_s,
-    #                        mesh_frequency=frequency_cwt_hz,
-    #                        mesh_panel_b_tfr=cwt_information_bits,
-    #                        mesh_panel_b_colormap_scaling="range",
-    #                        wf_panel_a_units="Norm",
-    #                        mesh_panel_b_cbar_units="bits",
-    #                        start_time_epoch=0,
-    #                        figure_title="cwt for " + EVENT_NAME,
-    #                        frequency_hz_ymin=fmin,
-    #                        frequency_hz_ymax=fmax)
 
-    # pltq.plot_wf_mesh_vert(redvox_id='00',
-    #                        wf_panel_a_sig=mic_sig,
-    #                        wf_panel_a_time=time_cwt_s,
-    #                        mesh_time=time_cwt_s,
-    #                        mesh_frequency=frequency_stx_hz,
-    #                        mesh_panel_b_tfr=mic_stx_bits,
-    #                        mesh_panel_b_colormap_scaling="range",
-    #                        wf_panel_a_units="Norm",
-    #                        mesh_panel_b_cbar_units="bits",
-    #                        start_time_epoch=0,
-    #                        figure_title="STX for " + EVENT_NAME,
-    #                        frequency_hz_ymin=fmin,
-    #                        frequency_hz_ymax=fmax)
+
+    # Select plot frequencies
+    fmin = 2 * frequency_resolution_stft_hz
+    fmax = frequency_sample_rate_hz/2  # Nyquist
+
+    pltq.plot_wf_mesh_vert(redvox_id='00',
+                           wf_panel_a_sig=mic_sig,
+                           wf_panel_a_time=time_s,
+                           mesh_time=time_stft_s,
+                           mesh_frequency=frequency_stft_hz,
+                           mesh_panel_b_tfr=np.log2(stft_power + scales.EPSILON),
+                           mesh_panel_b_colormap_scaling="range",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="stft for " + EVENT_NAME,
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax)
+
+    pltq.plot_wf_mesh_vert(redvox_id='00',
+                           wf_panel_a_sig=mic_sig,
+                           wf_panel_a_time=time_cwt_s,
+                           mesh_time=time_cwt_s,
+                           mesh_frequency=frequency_cwt_hz,
+                           mesh_panel_b_tfr=np.log2(cwt_power + scales.EPSILON),
+                           mesh_panel_b_colormap_scaling="range",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="cwt for " + EVENT_NAME,
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax)
+    #
+    # # pltq.plot_wf_mesh_vert(redvox_id='00',
+    # #                        wf_panel_a_sig=mic_sig,
+    # #                        wf_panel_a_time=time_cwt_s,
+    # #                        mesh_time=time_cwt_s,
+    # #                        mesh_frequency=frequency_stx_hz,
+    # #                        mesh_panel_b_tfr=mic_stx_bits,
+    # #                        mesh_panel_b_colormap_scaling="range",
+    # #                        wf_panel_a_units="Norm",
+    # #                        mesh_panel_b_cbar_units="bits",
+    # #                        start_time_epoch=0,
+    # #                        figure_title="STX for " + EVENT_NAME,
+    # #                        frequency_hz_ymin=fmin,
+    # #                        frequency_hz_ymax=fmax)
 
 
     plt.show()
