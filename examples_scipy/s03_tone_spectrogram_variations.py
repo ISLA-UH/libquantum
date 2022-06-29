@@ -153,6 +153,8 @@ if __name__ == "__main__":
     print('Scipy signal.welch and signal.spectrogram provide compatible estimates.')
     print('Mode psd returns Welch power, whereas mode magnitude complex returns STFT coefficients.')
     print('The Welch power is reproduced by averaging the spectrogram over the time dimension.')
+    print('This example uses the STD (e.g. RMS) instead of the variance. '
+          'RMS signal amplitude is sometimes used instead of power.')
 
     plt.figure()
     # Scales with the signal variance
