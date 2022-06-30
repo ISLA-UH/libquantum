@@ -5,9 +5,9 @@ libquantum example: s07_grain_tfr
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from libquantum import utils, synthetics, atoms_styx
+from libquantum import utils, synthetics, styx_cwt
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
-from libquantum.styx import tfr_stx_fft
+from libquantum.styx_stx import tfr_stx_fft
 
 print(__doc__)
 EVENT_NAME = 'grain test'

@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from libquantum.styx import tfr_stx_fft
+from libquantum.styx_stx import tfr_stx_fft
 from libquantum.benchmark_signals import plot_tfr_bits
 
 DIR_PATH = "/Users/mgarces/Documents/DATA_2022/Tonga/CEA"

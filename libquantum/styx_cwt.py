@@ -307,13 +307,12 @@ def cwt_complex_inferno(band_order_Nth: float,
     return frequency_cwt_hz, time_cwt_s, cwt
 
 
-def cwt_complex_any_scale(band_order_Nth: float,
-                          sig_wf: np.ndarray,
-                          frequency_sample_rate_hz: float,
-                          frequency_cwt_hz: np.ndarray,
-                          cwt_type: str = "fft",
-
-                          dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def cwt_complex_any_scale_pow2(band_order_Nth: float,
+                               sig_wf: np.ndarray,
+                               frequency_sample_rate_hz: float,
+                               frequency_cwt_hz: np.ndarray,
+                               cwt_type: str = "fft",
+                               dictionary_type: str = "norm") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate CWT for chirp
 

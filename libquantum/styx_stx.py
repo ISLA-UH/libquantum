@@ -6,7 +6,7 @@ Rederivation in preparation, Garces et al. 2022; last updated 9 May 2022
 """
 import numpy as np
 from scipy.fft import fft, ifft, fftfreq
-from libquantum import scales
+from libquantum import scales, styx_cwt
 from typing import Tuple
 
 
@@ -76,7 +76,7 @@ def tfr_stx_fft(sig_wf: np.ndarray,
     :param is_inferno: are frequencies geometrically spaced and standardized as in inferno?
     :param scale_base_input: scale base; default is base 10, base 2 octaves is scales.Slice.G2
     :param scale_ref_input: scale reference time; default is 1 s
-    # :return: tfr_stx, psd_stx, frequency_stx, frequency_stx_fft, windows_fft
+    # :return: tfr_stx, psd_stx, frequency_stx_hz, frequency_stx_fft, windows_fft
     # """
 
     frequency_sample_rate: float = 1 / time_sample_interval
@@ -153,7 +153,7 @@ def tfr_stx_fft(sig_wf: np.ndarray,
     for isx, fsx in enumerate(frequency_stx):
         stx_index = np.abs(frequency_fft - fsx).argmin()
         frequency_stx_fft[isx] = frequency_fft[stx_index]
-        # omega_sx = 2*np.pi*frequency_stx/sample_rate    # non-dimensional angular stx frequency
+        # omega_sx = 2*np.pi*frequency_stx_hz/sample_rate    # non-dimensional angular stx frequency
         omega_sx = 2 * np.pi * frequency_stx_fft[isx]/frequency_sample_rate  # eq non-dimensional angular fft frequency
         if omega_sx == 0.:
             windows_fft[isx] = np.ones(len(n_fft_pow2))
@@ -177,3 +177,57 @@ def tfr_stx_fft(sig_wf: np.ndarray,
         psd_stx[isx, :] = tfr_abs + scales.EPSILON
 
     return tfr_stx, psd_stx, frequency_stx, frequency_stx_fft, windows_fft
+
+
+def stx_complex_any_scale_pow2(band_order_Nth: float,
+                               sig_wf: np.ndarray,
+                               frequency_sample_rate_hz: float,
+                               frequency_stx_hz: np.ndarray,
+                               factor_q: float = 0.,
+                               power_p: float = 0.,
+                               power_r: float = 1.,
+                               dictionary_type: str = "spect") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+
+    n_fft_pow2 = len(sig_wf)
+    time_stx_s = np.arange(n_fft_pow2)/frequency_sample_rate_hz
+    scale_points = len(frequency_stx_hz)
+    cycles_M = styx_cwt.cycles_from_order(band_order_Nth=band_order_Nth)
+    # Take FFT and concatenate. A leaner version could let the fft do the padding.
+    sig_fft = fft(sig_wf)
+    sig_fft_cat = np.concatenate([sig_fft, sig_fft], axis=-1)
+
+    frequency_fft = fftfreq(n_fft_pow2, 1/frequency_sample_rate_hz)   # in units of 1/sample interval
+    omega_fft = 2 * np.pi * frequency_fft / frequency_sample_rate_hz  # scaled angular frequency
+    # Vectorize
+    omega_stx = 2*np.pi*frequency_stx_hz/frequency_sample_rate_hz    # non-dimensional angular stx frequency
+    sigma_stx = cycles_M/omega_stx
+
+    # Construct 2d matrices to vectorize
+    # sigma_stx_2d =
+    # omega_fft_2d =
+    # sig_fft_cat_2d =
+    # windows_fft_2d =
+
+    # # Construct shifting frequency indexes
+    # frequency_stx_fft = np.empty(scale_points)
+    # Construct time domain and fft of window
+    windows_fft = np.empty((scale_points, n_fft_pow2), dtype=np.complex128)
+    tfr_stx = np.empty((scale_points, n_fft_pow2), dtype=np.complex128)
+
+    # Minimized for loops and operations - vectorize
+    for isx, fsx in enumerate(frequency_stx_hz):
+
+        omega_sx = 2*np.pi*fsx/frequency_sample_rate_hz    # non-dimensional angular stx frequency
+        # frequency_stx_fft[isx] = frequency_fft[stx_index]
+        # omega_sx = 2 * np.pi * frequency_stx_fft[isx]/frequency_sample_rate_hz  # eq non-dimensional angular fft frequency
+        if omega_sx == 0.:
+            windows_fft[isx] = np.ones(n_fft_pow2)
+        else:
+            # Sigma is the standard deviation of the Gaussian
+            sigma = cycles_M/omega_sx
+            windows_fft[isx] = np.exp(-0.5 * (sigma ** 2.) * (omega_fft ** 2.))
+        # This is the main event
+        stx_index = np.abs(frequency_fft - fsx).argmin()
+        tfr_stx[isx, :] = ifft(sig_fft_cat[stx_index:stx_index + n_fft_pow2] * windows_fft[isx])
+
+    return frequency_stx_hz, time_stx_s, tfr_stx
