@@ -183,11 +183,16 @@ def stx_complex_any_scale_pow2(band_order_Nth: float,
                                sig_wf: np.ndarray,
                                frequency_sample_rate_hz: float,
                                frequency_stx_hz: np.ndarray,
-                               factor_q: float = 0.,
-                               power_p: float = 0.,
-                               power_r: float = 1.,
                                dictionary_type: str = "spect") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-
+    """
+    With some assumptions and simplifications, and with some vectorization
+    :param band_order_Nth: 
+    :param sig_wf: 
+    :param frequency_sample_rate_hz: 
+    :param frequency_stx_hz: 
+    :param dictionary_type: 
+    :return: 
+    """
     n_fft_pow2 = len(sig_wf)
     time_stx_s = np.arange(n_fft_pow2)/frequency_sample_rate_hz
     scale_points = len(frequency_stx_hz)
@@ -198,36 +203,43 @@ def stx_complex_any_scale_pow2(band_order_Nth: float,
 
     frequency_fft = fftfreq(n_fft_pow2, 1/frequency_sample_rate_hz)   # in units of 1/sample interval
     omega_fft = 2 * np.pi * frequency_fft / frequency_sample_rate_hz  # scaled angular frequency
-    # Vectorize
     omega_stx = 2*np.pi*frequency_stx_hz/frequency_sample_rate_hz    # non-dimensional angular stx frequency
-    sigma_stx = cycles_M/omega_stx
+    sigma_stx = cycles_M/omega_stx  # TODO: Use same nomenclature as cwt
 
-    # Construct 2d matrices to vectorize
-    # sigma_stx_2d =
-    # omega_fft_2d =
-    # sig_fft_cat_2d =
-    # windows_fft_2d =
+    # Construct 2d matrices
+    # sig_fft_cat_2d = np.tile(sig_fft_cat, (scale_points, 1))
+    omega_fft_2d = np.tile(omega_fft, (scale_points, 1))
+    sigma_stx_2d = np.tile(sigma_stx, (n_fft_pow2, 1)).T
+    windows_fft_2d = np.exp(-0.5 * (sigma_stx_2d ** 2.) * (omega_fft_2d ** 2.))
 
-    # # Construct shifting frequency indexes
-    # frequency_stx_fft = np.empty(scale_points)
-    # Construct time domain and fft of window
-    windows_fft = np.empty((scale_points, n_fft_pow2), dtype=np.complex128)
+    # Construct shifting frequency indexes
     tfr_stx = np.empty((scale_points, n_fft_pow2), dtype=np.complex128)
 
-    # Minimized for loops and operations - vectorize
+    # Minimal iteration
     for isx, fsx in enumerate(frequency_stx_hz):
-
-        omega_sx = 2*np.pi*fsx/frequency_sample_rate_hz    # non-dimensional angular stx frequency
-        # frequency_stx_fft[isx] = frequency_fft[stx_index]
-        # omega_sx = 2 * np.pi * frequency_stx_fft[isx]/frequency_sample_rate_hz  # eq non-dimensional angular fft frequency
-        if omega_sx == 0.:
-            windows_fft[isx] = np.ones(n_fft_pow2)
-        else:
-            # Sigma is the standard deviation of the Gaussian
-            sigma = cycles_M/omega_sx
-            windows_fft[isx] = np.exp(-0.5 * (sigma ** 2.) * (omega_fft ** 2.))
         # This is the main event
         stx_index = np.abs(frequency_fft - fsx).argmin()
-        tfr_stx[isx, :] = ifft(sig_fft_cat[stx_index:stx_index + n_fft_pow2] * windows_fft[isx])
+        tfr_stx[isx, :] = ifft(sig_fft_cat[stx_index:stx_index + n_fft_pow2] * windows_fft_2d[isx, :])
 
     return frequency_stx_hz, time_stx_s, tfr_stx
+
+
+def power_and_information_shannon_stx(stx_complex):
+    """
+    Computes power and information metrics
+    :param stx_complex:
+    :return:
+    """
+    power = 2 * np.abs(np.copy(stx_complex)) ** 2
+    power_per_band = np.sum(power, axis=-1)
+    power_per_sample = np.sum(power, axis=0)
+    power_total = np.sum(power) + scales.EPSILON
+    power_scaled = power/power_total
+    information_bits = -power_scaled*np.log2(power_scaled + scales.EPSILON)
+    information_bits_per_band = np.sum(information_bits, axis=-1)
+    information_bits_per_sample = np.sum(information_bits, axis=0)
+    information_bits_total = np.sum(information_bits) + scales.EPSILON
+    information_scaled = information_bits/information_bits_total
+    return power, power_per_band, power_per_sample, power_total, power_scaled, \
+           information_bits, information_bits_per_band, information_bits_per_sample, \
+           information_bits_total, information_scaled

@@ -6,7 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from libquantum import styx_stx, styx_cwt, styx_fft, scales
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
-from libquantum.styx_stx import tfr_stx_fft
 print(__doc__)
 
 
@@ -103,7 +102,7 @@ if __name__ == "__main__":
     welch_information_bits, welch_information_bits_per_band, welch_information_bits_per_sample, \
     welch_information_bits_total, welch_information_scaled = styx_fft.power_and_information_shannon_welch(psd_welch_power)
     
-    # Compute the spectrogram with the stft option
+    # STFT
     frequency_stft_hz, time_stft_s, stft_complex = \
         styx_fft.stft_complex_pow2(sig_wf=mic_sig,
                                    frequency_sample_rate_hz=frequency_sample_rate_hz,
@@ -127,19 +126,6 @@ if __name__ == "__main__":
     cwt_information_bits, cwt_information_bits_per_band, cwt_information_bits_per_sample, \
     cwt_information_bits_total, cwt_information_scaled = styx_cwt.power_and_information_shannon_cwt(cwt_complex)
 
-    # Compute Stockwell transform TODO: Export time
-    # [stx_complex, _, frequency_stx_hz, frequency_stx_fft_hz, W] = \
-    #     tfr_stx_fft(sig_wf=mic_sig,
-    #                 time_sample_interval=1/frequency_sample_rate_hz,
-    #                 frequency_min=frequency_resolution_stft_hz,
-    #                 frequency_max=frequency_sample_rate_hz/2,
-    #                 scale_order_input=order_number_input,
-    #                 scale_ref_input=1 / frequency_center_stft_hz,
-    #                 is_geometric=True,
-    #                 is_inferno=False)
-    # 
-    # stx_power = 2 * np.abs(stx_complex) ** 2
-
     # STX
     frequency_stx_hz, time_stx_s, stx_complex = \
         styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_sig,
@@ -148,8 +134,10 @@ if __name__ == "__main__":
                                             band_order_Nth=order_number_input,
                                             dictionary_type="spect")
 
-    # exit()
-    stx_power = 2 * np.abs(stx_complex) ** 2
+    # Information overload methods
+    stx_power, stx_power_per_band, stx_power_per_sample, stx_power_total, stx_power_scaled, \
+    stx_information_bits, stx_information_bits_per_band, stx_information_bits_per_sample, \
+    stx_information_bits_total, stx_information_scaled = styx_stx.power_and_information_shannon_stx(stx_complex)
 
     # Scale power by variance
     welch_over_var = psd_welch_power / mic_sig_var
@@ -239,7 +227,6 @@ if __name__ == "__main__":
                            figure_title="STX for " + EVENT_NAME,
                            frequency_hz_ymin=fmin,
                            frequency_hz_ymax=fmax)
-
 
     plt.show()
 
