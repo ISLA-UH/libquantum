@@ -126,7 +126,7 @@ if __name__ == "__main__":
     cwt_information_bits, cwt_information_bits_per_band, cwt_information_bits_per_sample, \
     cwt_information_bits_total, cwt_information_scaled = styx_cwt.power_and_information_shannon_cwt(cwt_complex)
 
-    # STX
+    # Stockwell transform
     frequency_stx_hz, time_stx_s, stx_complex = \
         styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_sig,
                                             frequency_sample_rate_hz=frequency_sample_rate_hz,
