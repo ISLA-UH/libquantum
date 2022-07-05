@@ -120,17 +120,29 @@ if __name__ == "__main__":
     stft_log2_power = np.log2(stft_power + scales.EPSILON)
     stft_log2_power -= np.max(stft_log2_power)
 
-    # # STX
-    # frequency_stx_hz, time_stx_s, stx_complex = \
-    #     styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_sig,
-    #                                         frequency_sample_rate_hz=mic_sample_rate_hz,
-    #                                         frequency_stx_hz=frequency_cwt_fft_hz,
-    #                                         band_order_Nth=order_Nth,
-    #                                         dictionary_type="spect")
-    #
-    # stx_power = 2*np.abs(stx_complex)**2
-    # stx_log2_power = np.log2(stx_power + scales.EPSILON)
-    # stx_log2_power -= np.max(stx_log2_power)
+    # CWT
+    frequency_cwt_hz, time_cwt_s, cwt_complex = \
+        styx_cwt.cwt_complex_any_scale_pow2(sig_wf=mic_sig,
+                                            frequency_sample_rate_hz=mic_sample_rate_hz,
+                                            frequency_cwt_hz=frequency_cwt_fft_hz,
+                                            band_order_Nth=order_Nth,
+                                            dictionary_type="spect")
+
+    cwt_power = 2*np.abs(cwt_complex)**2
+    cwt_log2_power = np.log2(cwt_power + scales.EPSILON)
+    cwt_log2_power -= np.max(cwt_log2_power)
+
+    # STX
+    frequency_stx_hz, time_stx_s, stx_complex = \
+        styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_sig,
+                                            frequency_sample_rate_hz=mic_sample_rate_hz,
+                                            frequency_stx_hz=frequency_cwt_fft_hz,
+                                            band_order_Nth=order_Nth,
+                                            dictionary_type="spect")
+
+    stx_power = 2*np.abs(stx_complex)**2
+    stx_log2_power = np.log2(stx_power + scales.EPSILON)
+    stx_log2_power -= np.max(stx_log2_power)
 
     # Plot resampled, normalized mic and accel with 2^n points
     fig2, ax = plt.subplots(nrows=2, ncols=1, sharex='col')
@@ -159,21 +171,36 @@ if __name__ == "__main__":
                            frequency_hz_ymin=fmin,
                            frequency_hz_ymax=fmax)
 
-    # pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
-    #                        wf_panel_a_sig=mic_sig,
-    #                        wf_panel_a_time=time_s,
-    #                        mesh_time=time_stx_s,
-    #                        mesh_frequency=frequency_stx_hz,
-    #                        mesh_panel_b_tfr=stft_log2_power,
-    #                        mesh_panel_b_colormap_scaling="range",
-    #                        wf_panel_a_units="Norm",
-    #                        mesh_panel_b_cbar_units="bits",
-    #                        start_time_epoch=0,
-    #                        figure_title="Mic STX for " + EVENT_NAME,
-    #                        frequency_hz_ymin=fmin,
-    #                        frequency_hz_ymax=fmax)
+    pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
+                           wf_panel_a_sig=mic_sig,
+                           wf_panel_a_time=time_cwt_s,
+                           mesh_time=time_cwt_s,
+                           mesh_frequency=frequency_cwt_hz,
+                           mesh_panel_b_tfr=cwt_log2_power,
+                           mesh_panel_b_colormap_scaling="range",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="Mic CWT for " + EVENT_NAME,
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax)
+
+    pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
+                           wf_panel_a_sig=mic_sig,
+                           wf_panel_a_time=time_s,
+                           mesh_time=time_stx_s,
+                           mesh_frequency=frequency_stx_hz,
+                           mesh_panel_b_tfr=stx_log2_power,
+                           mesh_panel_b_colormap_scaling="range",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="Mic STX for " + EVENT_NAME,
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax)
 
     # Compute TFR for Acc
+    # STFT
     frequency_stft_hz, time_stft_s, stft_complex = \
         styx_fft.stft_complex_pow2(sig_wf=acc_sig,
                                    frequency_sample_rate_hz=mic_sample_rate_hz,
@@ -194,6 +221,68 @@ if __name__ == "__main__":
                            mesh_panel_b_cbar_units="bits",
                            start_time_epoch=0,
                            figure_title="AccZ STFT for " + EVENT_NAME,
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax)
+
+    # Atom scales for acc
+    # TODO: In this case, accz has been resampled to match  mic. Could extract from mic.
+    order_Nth, _, frequency_center_geometric, _, _ = \
+        styx_cwt.scale_frequency_bands(scale_order_input=input_order,
+                                       frequency_low_input=fmin,
+                                       frequency_sample_rate_input=accz_new_sample_rate_hz,
+                                       frequency_high_input=fmax)
+    # Flip to match
+    frequency_cwt_fft_hz = np.flip(frequency_center_geometric)
+
+    # CWT
+    frequency_cwt_hz, time_cwt_s, cwt_complex = \
+        styx_cwt.cwt_complex_any_scale_pow2(sig_wf=acc_sig,
+                                            frequency_sample_rate_hz=accz_new_sample_rate_hz,
+                                            frequency_cwt_hz=frequency_cwt_fft_hz,
+                                            band_order_Nth=order_Nth,
+                                            dictionary_type="spect")
+
+    cwt_power = 2*np.abs(cwt_complex)**2
+    cwt_log2_power = np.log2(cwt_power + scales.EPSILON)
+    cwt_log2_power -= np.max(cwt_log2_power)
+
+    # STX
+    frequency_stx_hz, time_stx_s, stx_complex = \
+        styx_stx.stx_complex_any_scale_pow2(sig_wf=acc_sig,
+                                            frequency_sample_rate_hz=accz_new_sample_rate_hz,
+                                            frequency_stx_hz=frequency_cwt_fft_hz,
+                                            band_order_Nth=order_Nth,
+                                            dictionary_type="spect")
+
+    stx_power = 2*np.abs(stx_complex)**2
+    stx_log2_power = np.log2(stx_power + scales.EPSILON)
+    stx_log2_power -= np.max(stx_log2_power)
+
+    pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
+                           wf_panel_a_sig=acc_sig,
+                           wf_panel_a_time=time_cwt_s,
+                           mesh_time=time_cwt_s,
+                           mesh_frequency=frequency_cwt_hz,
+                           mesh_panel_b_tfr=cwt_log2_power,
+                           mesh_panel_b_colormap_scaling="range",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="AccZ CWT for " + EVENT_NAME,
+                           frequency_hz_ymin=fmin,
+                           frequency_hz_ymax=fmax)
+
+    pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
+                           wf_panel_a_sig=acc_sig,
+                           wf_panel_a_time=time_stx_s,
+                           mesh_time=time_stx_s,
+                           mesh_frequency=frequency_stx_hz,
+                           mesh_panel_b_tfr=stx_log2_power,
+                           mesh_panel_b_colormap_scaling="range",
+                           wf_panel_a_units="Norm",
+                           mesh_panel_b_cbar_units="bits",
+                           start_time_epoch=0,
+                           figure_title="AccZ STX for " + EVENT_NAME,
                            frequency_hz_ymin=fmin,
                            frequency_hz_ymax=fmax)
 
