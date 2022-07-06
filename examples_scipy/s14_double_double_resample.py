@@ -20,13 +20,6 @@ lead_s = 75
 lead_pts = int(lead_s*mic_orig_fs_hz/mic_decimate)
 EVENT_NAME = 'Double 2'
 
-# def resample_uneven_signal(sig_wf: np.ndarray, sig_epoch_s: np.ndarray, sample_rate_new_hz: float = 30):
-#     interval_s = 1/sample_rate_new_hz
-#     sig_new_epoch_s = np.arange(sig_epoch_s[0], sig_epoch_s[-1], interval_s)
-#     f = interpolate.interp1d(sig_epoch_s, sig_wf)
-#     sig_new_wf = f(sig_new_epoch_s)
-#     return sig_new_wf, sig_new_epoch_s
-
 
 if __name__ == "__main__":
     npzfile = np.load(input_file, allow_pickle=True)
