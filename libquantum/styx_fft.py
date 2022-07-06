@@ -9,6 +9,69 @@ from libquantum.scales import EPSILON
 from typing import Union, Tuple
 
 
+# TODO: Standardize inputs
+def butter_bandpass(sig_wf: np.ndarray,
+                    frequency_sample_rate_hz: float,
+                    frequency_cut_low_hz,
+                    frequency_cut_high_hz,
+                    filter_order: int = 4,
+                    tukey_alpha: float = 0.5):
+    """
+    Buterworth bandpass filter
+    :param sig_wf:
+    :param frequency_sample_rate_hz:
+    :param frequency_cut_low_hz:
+    :param frequency_cut_high_hz:
+    :param filter_order:
+    :param tukey_alpha:
+    :return:
+    """
+
+    nyquist = 0.5 * frequency_sample_rate_hz
+    edge_low = frequency_cut_low_hz / nyquist
+    edge_high = frequency_cut_high_hz / nyquist
+    if edge_high >= 1:
+        edge_high = 0.5  # Half of nyquist
+    [b, a] = signal.butter(N=filter_order,
+                           Wn=[edge_low, edge_high],
+                           btype='bandpass')
+    sig_taper = np.copy(sig_wf)
+    sig_taper = sig_taper * signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
+    sig_bandpass = signal.filtfilt(b, a, sig_taper)
+
+    return sig_bandpass
+
+
+def butter_highpass(sig_wf: np.ndarray,
+                    frequency_sample_rate_hz: float,
+                    frequency_cut_low_hz,
+                    filter_order: int = 4,
+                    tukey_alpha: float = 0.5):
+    """
+    Buterworth bandpass filter
+    :param sig_wf:
+    :param frequency_sample_rate_hz:
+    :param frequency_cut_low_hz:
+    :param filter_order:
+    :param tukey_alpha:
+    :return:
+    """
+
+    nyquist = 0.5 * frequency_sample_rate_hz
+    edge_low = frequency_cut_low_hz / nyquist
+    if edge_low >= 1:
+        print('Cutoff greater than Nyquist')
+        exit()
+    [b, a] = signal.butter(N=filter_order,
+                           Wn=[edge_low],
+                           btype='highpass')
+    sig_taper = np.copy(sig_wf)
+    sig_taper = sig_taper * signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
+    sig_highpass = signal.filtfilt(b, a, sig_taper)
+
+    return sig_highpass
+
+
 def stft_complex_pow2(sig_wf: np.ndarray,
                       frequency_sample_rate_hz: float,
                       nfft_points: int,
@@ -397,34 +460,3 @@ def power_and_information_shannon_welch(welch_power):
 #     return snr_frequency, snr_power
 #
 #
-# # TODO: Standardize inputs
-# def butter_bandpass(sig_wf: np.ndarray,
-#                     sample_rate_hz: float,
-#                     frequency_cut_low_hz,
-#                     frequency_cut_high_hz,
-#                     filter_order: int = 4,
-#                     tukey_alpha: float = 0.5):
-#     """
-#     Buterworth bandpass filter
-#     :param sig_wf:
-#     :param sample_rate_hz:
-#     :param frequency_cut_low_hz:
-#     :param frequency_cut_high_hz:
-#     :param filter_order:
-#     :param tukey_alpha:
-#     :return:
-#     """
-#
-#     nyquist = 0.5 * sample_rate_hz
-#     edge_low = frequency_cut_low_hz / nyquist
-#     edge_high = frequency_cut_high_hz / nyquist
-#     if edge_high >= 1:
-#         edge_high = 0.5  # Half of nyquist
-#     [b, a] = signal.butter(N=filter_order,
-#                            Wn=[edge_low, edge_high],
-#                            btype='bandpass')
-#     sig_taper = np.copy(sig_wf)
-#     sig_taper = sig_taper * signal.windows.tukey(M=len(sig_taper), alpha=tukey_alpha)
-#     sig_bandpass = signal.filtfilt(b, a, sig_taper)
-#
-#     return sig_bandpass

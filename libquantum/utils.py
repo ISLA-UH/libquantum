@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Tuple, Union
 
 import numpy as np
-from scipy import signal
+from scipy import interpolate, signal
 
 from scipy.integrate import cumulative_trapezoid
 from libquantum.scales import EPSILON
@@ -69,6 +69,29 @@ def duration_floor(sample_rate_hz: float, time_s: float) -> Tuple[int, int, floa
 
 
 """ Sampling Utils """
+
+
+def resample_uneven_signal(sig_wf: np.ndarray,
+                           sig_epoch_s: np.ndarray,
+                           sample_rate_new_hz: float = None):
+    """
+
+    :param sig_wf:
+    :param sig_epoch_s:
+    :param sample_rate_new_hz:
+    :return:
+    """
+
+    if sample_rate_new_hz is None:
+        interval_from_epoch_s = np.mean(np.diff(sig_epoch_s))
+        # Round up
+        sample_rate_new_hz = np.ceil(1/interval_from_epoch_s)
+
+    interval_s = 1/sample_rate_new_hz
+    sig_new_epoch_s = np.arange(sig_epoch_s[0], sig_epoch_s[-1], interval_s)
+    f = interpolate.interp1d(sig_epoch_s, sig_wf)
+    sig_new_wf = f(sig_new_epoch_s)
+    return sig_new_wf, sig_new_epoch_s
 
 
 def upsample_fourier(sig_wf: np.ndarray,
