@@ -25,6 +25,8 @@ EVENT_NAME = 'Double 2'
 
 duration_s = 60
 duration_points = int(duration_s*mic_orig_fs_hz)
+duration_pow2_points = int(duration_s*mic_orig_fs_hz)
+
 
 if __name__ == "__main__":
     npzfile = np.load(input_file, allow_pickle=True)
@@ -42,7 +44,7 @@ if __name__ == "__main__":
     accy_cmps2 = npzfile['accy_cmps2']
     accx_cmps2 = npzfile['accx_cmps2']
 
-
+    # Select the specified window
     mic_time_start = mic_time_s[lead_pts]
     mic_time_stop = mic_time_s[lead_pts+duration_points]
     acc_start_idx = np.argmin(np.abs(acc_time_s-mic_time_start))
@@ -84,7 +86,6 @@ if __name__ == "__main__":
     print('Mic sample rate, hz:', mic_sample_rate_hz)
     print('Acc sample rate, hz:', acc_sample_rate_hz)
 
-    # exit()
     # Highpass
     mic_sig = styx_fft.butter_highpass(sig_wf=mic_w,
                                        frequency_sample_rate_hz=mic_sample_rate_hz,
@@ -131,11 +132,10 @@ if __name__ == "__main__":
     ax[1].set_xlabel(f"Seconds from {start_utc} UTC")
     plt.suptitle(f"RedVox ID {station_id}")
 
-    plt.show()
+    # plt.show()
 
 
 
-    #
     # mic_sig_pow2 = mic_sig_dec[lead_pts:lead_pts + pow2_points]
     # mic_sig_pow2 /= np.max(np.abs(mic_sig_pow2))
     # acc_sig_pow2 = acc_sig_dec[lead_pts:lead_pts + pow2_points]
