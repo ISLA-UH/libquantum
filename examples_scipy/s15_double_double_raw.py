@@ -8,27 +8,51 @@ from libquantum import styx_stx, styx_cwt, styx_fft, scales
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 
 
-input_order = 12.
-mic_orig_fs_hz = 800.
-frequency_cutoff_low_hz = 0.5
-frequency_cutoff_high_hz = 50
-
 # input_file = "/Users/mgarces/Documents/DATA_2022/DOUBLE_DOUBLE/redvox_data/double_1_1637610021.npz"
 # lead_s = 30 + 50
-# lead_pts = int(lead_s*mic_orig_fs_hz)
 # EVENT_NAME = 'Double 1'
 
 input_file = "/Users/mgarces/Documents/DATA_2022/DOUBLE_DOUBLE/redvox_data/double_2_1637610021.npz"
 lead_s = 75 + 45
-lead_pts = int(lead_s*mic_orig_fs_hz)
 EVENT_NAME = 'Double 2'
 
+# Gabor atom averaging spec (lowest frequency)
+input_order = 12.
+frequency_averaging_hz = 0.5
+number_cycles_averaging = 3*np.pi/4 * input_order
+duration_averaging_s = number_cycles_averaging / frequency_averaging_hz
+
+# Targeted Duration
 duration_s = 60
-duration_points = int(duration_s*mic_orig_fs_hz)
-duration_pow2_points = int(duration_s*mic_orig_fs_hz)
+
+# Bandwidth
+frequency_cutoff_low_hz = frequency_averaging_hz
+frequency_cutoff_high_hz = 50
+
+# Display spec
+pixels_per_mesh = 2**19
+
+
+def plt_two_time_series(time_1, sig_1, time_2, sig_2,
+                        y_label1, y_label2,
+                        title_label,
+                        sta_id,
+                        datetime_start_utc):
+    """
+    Quick plots
+    """
+    fig, ax = plt.subplots(nrows=2, ncols=1)
+    ax[0].plot(time_1, sig_1)
+    ax[1].plot(time_2, sig_2)
+    # Set labels and subplot title
+    ax[0].set_ylabel(y_label1)
+    ax[1].set_ylabel(y_label2)
+    ax[1].set_xlabel(f"Seconds from {datetime_start_utc} UTC")
+    plt.suptitle(title_label + " " + str(sta_id))
 
 
 if __name__ == "__main__":
+
     npzfile = np.load(input_file, allow_pickle=True)
     #  print(npzfile.files)
     # exit()
@@ -44,40 +68,74 @@ if __name__ == "__main__":
     accy_cmps2 = npzfile['accy_cmps2']
     accx_cmps2 = npzfile['accx_cmps2']
 
+    # THE NEXT STEPS ARE JUST PREP:
+    # Compute sample rates and number of points
+    mic_fs_hz: float = 1/np.mean(np.diff(mic_time_s))  # 800.
+    mic_duration_points: int = int(np.ceil(duration_s*mic_fs_hz))
+
     # Select the specified window
+    lead_pts = int(lead_s*mic_fs_hz)
     mic_time_start = mic_time_s[lead_pts]
-    mic_time_stop = mic_time_s[lead_pts+duration_points]
+    mic_time_stop = mic_time_s[lead_pts+mic_duration_points]
     acc_start_idx = np.argmin(np.abs(acc_time_s-mic_time_start))
     acc_stop_idx = np.argmin(np.abs(acc_time_s-mic_time_stop))
     acc_time_start = acc_time_s[acc_start_idx]
     acc_time_stop = acc_time_s[acc_stop_idx]
-    print(mic_time_start)
-    print(acc_time_start)
-    print(mic_time_stop)
-    print(acc_time_stop)
+    # print(mic_time_start)
+    # print(acc_time_start)
+    # print(mic_time_stop)
+    # print(acc_time_stop)
 
     # Correct time lines
-    start_utc = mic_start_utc + timedelta(seconds=mic_time_start)  # Have to use datetime
-    print('Corrected start time:', start_utc)
-    mic_t = np.copy(mic_time_s[lead_pts:lead_pts+duration_points])
+    start_utc = mic_start_utc + timedelta(seconds=mic_time_start)
+    print('\nFile name:', input_file)
+    print('Original start time:', mic_time_start)
+    print('Signal start time:', start_utc)
+    mic_t = np.copy(mic_time_s[lead_pts:lead_pts+mic_duration_points])
     mic_t -= mic_time_s[lead_pts]
     acc_t = np.copy(acc_time_s[acc_start_idx:acc_stop_idx])
     acc_t -= mic_time_s[lead_pts]
+
     # Waveforms
-    mic_w = np.copy(mic_mpa[lead_pts:lead_pts+duration_points])
+    mic_w = np.copy(mic_mpa[lead_pts:lead_pts+mic_duration_points])
     acc_z = np.copy(accz_cmps2[acc_start_idx:acc_stop_idx])
     acc_y = np.copy(accy_cmps2[acc_start_idx:acc_stop_idx])
     acc_x = np.copy(accx_cmps2[acc_start_idx:acc_stop_idx])
 
+    """
+    THIS IS THE REAL BEGINNING OF THE METHODS
+    """
+    # These are the selected signals with 60s durations
+    # They will require zero padding to meet 2^N FFT spec, and then truncating to display
+
+    # Collect fundamental metrics
     mic_sample_interval_s = np.mean(np.diff(mic_t))
     mic_sample_interval_std_s = np.std(np.diff(mic_t))
+    mic_sample_rate_hz = 1/mic_sample_interval_s
+    mic_points: int = len(mic_w)
+    mic_points_pow2 = 2**int(np.ceil(np.log2(mic_points)))
+    mic_points_pow2_atom: int = 2**int(np.ceil(np.log2(duration_averaging_s*mic_sample_rate_hz)))
+
     acc_sample_interval_s = np.mean(np.diff(acc_t))
     acc_sample_interval_std_s = np.std(np.diff(acc_t))
-
-    mic_sample_rate_hz = 1/mic_sample_interval_s
     acc_sample_rate_hz = 1/acc_sample_interval_s
+    acc_points: int = len(acc_z)
+    acc_points_pow2 = 2**int(np.ceil(np.log2(acc_points)))
+    acc_points_pow2_atom: int = 2**int(np.ceil(np.log2(duration_averaging_s*acc_sample_rate_hz)))
 
-    print(input_file)
+    # *** Begin processing chain ***
+    # Highpass, could be a simpler representation
+    fraction_cosine = 0.1
+    mic_sig = styx_fft.butter_highpass(sig_wf=mic_w,
+                                       frequency_sample_rate_hz=mic_sample_rate_hz,
+                                       frequency_cut_low_hz=frequency_cutoff_low_hz,
+                                       tukey_alpha=fraction_cosine)
+
+    accz_sig = styx_fft.butter_highpass(sig_wf=acc_z,
+                                        frequency_sample_rate_hz=acc_sample_rate_hz,
+                                        frequency_cut_low_hz=frequency_cutoff_low_hz,
+                                        tukey_alpha=fraction_cosine)
+
     print('Mic sample interval, s:', mic_sample_interval_s)
     print('Mic sample interval std, s:', mic_sample_interval_std_s)
     print('AccZ sample interval, s:', acc_sample_interval_s)
@@ -86,53 +144,38 @@ if __name__ == "__main__":
     print('Mic sample rate, hz:', mic_sample_rate_hz)
     print('Acc sample rate, hz:', acc_sample_rate_hz)
 
-    # Highpass
-    mic_sig = styx_fft.butter_highpass(sig_wf=mic_w,
-                                       frequency_sample_rate_hz=mic_sample_rate_hz,
-                                       frequency_cut_low_hz=frequency_cutoff_low_hz,
-                                       tukey_alpha=0.1)
+    # Reconcile Order and Duration specs
 
-    accz_sig = styx_fft.butter_highpass(sig_wf=acc_z,
-                                        frequency_sample_rate_hz=acc_sample_rate_hz,
-                                        frequency_cut_low_hz=frequency_cutoff_low_hz,
-                                        tukey_alpha=0.1)
-
-    # TODO: Pad to match mic
-    pow2_points = 2**int(np.ceil(np.log2(len(mic_mpa))))
-    print('Len sig:', len(mic_mpa))
-    print('New len sig:', pow2_points)
-
+    # TDR PLOTS
     # Plot raw mic and zoomed signal
-    fig1, ax = plt.subplots(nrows=2, ncols=1)
-    ax[0].plot(mic_time_s, mic_mpa)
-    ax[1].plot(mic_t+lead_s, mic_w)
-    # Set labels and subplot title
-    ax[0].set_ylabel('Mic, mPa')
-    ax[1].set_ylabel('Mic, mPa, zoom in')
-    ax[1].set_xlabel(f"Seconds from {mic_start_utc} UTC")
-    plt.suptitle(f"RedVox ID {station_id}")
+    plt_two_time_series(time_1=mic_time_s, sig_1=mic_mpa,
+                        time_2=mic_t+lead_s, sig_2=mic_w,
+                        y_label1='Mic, mPa',
+                        y_label2='Mic, mPa, zoom in',
+                        title_label='Record and Selected Sig for RedVox ID',
+                        sta_id=station_id,
+                        datetime_start_utc=mic_start_utc)
 
     # Plot raw mic and accel
-    fig2, ax = plt.subplots(nrows=2, ncols=1, sharex='col')
-    ax[0].plot(mic_t, mic_w)
-    ax[1].plot(acc_t, acc_z)
-    # Set labels and subplot title
-    ax[0].set_ylabel('Mic, mPa')
-    ax[1].set_ylabel('Acc Z, cm/s2')
-    ax[1].set_xlabel(f"Seconds from {start_utc} UTC")
-    plt.suptitle(f"RedVox ID {station_id}")
+    plt_two_time_series(time_1=mic_t, sig_1=mic_w,
+                        time_2=acc_t, sig_2=acc_z,
+                        y_label1='Mic, mPa',
+                        y_label2='Acc Z, cm/s2',
+                        title_label='Raw Mic and AccZ Sig for RedVox ID',
+                        sta_id=station_id,
+                        datetime_start_utc=start_utc)
 
     # Plot highpass mic and accel
-    fig3, ax = plt.subplots(nrows=2, ncols=1, sharex='col')
-    ax[0].plot(mic_t, mic_sig)
-    ax[1].plot(acc_t, accz_sig)
-    # Set labels and subplot title
-    ax[0].set_ylabel('Mic, mPa')
-    ax[1].set_ylabel('Acc Z, cm/s2')
-    ax[1].set_xlabel(f"Seconds from {start_utc} UTC")
-    plt.suptitle(f"RedVox ID {station_id}")
+    plt_two_time_series(time_1=mic_t, sig_1=mic_sig,
+                        time_2=acc_t, sig_2=accz_sig,
+                        y_label1='Mic, mPa',
+                        y_label2='Acc Z, cm/s2',
+                        title_label='Higpassed Mic and AccZ Sig for RedVox ID',
+                        sta_id=station_id,
+                        datetime_start_utc=start_utc)
 
-    # plt.show()
+
+    plt.show()
 
 
 
