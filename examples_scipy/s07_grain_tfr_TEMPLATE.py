@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # exit()
     # TODO: Note oversampling on CWT leads to overestimation of energy!!
     frequency_cwt_fft_hz = frequency_stft_pos_hz[2:]
-    # frequency_cwt_fft_hz = frequency_cwt_pos_hz[1:]
+    # frequency_inferno_hz = frequency_cwt_pos_hz[1:]
 
     mic_sig_complex, time_s, scale, omega, amp = \
         styx_cwt.wavelet_centered_4cwt(band_order_Nth=order_number_input,
