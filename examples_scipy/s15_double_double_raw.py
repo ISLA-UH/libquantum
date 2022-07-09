@@ -1,11 +1,10 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-from libquantum import utils
-from scipy import interpolate, signal
+from datetime import timedelta
 from libquantum import styx_stx, styx_cwt, styx_fft, scales
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
+from typing import Tuple
 
 
 # input_file = "/Users/mgarces/Documents/DATA_2022/DOUBLE_DOUBLE/redvox_data/double_1_1637610021.npz"
@@ -30,7 +29,61 @@ frequency_cutoff_low_hz = frequency_averaging_hz
 frequency_cutoff_high_hz = 100
 
 # Display spec
-pixels_per_mesh = 2**19
+pixels_per_mesh = 2**16  # Edge spec is up to 2^20 for a single mesh, 2^19 for a double
+
+
+def resampled_power_per_band(sig_wf: np.array,
+                             sig_time: np.array,
+                             power_tfr: np.array,
+                             points_per_seg: int,
+                             points_hop: int = None) -> Tuple[np.array, np.array, np.array]:
+    """
+    Look at
+    https://localcoder.org/rolling-window-for-1d-arrays-in-numpy
+    :param sig_wf: audio waveform
+    :param sig_time: audio timestamps in seconds, same dimensions as sig
+    :param power_tfr: time-frequency representation with same number of columns as sig
+    :param points_per_seg: number of points, set by downsampling factor
+    :param points_hop: number of points overlap per window. Default is 50%
+
+    :return: rms_sig_wf, rms_sig_time_s
+    """
+
+    number_bands = power_tfr.shape[0]
+
+    if points_hop is None:
+        points_hop: int = points_per_seg  # Tested at 0.5*int(points_per_seg)
+
+    var_sig = (sig_wf - np.mean(sig_wf))**2
+    # https://numpy.org/devdocs/reference/generated/numpy.lib.stride_tricks.sliding_window_view.html
+    # Variance over the signal waveform, all bands
+    var_wf_windowed = \
+        np.lib.stride_tricks.sliding_window_view(var_sig,
+                                                 window_shape=points_per_seg)[0::points_hop, :].copy()
+
+    var_sig_wf = var_wf_windowed.mean(axis=-1)
+
+    var_tfr = np.zeros((number_bands, len(var_sig_wf)))
+    # Mean of absolute TFR power per band
+    for j in np.arange(number_bands):
+        var_tfr_windowed = \
+            np.lib.stride_tricks.sliding_window_view(power_tfr[j, :],
+                                                     window_shape=points_per_seg)[0::points_hop, :].copy()
+        var_tfr[j, :] = var_tfr_windowed.mean(axis=-1)
+
+    # TODO: Could also compute the max power per band per time step
+    # sig time
+    var_sig_time_s = sig_time[0::points_hop].copy()
+
+    # check dims
+    diff = abs(len(var_sig_time_s) - len(var_sig_wf))
+
+    if (diff % 2) != 0:
+        var_sig_time_s = var_sig_time_s[0:-1]
+    else:
+        var_sig_time_s = var_sig_time_s[1:-1]
+
+    return var_sig_time_s, var_sig_wf, var_tfr
 
 
 def plt_two_time_series(time_1, sig_1, time_2, sig_2,
@@ -226,88 +279,144 @@ if __name__ == "__main__":
                                        frequency_high_input=frequency_cutoff_high_hz)
     # Flip to match STFT
     frequency_inferno_hz = np.flip(frequency_center_geometric)
-    print('\nLen Inferno Frequency Bands:', len(frequency_inferno_hz))
-    # Compute TFRs for Mic
-    nfft = int(len(mic_pad_sig)/16)
-    frequency_stft_hz, time_stft_s, stft_complex = \
-        styx_fft.stft_complex_pow2(sig_wf=mic_pad_sig,
-                                   frequency_sample_rate_hz=mic_sample_rate_hz,
-                                   nfft_points=nfft)
 
-    stft_power = 2*np.abs(stft_complex)**2
-    stft_log2_power = np.log2(stft_power + scales.EPSILON)
-    stft_log2_power -= np.max(stft_log2_power)
+    # # Compute TFRs for Mic
+    # nfft = int(len(mic_pad_sig)/16)
+    # frequency_stft_hz, time_stft_s, stft_complex = \
+    #     styx_fft.stft_complex_pow2(sig_wf=mic_pad_sig,
+    #                                frequency_sample_rate_hz=mic_sample_rate_hz,
+    #                                nfft_points=nfft)
+    #
+    # stft_power = 2*np.abs(stft_complex)**2
+    # stft_log2_power = np.log2(stft_power + scales.EPSILON)
+    # stft_log2_power -= np.max(stft_log2_power)
+    #
+    # # CWT
+    # frequency_cwt_hz, time_cwt_s, cwt_complex = \
+    #     styx_cwt.cwt_complex_any_scale_pow2(sig_wf=mic_pad_sig,
+    #                                         frequency_sample_rate_hz=mic_sample_rate_hz,
+    #                                         frequency_cwt_hz=frequency_inferno_hz,
+    #                                         band_order_Nth=order_Nth,
+    #                                         dictionary_type="spect")
+    #
+    # cwt_power = 2*np.abs(cwt_complex)**2
+    # cwt_log2_power = np.log2(cwt_power + scales.EPSILON)
+    # cwt_log2_power -= np.max(cwt_log2_power)
 
-    # CWT
-    frequency_cwt_hz, time_cwt_s, cwt_complex = \
-        styx_cwt.cwt_complex_any_scale_pow2(sig_wf=mic_pad_sig,
-                                            frequency_sample_rate_hz=mic_sample_rate_hz,
-                                            frequency_cwt_hz=frequency_inferno_hz,
-                                            band_order_Nth=order_Nth,
-                                            dictionary_type="spect")
-
-    cwt_power = 2*np.abs(cwt_complex)**2
-    cwt_log2_power = np.log2(cwt_power + scales.EPSILON)
-    cwt_log2_power -= np.max(cwt_log2_power)
+    # # Verify
+    # print('Total number of points in STFT TFR:', stft_power.size)
+    # print('Total number of points in CWT TFR:', cwt_power.size)
 
     # STX
-    frequency_stx_hz, time_stx_s, stx_complex = \
+    frequency_stx_hz, time_stx_s0, stx_complex0 = \
         styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_pad_sig,
                                             frequency_sample_rate_hz=mic_sample_rate_hz,
                                             frequency_stx_hz=frequency_inferno_hz,
                                             band_order_Nth=order_Nth,
                                             dictionary_type="spect")
 
-    stx_power = 2*np.abs(stx_complex)**2
+    stx_power0 = 2*np.abs(stx_complex0)**2
+
+    # Correct STX
+    time_stx_s = time_stx_s0[mic_pad_points:]
+    time_stx_s -= time_stx_s[0]
+    sig_wf = mic_pad_sig[mic_pad_points:]
+    stx_power = stx_power0[:, mic_pad_points:]
     stx_log2_power = np.log2(stx_power + scales.EPSILON)
     stx_log2_power -= np.max(stx_log2_power)
+    stx_time_contraction_factor = int(np.ceil((len(time_stx_s)/(pixels_per_mesh/len(frequency_inferno_hz)))))
 
-    print('\nTotal number of points in STFT TFR:', stft_power.size)
-    print('Total number of points in CWT TFR:', cwt_power.size)
-    print('Total number of points in STX TFR:', stx_power.size)
+
+    print('\nCORRECT STX FOR SPECIFIED DURATION AND PIXELS/MESH')
+    print('Len Inferno Frequency Bands:', len(frequency_inferno_hz))
+    print('Len STX time:', len(time_stx_s))
+    print('pixels_per_mesh/bands:', pixels_per_mesh/len(frequency_inferno_hz))
+
+
+    var_sig_time_s, var_sig_wf, var_tfr = \
+        resampled_power_per_band(sig_wf=sig_wf,
+                                 sig_time=time_stx_s,
+                                 power_tfr=stx_power,
+                                 points_per_seg=stx_time_contraction_factor)
+    # print(var_sig_wf.shape)
+    # print(var_tfr.shape)
+    print('Total number of points in STX TFR:', stx_log2_power.size)
+    print('Max Pixels per mesh:', pixels_per_mesh)
+    print('STX_time_contraction_factor:', stx_time_contraction_factor)
+    print('Reshaped STX TFR:', var_tfr.size)
+
+    stx_log2_power2 = np.log2(var_tfr + scales.EPSILON)
+    stx_log2_power2 -= np.max(stx_log2_power2)
+
+    # Plot highpass mic and rms
+    plt_two_time_series(time_1=mic_t, sig_1=mic_sig,
+                        time_2=var_sig_time_s, sig_2=var_sig_wf,
+                        y_label1='Mic, mPa',
+                        y_label2='Mic VAR, mPa^2',
+                        title_label='Higpassed Mic Sig and Var for RedVox ID',
+                        sta_id=station_id,
+                        datetime_start_utc=start_utc)
+
+    # plt.show()
+    #
+    # exit()
     # print('STX TFR decimation factor:', cwt_power.size)
 
-    exit()
+
+
+    # pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
+    #                        wf_panel_a_sig=mic_pad_sig,
+    #                        wf_panel_a_time=mic_pad_time,
+    #                        mesh_time=time_stft_s,
+    #                        mesh_frequency=frequency_stft_hz,
+    #                        mesh_panel_b_tfr=stft_log2_power,
+    #                        mesh_panel_b_colormap_scaling="range",
+    #                        wf_panel_a_units="Norm",
+    #                        mesh_panel_b_cbar_units="bits",
+    #                        start_time_epoch=0,
+    #                        figure_title="Mic STFT for " + EVENT_NAME,
+    #                        frequency_hz_ymin=frequency_inferno_hz[-0],
+    #                        frequency_hz_ymax=frequency_inferno_hz[-1])
+    #
+    # pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
+    #                        wf_panel_a_sig=mic_pad_sig,
+    #                        wf_panel_a_time=mic_pad_time,
+    #                        mesh_time=time_cwt_s,
+    #                        mesh_frequency=frequency_cwt_hz,
+    #                        mesh_panel_b_tfr=cwt_log2_power,
+    #                        mesh_panel_b_colormap_scaling="range",
+    #                        wf_panel_a_units="Norm",
+    #                        mesh_panel_b_cbar_units="bits",
+    #                        start_time_epoch=0,
+    #                        figure_title="Mic CWT for " + EVENT_NAME,
+    #                        frequency_hz_ymin=frequency_inferno_hz[-0],
+    #                        frequency_hz_ymax=frequency_inferno_hz[-1])
+    #
+    # pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
+    #                        wf_panel_a_sig=sig_wf,
+    #                        wf_panel_a_time=time_stx_s,
+    #                        mesh_time=time_stx_s,
+    #                        mesh_frequency=frequency_stx_hz,
+    #                        mesh_panel_b_tfr=stx_log2_power,
+    #                        mesh_panel_b_colormap_scaling="range",
+    #                        wf_panel_a_units="mPa",
+    #                        mesh_panel_b_cbar_units="bits",
+    #                        start_time_epoch=0,
+    #                        figure_title="Mic STX for " + EVENT_NAME,
+    #                        frequency_hz_ymin=frequency_inferno_hz[-0],
+    #                        frequency_hz_ymax=frequency_inferno_hz[-1])
 
     pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
-                           wf_panel_a_sig=mic_pad_sig,
-                           wf_panel_a_time=mic_pad_time,
-                           mesh_time=time_stft_s,
-                           mesh_frequency=frequency_stft_hz,
-                           mesh_panel_b_tfr=stft_log2_power,
-                           mesh_panel_b_colormap_scaling="range",
-                           wf_panel_a_units="Norm",
-                           mesh_panel_b_cbar_units="bits",
-                           start_time_epoch=0,
-                           figure_title="Mic STFT for " + EVENT_NAME,
-                           frequency_hz_ymin=frequency_inferno_hz[-0],
-                           frequency_hz_ymax=frequency_inferno_hz[-1])
-
-    pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
-                           wf_panel_a_sig=mic_pad_sig,
-                           wf_panel_a_time=mic_pad_time,
-                           mesh_time=time_cwt_s,
-                           mesh_frequency=frequency_cwt_hz,
-                           mesh_panel_b_tfr=cwt_log2_power,
-                           mesh_panel_b_colormap_scaling="range",
-                           wf_panel_a_units="Norm",
-                           mesh_panel_b_cbar_units="bits",
-                           start_time_epoch=0,
-                           figure_title="Mic CWT for " + EVENT_NAME,
-                           frequency_hz_ymin=frequency_inferno_hz[-0],
-                           frequency_hz_ymax=frequency_inferno_hz[-1])
-
-    pltq.plot_wf_mesh_vert(redvox_id=str(station_id),
-                           wf_panel_a_sig=mic_pad_sig,
-                           wf_panel_a_time=mic_pad_time,
-                           mesh_time=time_stx_s,
+                           wf_panel_a_sig=var_sig_wf,
+                           wf_panel_a_time=var_sig_time_s,
+                           mesh_time=var_sig_time_s,
                            mesh_frequency=frequency_stx_hz,
-                           mesh_panel_b_tfr=stx_log2_power,
+                           mesh_panel_b_tfr=stx_log2_power2,
                            mesh_panel_b_colormap_scaling="range",
-                           wf_panel_a_units="Norm",
+                           wf_panel_a_units="mPa^2",
                            mesh_panel_b_cbar_units="bits",
                            start_time_epoch=0,
-                           figure_title="Mic STX for " + EVENT_NAME,
+                           figure_title="Resampled Mic STX for " + EVENT_NAME,
                            frequency_hz_ymin=frequency_inferno_hz[-0],
                            frequency_hz_ymax=frequency_inferno_hz[-1])
 
