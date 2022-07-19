@@ -131,8 +131,7 @@ if __name__ == "__main__":
         styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_sig,
                                             frequency_sample_rate_hz=frequency_sample_rate_hz,
                                             frequency_stx_hz=frequency_cwt_fft_hz,
-                                            band_order_Nth=order_number_input,
-                                            dictionary_type="spect")
+                                            band_order_Nth=order_number_input)
 
     # Information overload methods
     stx_power, stx_power_per_band, stx_power_per_sample, stx_power_total, stx_power_scaled, \

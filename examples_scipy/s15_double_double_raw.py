@@ -312,8 +312,7 @@ if __name__ == "__main__":
         styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_pad_sig,
                                             frequency_sample_rate_hz=mic_sample_rate_hz,
                                             frequency_stx_hz=frequency_inferno_hz,
-                                            band_order_Nth=order_Nth,
-                                            dictionary_type="spect")
+                                            band_order_Nth=order_Nth)
 
     stx_power0 = 2*np.abs(stx_complex0)**2
 
