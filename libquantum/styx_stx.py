@@ -182,15 +182,13 @@ def tfr_stx_fft(sig_wf: np.ndarray,
 def stx_complex_any_scale_pow2(band_order_Nth: float,
                                sig_wf: np.ndarray,
                                frequency_sample_rate_hz: float,
-                               frequency_stx_hz: np.ndarray,
-                               dictionary_type: str = "spect") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+                               frequency_stx_hz: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     With some assumptions and simplifications, and with some vectorization
-    :param band_order_Nth: 
-    :param sig_wf: 
-    :param frequency_sample_rate_hz: 
-    :param frequency_stx_hz: 
-    :param dictionary_type: 
+    :param band_order_Nth: Fractional octave band - revisit
+    :param sig_wf: input signal with 2^M points
+    :param frequency_sample_rate_hz: sample rate in Hz
+    :param frequency_stx_hz: frequency vector in increasing order
     :return: 
     """
     n_fft_pow2 = len(sig_wf)
@@ -204,7 +202,7 @@ def stx_complex_any_scale_pow2(band_order_Nth: float,
     frequency_fft = fftfreq(n_fft_pow2, 1/frequency_sample_rate_hz)   # in units of 1/sample interval
     omega_fft = 2 * np.pi * frequency_fft / frequency_sample_rate_hz  # scaled angular frequency
     omega_stx = 2*np.pi*frequency_stx_hz/frequency_sample_rate_hz    # non-dimensional angular stx frequency
-    sigma_stx = cycles_M/omega_stx  # TODO: Use same nomenclature as cwt
+    sigma_stx = cycles_M/omega_stx  # TODO: revisit; manage order vs frequency, use same nomenclature as cwt
 
     # Construct 2d matrices
     # sig_fft_cat_2d = np.tile(sig_fft_cat, (scale_points, 1))
