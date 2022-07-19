@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     mic_sig_sample_rate_hz = 800.
     sig_frequency_hz = 50.
-    sig_duration_s = 5.
+    sig_duration_s = 6.
 
     # Construct synthetic tone with max unit amplitude
     mic_sig_epoch_s = np.arange(int(mic_sig_sample_rate_hz * sig_duration_s)) / mic_sig_sample_rate_hz + run_time_epoch_s

@@ -3,6 +3,6 @@
 # Updated with conda install from miniforge, verify with cuda list
 # Last updated 08 December 2021
 
-pdoc3 >= 0.8.1
-twine >= 3.7.1
-wheel >= 0.37.0
+pdoc3 >= 0.8.4
+twine >= 3.2.0
+wheel >= 0.34.2

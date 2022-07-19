@@ -104,7 +104,7 @@ def cqt_from_sig(sig_wf: np.ndarray,
                                scale=True, pad_mode='reflect')
 
     time_cqt_s = librosa.times_like(CQT, sr=frequency_sample_rate_hz, hop_length=cqt_points_hop_min)
-    frequency_cqt_hz = librosa.core.cqt_frequencies(scale_number_bins, frequency_hz_center_min,
+    frequency_cqt_hz = librosa.core.cqt_frequencies(n_bins=scale_number_bins, fmin=frequency_hz_center_min,
                                                     bins_per_octave=int_order_N, tuning=0.0)
     cqt_multiplier = cqt_scaling(band_order_Nth,
                                  frequency_cqt_hz,
