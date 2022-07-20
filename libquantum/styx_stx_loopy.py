@@ -1,3 +1,7 @@
+"""
+STRIPPED DOWN STOCKWELL CODE
+"""
+
 import numpy as np
 from scipy.fft import fft, ifft
 import matplotlib.pyplot as plt
