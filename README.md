@@ -29,6 +29,16 @@ Seism. Res. Lett.](https://pubs.geoscienceworld.org/ssa/srl/article-abstract/91/
 Empirical Acoustic Source Model for Chemical Explosions in Air,
 Bulletin of the Seismological Society of America](https://pubs.geoscienceworld.org/ssa/bssa/article-abstract/doi/10.1785/0120210030/600721/Empirical-Acoustic-Source-Model-for-Chemical?redirectedFrom=fulltext)
 
+Recommended reading in chronological order:
+- Gabor, D. Theory of Communication, Part 3. Electr. Eng. 1946, 93, 445–457.
+- Shannon, C.E. The Mathematical Theory of Communication; University of Illinois Press: Urbana, IL, USA, 1998; [1949 first ed].
+- Harris, F. J. On the Use of Windows for Harmonic Analysis with the Discrete Fourier Transform, Proceedings of the IEEE, 1978, 66 (1), 51-83.
+- Cohen, L. Time-Frequency Analysis, Prentice-Hall, NI 07458, 1995.
+- Stockwell, R. G., Mansina, L, and R. P. Lowe. Localization of the Complex Spectrum: The S Transform. Signal Processing, IEEE Transactions, 1996, 44 no. 4, 998-1001.
+- Mallat, S. A Wavelet Tour of Signal Processing: The Sparse Way, 3rd ed.; Academic Press: Cambridge, MA, USA, 2009 [1998 first ed].
+
+
+
 ### Installation
 
 ```shell script
