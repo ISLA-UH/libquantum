@@ -15,14 +15,28 @@ if __name__ == "__main__":
     order = 12
     scale_multiplier = 3/4*np.pi * order
     omega = np.pi/16  # Only matters for adequate sampling. Nyquist is at pi
-    # TODO: autoscale vertical information axis with omega
 
+    # Atoms scale
     scale = scale_multiplier/omega
+    # Largest amplitude and information is for the atom
+
+    # Real or imaginary signal
+    chirp_sig_type = 'complex'  # 'real', 'imag', or 'complex'
+
+    if chirp_sig_type == 'complex':
+        atom_peak_amp = 1./(np.pi*scale**2)**0.25
+    else:
+        atom_peak_amp = np.sqrt(2)/(np.pi*scale**2)**0.25
+
+    atom_peak_power = atom_peak_amp**2
+    atom_peak_info = -atom_peak_power*np.log2(atom_peak_power)
+
     window_support_points = 2*np.pi*scale
     # scale up
     window_support_pow2 = 2**(np.ceil(np.log2(window_support_points)))
 
     gamma0 = np.logspace(start=2, stop=-2, num=5, base=2)
+    # gamma0 = np.array([0, 1/4, 1/2, 1, 2, 4])
     mu0 = np.sqrt(1 + gamma0**2)
     # Working with number of points
     window_duration = window_support_pow2 * mu0
@@ -33,10 +47,6 @@ if __name__ == "__main__":
     time = time0 - time0[-1]/2
 
     fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, sharex='col', figsize=(8, 6))
-
-    # Real or imaginary signal
-    chirp_sig_type = 'imag'  # 'real', 'imag', or 'complex'
-
     for i, gamma in enumerate(gamma0):
         mu = mu0[i]
         chirp_scale = scale * mu
@@ -91,29 +101,31 @@ if __name__ == "__main__":
         # TODO: increases to ~ np.sqrt(np.pi)/2 as mu -> 1
         print('Correction factor:', correction_factor)
         print('Info dif in bits divided by sqrt(pi)/4:', chirp_info_error_bits/correction_factor)
+
+        # Handle label powers
         gamma_str = str(int(np.log2(gamma0[i])))
+        # gamma_str = r'$2^{}$'
+
         info_str = str(np.around(chirp_sum_info, decimals=1))
         ax1.plot(time/window_support_points, chirp_wf_info, label=r'$\sum = $' + info_str)
         ax1.xaxis.set_tick_params(labelsize='x-large')
         ax1.yaxis.set_tick_params(labelsize='x-large')
         ax1.set_ylabel('Info, bits', rotation=90, fontsize='xx-large')
-        # ax1.set_yscale('log', base=2)
+        ax1.set_yscale('log', base=2)
         # ax.set_xscale('log', base=2)
-        ax1.set_ylim(-0.001, 0.2)
+        ax1.set_ylim(2**-16, 2**np.ceil(np.log2(1.1*atom_peak_info)))
         ax1.set_xlim(-2, 2)
 
         if chirp_sig_type == 'complex':
-            ax2.plot(time/window_support_points, np.real(chirp_wf_in), label=r'$\gamma = $' + gamma_str)
-            ax2.plot(time/window_support_points, np.imag(chirp_wf_in), '--')
+            ax2.plot(time/window_support_points, np.real(chirp_wf_in), label=r'$ln_2\gamma = $' + gamma_str)
+            # ax2.plot(time/window_support_points, np.imag(chirp_wf_in), '--')
         else:
             ax2.plot(time/window_support_points, chirp_wf_in, label=r'$\gamma = $' + gamma_str)
         ax2.xaxis.set_tick_params(labelsize='x-large')
         ax2.yaxis.set_tick_params(labelsize='x-large')
         ax2.set_xlabel(r'$\dfrac{time}{M_N}$', fontsize='xx-large')
-        ax2.set_ylabel(r'$\dfrac{\psi}{\psi_{rms}}$', rotation=0, fontsize='xx-large')
-        # ax.set_yscale('log', base=2)
-        # ax.set_xscale('log', base=2)
-        ax2.set_ylim(-0.2, 0.2)
+        ax2.set_ylabel(r'$\dfrac{f}{f_{rms}}$', rotation=0, fontsize='xx-large')
+        ax2.set_ylim(-1.1*atom_peak_amp, 1.1*atom_peak_amp)
         ax2.set_xlim(-2, 2)
     ax1.legend(loc='upper right', fontsize='large')
     ax1.grid(True)
