@@ -5,7 +5,7 @@ libquantum example: s07_grain_tfr
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from libquantum import utils, synthetics, spectra, benchmark_signals, atoms, entropy
+from libquantum import utils, atoms
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 from libquantum.styx_stx import tfr_stx_fft
 from libquantum import blast_pulse as kaboom

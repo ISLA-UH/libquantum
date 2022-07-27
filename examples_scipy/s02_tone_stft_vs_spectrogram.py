@@ -13,7 +13,8 @@ RMS amplitude = 1/sqrt(2)
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from libquantum import utils, benchmark_signals
+from libquantum import utils
+from libquantum2 import benchmark_signals
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 print(__doc__)
 

@@ -5,7 +5,7 @@ First test synthetic: synth_00
 
 import numpy as np
 from libquantum.stockwell_orig import tfr_array_stockwell, calculate_rms_sig_test
-from libquantum.benchmark_signals import synth_00, synth_01, synth_02, synth_03
+from libquantum2.benchmark_signals import synth_03
 
 from matplotlib import pyplot as plt
 print(__doc__)

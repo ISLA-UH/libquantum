@@ -11,7 +11,8 @@ RMS amplitude = 1/sqrt(2)
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
-from libquantum import benchmark_signals
+from libquantum2 import benchmark_signals
+
 print(__doc__)
 
 

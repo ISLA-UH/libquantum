@@ -4,12 +4,11 @@ First test synthetic: synth_00
 """
 
 import numpy as np
-from scipy.fft import fft, rfft, ifft, fftfreq, fftshift
+from scipy.fft import fft, ifft, fftfreq
 from libquantum.scales import EPSILON
 # from libquantum.stockwell_orig import tfr_array_stockwell, calculate_rms_sig_test
-from libquantum.benchmark_signals import synth_00
-from libquantum.benchmark_signals import plot_tdr_sig, plot_tfr_lin, plot_tfr_bits, \
-    plot_st_window_tdr_lin, plot_st_window_tfr_bits, plot_st_window_tfr_lin
+from libquantum2.benchmark_signals import synth_00
+from libquantum2.benchmark_signals import plot_tfr_lin
 
 from matplotlib import pyplot as plt
 print(__doc__)
