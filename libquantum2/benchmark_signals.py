@@ -181,9 +181,10 @@ def quantum_chirp(omega: float,
     :return:
     """
 
-    if omega >= np.pi:
-        print("Omega >= pi (Nyquist), reset to pi/4")
-        omega = np.pi / 4
+    if omega >= 0.8*np.pi:
+        print("Omega >= 0.8*pi (AA*Nyquist), reset to pi * 2**(-1/N")
+        omega = np.pi * 2**(-1/order)
+
     # Gabor atom specifications
     scale_multiplier = 3 / 4 * np.pi * order
 
