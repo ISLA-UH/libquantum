@@ -31,6 +31,7 @@ frequency_cutoff_high_hz = 100
 # Display spec
 pixels_per_mesh = 2**16  # Edge spec is up to 2^20 for a single mesh, 2^19 for a double
 
+# TODO: If size(TFR) < pixel per mesh, don't contract
 
 def resampled_power_per_band(sig_wf: np.array,
                              sig_time: np.array,
@@ -323,6 +324,7 @@ if __name__ == "__main__":
     stx_power = stx_power0[:, mic_pad_points:]
     stx_log2_power = np.log2(stx_power + scales.EPSILON)
     stx_log2_power -= np.max(stx_log2_power)
+    # TODO: Make this into a power of two
     stx_time_contraction_factor = int(np.ceil((len(time_stx_s)/(pixels_per_mesh/len(frequency_inferno_hz)))))
 
 
