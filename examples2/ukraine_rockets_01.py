@@ -168,5 +168,6 @@ def main():
             # TODO: Make this into a power of two
             # stx_time_contraction_factor = int(np.ceil((len(time_stx_s)/(pixels_per_mesh/len(frequency_inferno_hz)))))
 
+
 if __name__ == "__main__":
     main()
