@@ -26,7 +26,7 @@ print('Estimated peak pressure in Pa at full range (unity):', estimated_peak_pa)
 
 # Gabor atom averaging spec (lowest frequency)
 input_order = 3.
-frequency_averaging_hz = 1
+frequency_averaging_hz = 1.
 number_cycles_averaging = 3*np.pi/4 * input_order
 duration_averaging_s = number_cycles_averaging / frequency_averaging_hz
 
@@ -208,9 +208,12 @@ def main():
             # Get the three relevant powers of two
             mic_points_pow2: int = 2**int(np.ceil(np.log2(mic_points)))
             mic_points_pow2_display: int = 2**int(np.ceil(np.log2(mic_display_points)))
+            # TODO: This one is the most important, and sets the stride. How many base atoms per record?
             mic_points_pow2_long_atom: int = 2**int(np.ceil(np.log2(mic_long_atom_points)))
 
-            print(mic_points_pow2, mic_points_pow2_display, mic_points_pow2_long_atom)
+            print('Atom_pow2, audio_pow2, display_pow2')
+            print(mic_points_pow2_long_atom, mic_points_pow2, mic_points_pow2_display)
+            print('audio_pow2/atom_pow2', mic_points_pow2/mic_points_pow2_long_atom)
 
             # Zero pad relative to the largest of points_pow2
             if mic_points_pow2_display < mic_points_pow2_long_atom:
