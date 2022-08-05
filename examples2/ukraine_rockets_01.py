@@ -31,7 +31,7 @@ number_cycles_averaging = 3*np.pi/4 * input_order
 duration_averaging_s = number_cycles_averaging / frequency_averaging_hz
 
 # Targeted Duration
-duration_s = 60
+duration_s = 62
 
 # Bandwidth spec - build override
 frequency_cutoff_low_hz = frequency_averaging_hz
@@ -244,17 +244,18 @@ def main():
                                                     band_order_Nth=order_Nth)
 
             stx_power0 = 2*np.abs(stx_complex0)**2
-            # Correct STX
-            time_stx_s = time_stx_s0[mic_pad_points:]
+
+            # # Correct STX
+            # time_stx_s = time_stx_s0[mic_pad_points:]
+            # time_stx_s -= time_stx_s[0]
+            # sig_wf = mic_pad_sig[mic_pad_points:]
+            # stx_power = stx_power0[:, mic_pad_points:]
+
+            # Lock to duration
+            time_stx_s = time_stx_s0[-1-mic_display_points:-1]
             time_stx_s -= time_stx_s[0]
-            sig_wf = mic_pad_sig[mic_pad_points:]
-            stx_power = stx_power0[:, mic_pad_points:]
-            time_stx_s = time_stx_s0[mic_pad_points:]
-            time_stx_s -= time_stx_s[0]
-            sig_wf = mic_pad_sig[mic_pad_points:]
-            stx_power = stx_power0[:, mic_pad_points:]
-            # stx_log2_power = np.log2(stx_power + scales.EPSILON)
-            # stx_log2_power -= np.max(stx_log2_power)
+            sig_wf = mic_pad_sig[-1-mic_display_points:-1]
+            stx_power = stx_power0[:, -1-mic_display_points:-1]
 
             # TODO: Only perform if > 1
             var_sig_time_s, var_sig_wf, var_tfr = \
@@ -268,10 +269,14 @@ def main():
             EVENT_NAME = "Ukraine HIMARS, " + str(int(audio_sample_rate_hz)) + "hz"
             print(var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape)
 
-            # Override
+            # Override TODO: Why is this failing?
             var_sig_time_s = np.arange(len(var_sig_wf))*time_contraction_factor_pow2/audio_sample_rate_hz
             print(var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape)
 
+            if audio_sample_rate_hz < 100:
+                bit_range = 16
+            else:
+                bit_range = 32
 
             pltq.plot_wf_mesh_vert(redvox_id=station_id,
                                    wf_panel_a_sig=var_sig_wf,
@@ -280,7 +285,7 @@ def main():
                                    mesh_frequency=frequency_stx_hz,
                                    mesh_panel_b_tfr=stx_log2_power2,
                                    mesh_panel_b_colormap_scaling="range",
-                                   mesh_panel_b_color_range=32,
+                                   mesh_panel_b_color_range=bit_range,
                                    wf_panel_a_units="Pa^2",
                                    mesh_panel_b_cbar_units="bits",
                                    start_time_epoch=0,
