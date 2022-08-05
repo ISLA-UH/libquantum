@@ -277,7 +277,7 @@ if __name__ == "__main__":
         styx_cwt.scale_frequency_bands(scale_order_input=input_order,
                                        frequency_sample_rate_input=mic_sample_rate_hz,
                                        frequency_low_input=frequency_cutoff_low_hz,
-                                       frequency_high_input=frequency_cutoff_high_hz)
+                                       frequency_high_input=mic_frequency_cutoff_high_hz)
     # Flip to match STFT
     frequency_inferno_hz = np.flip(frequency_center_geometric)
 
