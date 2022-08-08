@@ -12,6 +12,10 @@ import numpy as np
 
 @dataclass
 class StockwellConfig:
+    """
+    Required Stockwell Transform inputs.
+    """
+
     n_cols: int
     n_chunk: int
     band_type_lin: bool
@@ -21,6 +25,12 @@ class StockwellConfig:
 
 
 def chunk_by(array: np.ndarray, chunk_size: int) -> Iterator[np.ndarray]:
+    """
+    Iterates over "chunks" of an array.
+    :param array: The array to iterator over.
+    :param chunk_size: The size of each chunk.
+    :return: An iterator over "chunks" of the array.
+    """
     start: int = 0
     while start + chunk_size <= len(array):
         yield array[start : start + chunk_size]
@@ -28,6 +38,13 @@ def chunk_by(array: np.ndarray, chunk_size: int) -> Iterator[np.ndarray]:
 
 
 def chunked_stockwell(config: StockwellConfig, samples: np.ndarray) -> None:
+    """
+    Computes the Stockwell Transform over chunks of data.
+    :param config: The Stockwell config.
+    :param samples: The samples to chunk and then transform.
+    """
+
+    # Compute times for the full output buffer and frequencies for the given input params.
     time_s: np.ndarray = np.arange(config.n_cols) / config.frequency_sample_rate_hz
     freqs: np.ndarray
     if config.band_type_lin:
@@ -39,14 +56,18 @@ def chunked_stockwell(config: StockwellConfig, samples: np.ndarray) -> None:
             config.band_order_nth, config.frequency_sample_rate_hz, config.frequency_averaging_hz
         )
 
+    # Build full output buffer
     out: np.ndarray = np.zeros((len(freqs), config.n_cols))
 
     total_chunks: int = len(samples) // config.n_chunk
 
+    # For each chunk, perform the transform and update the output
     i: int
     chunk: np.ndarray
     for i, chunk in enumerate(chunk_by(samples, config.n_chunk)):
         # Run stockwell
+        # TODO: Incorrect -- what can be done to fix? Persistent Gaussian window for full output?
+        # TODO: Don't recompute state on each chunk
         chunked_out: np.ndarray = stx.stx_power_any_scale_pow2(
             config.band_order_nth, chunk, config.frequency_sample_rate_hz, freqs
         )
@@ -79,9 +100,9 @@ def main() -> None:
     # Let's only use the closest power of 2 samples
     n_cols: int = 2 ** math.floor(math.log2(len(samples)))
 
-    print(f"Using output buf of size {n_cols}")
+    print(f"Using output buf of size {2}^{math.floor(math.log2(len(samples)))} ({n_cols})")
 
-    config: StockwellConfig = StockwellConfig(n_cols, 2**15, False, 3, sr_hz, 1)
+    config: StockwellConfig = StockwellConfig(n_cols, 2**18, False, 3, sr_hz, 1)
     chunked_stockwell(config, samples[:n_cols])
 
 
