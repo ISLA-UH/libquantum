@@ -18,13 +18,14 @@ from libquantum import styx_stx, styx_cwt, scales
 import libquantum.plot_templates.plot_time_frequency_reps_black as pltq
 
 # PROFILE SAMPLE RATE
-profile_sample_rate = 800.
+profile_sample_rate = 48000.
 EVENT_NAME = "Ukraine HIMARS, " + str(int(profile_sample_rate)) + "hz"
 title_header = "HIMARS"
 # Input Directories
 input_dirs = ["/Users/mgarces/Documents/DATA_2022/ROCKET_ML/Ukraine_ML/dw_all_sample_rates.pkl.lz4"]
 export_dir = "/Users/mgarces/Documents/DATA_2022/ROCKET_ML/Ukraine_ML/"
 plot_audio_wf: bool = False
+plot_tfr_mesh: bool = True
 
 # Estimate amplitude in Pa
 estimated_peak_db = 120
@@ -33,7 +34,7 @@ print('Estimated peak pressure in Pa at full range (unity):', estimated_peak_pa)
 
 # Gabor atom averaging spec (lowest frequency)
 input_order = 6.
-frequency_averaging_hz = 1.
+frequency_averaging_hz = 100.
 number_cycles_averaging = 3*np.pi/4 * input_order
 duration_averaging_s = number_cycles_averaging / frequency_averaging_hz
 
@@ -95,7 +96,7 @@ def resampled_power_per_band_no_hop(sig_wf: np.array,
 
 def main():
     """
-    Load data window
+    Load data window and select channel
     """
 
     for j, input_dir in enumerate(input_dirs):
@@ -143,31 +144,26 @@ def main():
                 # Number of frequency bands
                 frequency_points = len(frequency_inferno_hz)
 
-                # Perform the first set of checks
-                pixels_per_ave_atom = ave_atom_pow2_points*frequency_points
+                # Have all the information needed
                 # The desired number of display times is known, and the contraction factor can be computed
-                # TODO: mic_display_points relies on a sample rate
                 time_contraction_factor: float = mic_display_points/(pixels_per_mesh/frequency_points)
                 if time_contraction_factor > 1:
                     time_contraction_factor_pow2: int = 2**int(np.ceil(np.log2(time_contraction_factor)))
                 else:
                     time_contraction_factor_pow2: int = 1
+                    print('No averaging/resampling is needed for display')
 
-                    # Get the three relevant powers of two
+                # Get the next relevant powers of two
                 mic_points_pow2: int = 2**int(np.ceil(np.log2(mic_points)))
                 mic_points_pow2_display: int = 2**int(np.ceil(np.log2(mic_display_points)))
+                number_of_atoms_in_display: int = int(np.round(mic_points_pow2_display/ave_atom_pow2_points))
 
                 print('Min, Max frequency:', [frequency_inferno_hz[0], frequency_inferno_hz[-1]])
                 print('Time contraction factor, float:', time_contraction_factor)
                 print('Time contraction factor, pow2:', time_contraction_factor_pow2)
+                print('Number of atoms, display_pow2/atom_pow2', number_of_atoms_in_display)
 
-                print('Atom_pow2, audio_pow2, display_pow2')
-                print(ave_atom_pow2_points, mic_points_pow2, mic_points_pow2_display)
-                print('audio_pow2/atom_pow2', mic_points_pow2/ave_atom_pow2_points)
-
-                exit()
-
-                # We have not even loaded the audio data yet!
+                # Have not even loaded the audio data yet!
                 # Get audio data
                 audio_samples_0 = station.audio_sensor().get_microphone_data()
                 # Remove mean
@@ -178,9 +174,9 @@ def main():
                 audio_time_s = audio_time_micros*1E-6  # from microseconds to seconds
                 audio_pa = audio_samples*estimated_peak_pa
 
-                # Check recording against input data
+                # Check waveform
                 if plot_audio_wf:
-                    # Plot Audio data for each station
+                    # Plot input audio data
                     plt.figure()
                     plt.plot(audio_time_s, audio_pa)
                     plt.title(title_header + f", RedVox ID {station.id()}" + f", {int(audio_sample_rate_hz)} Hz")
@@ -189,6 +185,7 @@ def main():
                     plt.show()
 
                 # Zero pad relative to the largest of points_pow2
+                # TODO: TEST for only a single atom and no resampling
                 if mic_points_pow2_display < ave_atom_pow2_points:
                     if ave_atom_pow2_points > mic_points_pow2:
                         mic_pad_points = ave_atom_pow2_points - mic_points
@@ -201,67 +198,211 @@ def main():
                         mic_pad_points = mic_points_pow2_display - mic_points
                         mic_pad_sig = np.pad(array=audio_pa, pad_width=(mic_pad_points, 0))
                     else:
+                        # TODO: TEST If exactly power of two, unchanged.
                         mic_pad_points = mic_points_pow2 - mic_points
                         mic_pad_sig = np.pad(array=audio_pa, pad_width=(mic_pad_points, 0))
 
-                # # Plot Audio data for each station
-                # plt.figure()
-                # plt.plot(mic_pad_sig)
-                # plt.title(title_header + f", RedVox ID {station.id()}" + f", {int(audio_sample_rate_hz)} Hz")
-                # plt.xlabel(f"Seconds from {sequence_start_utc} UTC")
-                # plt.ylabel("Mic")
-                # plt.show()
-                # #
-                # STX
-                frequency_stx_hz, time_stx_s, stx_complex = \
-                    styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_pad_sig,
-                                                        frequency_sample_rate_hz=audio_sample_rate_hz,
-                                                        frequency_stx_hz=frequency_inferno_hz,
-                                                        band_order_Nth=order_Nth)
+                if plot_audio_wf:
+                    # Plot zero padded data
+                    plt.figure()
+                    plt.plot(mic_pad_sig)
+                    plt.title(title_header + f", RedVox ID {station.id()}" + f", {int(audio_sample_rate_hz)} Hz")
+                    plt.xlabel(f"Seconds from {sequence_start_utc} UTC")
+                    plt.ylabel("Mic")
+                    plt.show()
 
-                stx_power = 2*np.abs(stx_complex)**2
-
-
-                # TODO: Only perform if time_contraction_factor_pow2 > 1
-                [var_sig_time_s,
-                 var_sig_wf_mean, var_sig_wf_max, var_sig_wf_min,
-                 var_tfr_mean, var_tfr_max, var_tfr_min] = \
-                    resampled_power_per_band_no_hop(sig_wf=mic_pad_sig,
-                                                    sig_time=time_stx_s,
-                                                    power_tfr=stx_power,
-                                                    resampling_factor=time_contraction_factor_pow2)
-
-                var_sig_wf = var_sig_wf_max
-                var_tfr = var_tfr_max
-
-                print('var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape')
-                print(var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape)
-                print(len(mic_pad_sig)/time_contraction_factor_pow2)
-
-                # exit()
-                stx_log2_power2 = np.log2(var_tfr + scales.EPSILON)
-                stx_log2_power2 -= np.max(stx_log2_power2)
-
+                # For TFR plots
                 if audio_sample_rate_hz < 100:
                     bit_range = 16
                 else:
-                    bit_range = 32
+                    bit_range = 24
 
-                pltq.plot_wf_mesh_vert(redvox_id=station_id,
-                                       wf_panel_a_sig=var_sig_wf,
-                                       wf_panel_a_time=var_sig_time_s,
-                                       mesh_time=var_sig_time_s,
-                                       mesh_frequency=frequency_stx_hz,
-                                       mesh_panel_b_tfr=stx_log2_power2,
-                                       mesh_panel_b_colormap_scaling="range",
-                                       mesh_panel_b_color_range=bit_range,
-                                       wf_panel_a_units='Power',
-                                       mesh_panel_b_cbar_units="bits",
-                                       start_time_epoch=0,
-                                       figure_title="Resampled Mic STX for " + EVENT_NAME,
-                                       frequency_hz_ymin=frequency_inferno_hz[-0],
-                                       frequency_hz_ymax=frequency_inferno_hz[-1])
-                plt.show()
+                # condition_no_resampling => no resampling, single atom
+                condition_no_resample = (number_of_atoms_in_display <= 1) and (time_contraction_factor_pow2 <= 1)
+                # condition_resample_one_atom => resampling, single atom
+                condition_resample_one_atom = (number_of_atoms_in_display <= 1) and (time_contraction_factor_pow2 > 1)
+                # condition_resample_atoms => resampling over more than one atom; can use atom as stride/hop
+                condition_resample_atoms = (number_of_atoms_in_display > 1) and (time_contraction_factor_pow2 > 1)
+
+                if condition_no_resample:
+                    frequency_stx_hz, time_stx_s, stx_complex = \
+                        styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_pad_sig,
+                                                            frequency_sample_rate_hz=audio_sample_rate_hz,
+                                                            frequency_stx_hz=frequency_inferno_hz,
+                                                            band_order_Nth=order_Nth)
+
+                    stx_power = 2*np.abs(stx_complex)**2
+                    stx_log2_power2 = np.log2(stx_power + scales.EPSILON)
+                    # Scale to max
+                    stx_log2_power2 -= np.max(stx_log2_power2)
+
+                    if plot_tfr_mesh:
+                        pltq.plot_wf_mesh_vert(redvox_id=station_id,
+                                               wf_panel_a_sig=mic_pad_sig,
+                                               wf_panel_a_time=time_stx_s,
+                                               mesh_time=time_stx_s,
+                                               mesh_frequency=frequency_stx_hz,
+                                               mesh_panel_b_tfr=stx_log2_power2,
+                                               mesh_panel_b_colormap_scaling="range",
+                                               mesh_panel_b_color_range=bit_range,
+                                               wf_panel_a_units='Power',
+                                               mesh_panel_b_cbar_units="bits",
+                                               start_time_epoch=0,
+                                               figure_title="Resampled Mic STX for " + EVENT_NAME,
+                                               frequency_hz_ymin=frequency_inferno_hz[-0],
+                                               frequency_hz_ymax=frequency_inferno_hz[-1])
+                        plt.show()
+
+                elif condition_resample_one_atom:
+                    frequency_stx_hz, time_stx_s, stx_complex = \
+                        styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_pad_sig,
+                                                            frequency_sample_rate_hz=audio_sample_rate_hz,
+                                                            frequency_stx_hz=frequency_inferno_hz,
+                                                            band_order_Nth=order_Nth)
+                    stx_power = 2*np.abs(stx_complex)**2
+                    stx_log2_power2 = np.log2(stx_power + scales.EPSILON)
+                    # Scale to max
+                    stx_log2_power2 -= np.max(stx_log2_power2)
+
+                    [var_sig_time_s,
+                     var_sig_wf_mean, var_sig_wf_max, var_sig_wf_min,
+                     var_tfr_mean, var_tfr_max, var_tfr_min] = \
+                        resampled_power_per_band_no_hop(sig_wf=mic_pad_sig,
+                                                        sig_time=time_stx_s,
+                                                        power_tfr=stx_power,
+                                                        resampling_factor=time_contraction_factor_pow2)
+
+                    var_sig_wf = var_sig_wf_max
+                    var_tfr = var_tfr_max
+
+                    print('var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape')
+                    print(var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape)
+                    print(len(mic_pad_sig)/time_contraction_factor_pow2)
+
+                    stx_log2_power2 = np.log2(var_tfr + scales.EPSILON)
+                    stx_log2_power2 -= np.max(stx_log2_power2)
+
+                    if plot_tfr_mesh:
+                        pltq.plot_wf_mesh_vert(redvox_id=station_id,
+                                               wf_panel_a_sig=var_sig_wf,
+                                               wf_panel_a_time=var_sig_time_s,
+                                               mesh_time=var_sig_time_s,
+                                               mesh_frequency=frequency_stx_hz,
+                                               mesh_panel_b_tfr=stx_log2_power2,
+                                               mesh_panel_b_colormap_scaling="range",
+                                               mesh_panel_b_color_range=bit_range,
+                                               wf_panel_a_units='Power',
+                                               mesh_panel_b_cbar_units="bits",
+                                               start_time_epoch=0,
+                                               figure_title="Resampled Mic STX for " + EVENT_NAME,
+                                               frequency_hz_ymin=frequency_inferno_hz[-0],
+                                               frequency_hz_ymax=frequency_inferno_hz[-1])
+                        plt.show()
+
+                elif condition_resample_atoms:
+                    print("\nResample with ave atom stride")
+                    # TODO: Ensure the resampled atom returns a reasonable value - may need another if
+                    apply_atom_stride = True
+                    if apply_atom_stride:
+                        points_resampled: int = int(np.round((len(mic_pad_sig)/number_of_atoms_in_display)))
+                        # mic_pad_per_atom = np.reshape(a=mic_pad_sig,
+                        #                               newshape=(points_resampled, number_of_atoms_in_display))
+                        #
+                        # print('mic_pad_per_atom.shape', mic_pad_per_atom.shape)
+                        # # exit()
+                        # TODO: START HERE
+
+                        var_sig_wf = []
+                        var_tfr = []
+                        for j in range(number_of_atoms_in_display):
+                            print(j)
+                            mic_pad_per_atom = mic_pad_sig[j*points_resampled:(j+1)*points_resampled]
+                            print('mic_pad_per_atom.shape', mic_pad_per_atom.shape)
+
+                            # plt.figure()
+                            # plt.plot(mic_pad_per_atom)
+                            # plt.show()
+                            # # TODO: Harder/sharper window to reduce leakage?
+                            frequency_stx_hz, time_stx_s, stx_complex = \
+                                styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_pad_per_atom,
+                                                                    frequency_sample_rate_hz=audio_sample_rate_hz,
+                                                                    frequency_stx_hz=frequency_inferno_hz,
+                                                                    band_order_Nth=order_Nth)
+                            stx_power = 2*np.abs(stx_complex)**2
+
+                            [var_sig_time_s,
+                             var_sig_wf_mean, var_sig_wf_max, var_sig_wf_min,
+                             var_tfr_mean, var_tfr_max, var_tfr_min] = \
+                                    resampled_power_per_band_no_hop(sig_wf=mic_pad_per_atom,
+                                                                    sig_time=time_stx_s,
+                                                                    power_tfr=stx_power,
+                                                                    resampling_factor=time_contraction_factor_pow2)
+
+                            var_sig_wf.append(var_sig_wf_max)
+                            var_tfr.append(var_tfr_max)
+
+                            # print('var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape')
+                            # print(var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape)
+                            # print(len(mic_pad_sig)/time_contraction_factor_pow2)
+
+                        # Add power, only compute at the end
+                        var_tfr = np.concatenate(np.array(var_tfr), axis=1)
+                        var_sig_wf = np.concatenate(np.array(var_sig_wf), axis=0)
+                        print('final var_tfr.shape:', var_tfr.shape)
+                        print('final var_sig_wf.shape:', var_sig_wf.shape)
+                        # exit()
+
+                        stx_log2_power2 = np.log2(np.array(var_tfr) + scales.EPSILON)
+                        stx_log2_power2 -= np.max(stx_log2_power2)
+
+                        var_sig_time_s = np.arange(stx_log2_power2.shape[1])/(audio_sample_rate_hz/time_contraction_factor_pow2)
+
+                    else:
+                        frequency_stx_hz, time_stx_s, stx_complex = \
+                            styx_stx.stx_complex_any_scale_pow2(sig_wf=mic_pad_sig,
+                                                                frequency_sample_rate_hz=audio_sample_rate_hz,
+                                                                frequency_stx_hz=frequency_inferno_hz,
+                                                                band_order_Nth=order_Nth)
+                        stx_power = 2*np.abs(stx_complex)**2
+                        stx_log2_power2 = np.log2(stx_power + scales.EPSILON)
+                        # Scale to max
+                        stx_log2_power2 -= np.max(stx_log2_power2)
+
+                        [var_sig_time_s,
+                         var_sig_wf_mean, var_sig_wf_max, var_sig_wf_min,
+                         var_tfr_mean, var_tfr_max, var_tfr_min] = \
+                            resampled_power_per_band_no_hop(sig_wf=mic_pad_sig,
+                                                            sig_time=time_stx_s,
+                                                            power_tfr=stx_power,
+                                                            resampling_factor=time_contraction_factor_pow2)
+
+                        var_sig_wf = var_sig_wf_max
+                        var_tfr = var_tfr_max
+
+                        print('var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape')
+                        print(var_sig_time_s.shape, var_sig_wf.shape, var_tfr.shape)
+                        print(len(mic_pad_sig)/time_contraction_factor_pow2)
+
+                        stx_log2_power2 = np.log2(var_tfr + scales.EPSILON)
+                        stx_log2_power2 -= np.max(stx_log2_power2)
+
+
+                    if plot_tfr_mesh:
+                        pltq.plot_wf_mesh_vert(redvox_id=station_id,
+                                               wf_panel_a_sig=var_sig_wf,
+                                               wf_panel_a_time=var_sig_time_s,
+                                               mesh_time=var_sig_time_s,
+                                               mesh_frequency=frequency_stx_hz,
+                                               mesh_panel_b_tfr=stx_log2_power2,
+                                               mesh_panel_b_colormap_scaling="range",
+                                               mesh_panel_b_color_range=bit_range,
+                                               wf_panel_a_units='Power',
+                                               mesh_panel_b_cbar_units="bits",
+                                               start_time_epoch=0,
+                                               figure_title="Resampled Mic STX for " + EVENT_NAME,
+                                               frequency_hz_ymin=frequency_inferno_hz[-0],
+                                               frequency_hz_ymax=frequency_inferno_hz[-1])
+                        plt.show()
 
 
 if __name__ == "__main__":
