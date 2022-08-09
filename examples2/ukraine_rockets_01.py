@@ -137,7 +137,11 @@ def main():
 
         # Get station data
         for station in dw.stations():
+            audio_sample_rate_hz = station.audio_sample_rate_nominal_hz()
             station_id = station.id()
+            print('\nSample rate:', audio_sample_rate_hz)
+            print('Station ID:', station_id)
+
             # Get audio data
             audio_samples_0 = station.audio_sensor().get_microphone_data()
             # Remove mean
@@ -145,8 +149,6 @@ def main():
             audio_time_micros = station.audio_sensor().data_timestamps() - \
                                 station.audio_sensor().first_data_timestamp()
             audio_time_s = audio_time_micros*1E-6  # from microseconds to seconds
-            audio_sample_rate_hz = station.audio_sample_rate_nominal_hz()
-
             audio_pa = audio_samples*estimated_peak_pa
 
             # Check recording against input data
@@ -198,7 +200,6 @@ def main():
             else:
                 time_contraction_factor_pow2: int = 1
 
-            print('\nSample rate:', audio_sample_rate_hz)
             print('Min, Max frequency:', [frequency_inferno_hz[0], frequency_inferno_hz[-1]])
             print('Time contraction factor, float:', time_contraction_factor)
             print('Time contraction factor, pow2:', time_contraction_factor_pow2)
