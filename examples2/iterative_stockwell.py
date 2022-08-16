@@ -66,7 +66,6 @@ class StockwellConfig:
 
 
 class StockwellTransform:
-    # TODO: Narrow down params
     def __init__(self, config: StockwellConfig) -> None:
         self.config: StockwellConfig = config
         self.frequencies: np.ndarray = self.__frequencies()
@@ -76,8 +75,10 @@ class StockwellTransform:
 
         # TODO: Init stockwell state -- all other "constants"
 
+    # -------------------- Public API --------------------------------
+
     def update_input(self, vals: np.ndarray, cnt: int) -> None:
-        self.in_buf.update(vals, cnt)
+        self.in_buf.update(vals.reshape(1, cnt), cnt)
 
     def run(self) -> None:
         res: np.ndarray = self.__run_stockwell()
@@ -86,19 +87,25 @@ class StockwellTransform:
         self.__update_spect(res)
 
     def plot_res(self):
+        # TODO: Continually update a single figure with backed by a mutable buffer
         pass
 
+    # -------------------- Private API -------------------------------
+
     def __run_stockwell(self) -> np.ndarray:
+        # TODO: Run the current chunk returning the result chunk.
         pass
 
     def __reduce_res(self, res: np.ndarray) -> np.ndarray:
+        # TODO: Reduce the number of columns in the result chunk
         pass
 
-    def __convert_to_db(self, res: np.ndarray) -> np.ndarray:
-        pass
+    @staticmethod
+    def __convert_to_db(res: np.ndarray) -> np.ndarray:
+        return 10.0 * np.log10(res)
 
     def __update_spect(self, res: np.ndarray) -> None:
-        pass
+        self.out_buf.update(res, res.shape[1])
 
     def __frequencies(self) -> np.ndarray:
         if self.config.band_type_lin:
