@@ -14,6 +14,7 @@ print(__doc__)
 default_scale_order = 3.
 default_scale_base = Slice.G2
 default_ref_frequency = Slice.F1
+default_ref_period = Slice.T1S
 
 
 def scale_multiplier(scale_order: float = default_scale_order):
@@ -111,6 +112,30 @@ def scale_bands_from_pow2(frequency_sample_hz: float,
     return [band_nyq, band_max]
 
 
+def period_from_band(band_min: int,
+                        band_max: int,
+                        scale_order: float = default_scale_base,
+                        scale_ref_s: float = default_ref_period,
+                        scale_base: float = default_scale_base):
+
+    bands = np.arange(band_min, band_max+1)
+    # Increaseing order
+    period = scale_ref_s*scale_base**(bands/scale_order)
+    return period
+
+
+def frequency_from_band(band_min: int,
+                        band_max: int,
+                        scale_order: float = default_scale_base,
+                        scale_ref_hz: float = default_ref_frequency,
+                        scale_base: float = default_scale_base):
+
+    bands = np.arange(band_min, band_max+1)
+    # Flip so it increases
+    frequency = np.flip(scale_ref_hz*scale_base**(-bands/scale_order))
+    return frequency
+
+
 if __name__ == "__main__":
     # Framework specs
     scale_order0 = 12.
@@ -126,18 +151,18 @@ if __name__ == "__main__":
     print(scale_order0, scale_base0, scale_ref0)
     print(frequency_ave_hz0, frequency_sample_hz0)
 
-    [band_nyq, band_ave, band_max, log2_ave_life_dyad] = \
+    [band_nyq, band_ave, band_max, log2_ave_life_dyad0] = \
         scale_bands_from_ave(frequency_sample_hz0, frequency_ave_hz0, scale_order0, scale_ref0, scale_base0)
 
+    print(band_nyq, band_ave, band_max)
     # Min, Max, and Spec frequency
     freq_min_hz = scale_base0**(-band_max/scale_order0)
     freq_ave_hz = scale_base0**(-band_ave/scale_order0)
     freq_nyq_hz = scale_base0**(-band_nyq/scale_order0)
-
-
-    print(band_max, band_nyq)
-    bands = np.arange(band_nyq, band_max)
-    freqs = scale_ref0*scale_base0**(-bands/scale_order0)
     print(freq_min_hz, freq_ave_hz, freq_nyq_hz)
-    # print(freqs)
-    # TODO: VERIFY/TEST
+
+    # Reproduce
+    [band_nyq, band_max] = scale_bands_from_pow2(frequency_sample_hz0, log2_ave_life_dyad0, scale_order0, scale_ref0, scale_base0)
+    freqs = frequency_from_band(band_nyq, band_max, scale_order0, scale_ref0, scale_base0)
+    print(freqs)
+
