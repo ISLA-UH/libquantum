@@ -119,7 +119,7 @@ def period_from_band(band_min: int,
                         scale_base: float = default_scale_base):
 
     bands = np.arange(band_min, band_max+1)
-    # Increaseing order
+    # Increasing order
     period = scale_ref_s*scale_base**(bands/scale_order)
     return period
 
@@ -138,7 +138,7 @@ def frequency_from_band(band_min: int,
 
 if __name__ == "__main__":
     # Framework specs
-    scale_order0 = 12.
+    scale_order0 = 6.
     scale_base0 = Slice.G3
     scale_ref0 = Slice.F1
 
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     frequency_ave_hz0 = 10.
 
     # Sensor specific
-    frequency_sample_hz0 = 800.
+    frequency_sample_hz0 = 48000.
 
     print(scale_order0, scale_base0, scale_ref0)
     print(frequency_ave_hz0, frequency_sample_hz0)
@@ -164,5 +164,6 @@ if __name__ == "__main__":
     # Reproduce
     [band_nyq, band_max] = scale_bands_from_pow2(frequency_sample_hz0, log2_ave_life_dyad0, scale_order0, scale_ref0, scale_base0)
     freqs = frequency_from_band(band_nyq, band_max, scale_order0, scale_ref0, scale_base0)
-    print(freqs)
+    print('Physical freq:', freqs)
+    print('Number of bands:', len(freqs))
 
