@@ -8,11 +8,37 @@ import matplotlib.pyplot as plt
 from libquantum.scales import EPSILON, Slice
 print(__doc__)
 
+# CONSTANTS
+default_scale_order = 3.
+default_scale_base = Slice.G2
+default_ref_frequency = Slice.F1
+
+
+def scale_multiplier(scale_order: float = default_scale_order):
+    """
+    Scale multiplier for scale bands of order N > 0.75
+    :param scale_order: scale order
+    :return:
+    """
+    return 0.75*np.pi*scale_order
+
+
+def base_multiplier(scale_order: float = default_scale_order,
+                    scale_base: float = default_scale_base):
+    """
+    Dyadic (log2) foundation for arbitrary base
+    :param scale_order:
+    :param scale_base:
+    :return:
+    """
+    return scale_order/np.log2(scale_base)
+
+
 def main(frequency_sample_hz,
          frequency_ave_hz,
-         scale_order: float = 12.,
-         scale_ref_hz: float = Slice.F1,
-         scale_base: float = Slice.G2):
+         scale_order: float = default_scale_base,
+         scale_ref_hz: float = default_ref_frequency,
+         scale_base: float = default_scale_base):
     """
 
     :param frequency_sample_hz:
@@ -31,10 +57,10 @@ def main(frequency_sample_hz,
     log2_ref = np.log2(frequency_sample_hz/scale_ref_hz)
     band_nyq = int(np.ceil(n_over_log2g*(1-log2_ref)))
 
-    scale_multiplier = 0.75*np.pi*scale_order
+    scale_M = scale_multiplier(scale_order)
 
-    time_ave_log2 = np.ceil(np.log2(scale_multiplier*frequency_sample_hz/frequency_ave_hz))
-    band_ave = int(np.floor(n_over_log2g*(time_ave_log2 - np.log2(scale_multiplier) - log2_ref)))
+    time_ave_log2 = np.ceil(np.log2(scale_M*frequency_sample_hz/frequency_ave_hz))
+    band_ave = int(np.floor(n_over_log2g*(time_ave_log2 - np.log2(scale_M) - log2_ref)))
 
     freq_ave_hz = scale_base**(-band_ave/scale_order)
     freq_nyq_hz = scale_base**(-band_nyq/scale_order)
@@ -48,10 +74,11 @@ def main(frequency_sample_hz,
 
 
 if __name__ == "__main__":
-    scale_order = 12.
+    scale_order0 = 12.
+    scale_base0 = Slice.G3
+    scale_ref0 = Slice.F1
+
     frequency_sample_hz = 8000.
     frequency_ave_hz = 10.
-    scale_base = Slice.G3
-    scale_ref = Slice.F1
 
-    main(frequency_sample_hz, frequency_ave_hz, scale_order, scale_ref, scale_base)
+    main(frequency_sample_hz, frequency_ave_hz, scale_order0, scale_ref0, scale_base0)
