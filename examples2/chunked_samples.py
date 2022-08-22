@@ -87,13 +87,12 @@ def chunked_stockwell(config: StockwellConfig, samples: np.ndarray) -> None:
         plt.xlabel("Time, s")
         plt.title(f"{i + 1} / {total_chunks}")
         plt.colorbar()
-        plt.show()
 
 
 def main() -> None:
     sr_hz: float
     samples: np.ndarray
-    (sr_hz, samples) = wavfile.read("/home/opq/data/ml/ukraine_48khz.wav")
+    (sr_hz, samples) = wavfile.read("/Users/mgarces/Documents/DATA_2022/ROCKET_ML/Ukraine_ML/ukraine_48khz.wav")
 
     print(f"Loaded {len(samples)} samples @ {sr_hz}")
 
@@ -104,6 +103,7 @@ def main() -> None:
 
     config: StockwellConfig = StockwellConfig(n_cols, 2**18, False, 3, sr_hz, 1)
     chunked_stockwell(config, samples[:n_cols])
+    plt.show()
 
 
 if __name__ == "__main__":

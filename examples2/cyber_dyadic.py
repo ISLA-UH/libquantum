@@ -167,3 +167,5 @@ if __name__ == "__main__":
     print('Physical freq:', freqs)
     print('Number of bands:', len(freqs))
 
+
+

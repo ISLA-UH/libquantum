@@ -2,9 +2,7 @@
 A template for an iterative version of the Stockwell Transform.
 """
 from dataclasses import dataclass
-
 import libquantum.styx_stx_loopy as stx
-
 import numpy as np
 
 

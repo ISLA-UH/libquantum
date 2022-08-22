@@ -132,7 +132,7 @@ def main():
                     mic_frequency_cutoff_high_hz = np.copy(frequency_cutoff_high_hz)
 
                 # Get the standardized frequencies
-                # TODO: Rewrite scales with Nyquist as reference
+                # TODO: Rewrite scales with Nyquist as reference -see cyber_dyadic
                 order_Nth, cycles_M, frequency_center_geometric, frequency_start, frequency_end = \
                     styx_cwt.scale_frequency_bands(scale_order_input=input_order,
                                                    frequency_sample_rate_input=audio_sample_rate_hz,
