@@ -23,7 +23,6 @@ if __name__ == "__main__":
     order_number_input = 6
     EVENT_NAME = "Blast Test"
     station_id_str = 'Synth'
-    run_time_epoch_s = utils.datetime_now_epoch_s()
 
     mic_sig_sample_rate_hz = 800.
     # Target frequency
@@ -43,7 +42,7 @@ if __name__ == "__main__":
                                      sample_rate_hz=mic_sig_sample_rate_hz,
                                      noise_std_loss_bits=std_bit_loss)
 
-    mic_sig_epoch_s = time_center_s + run_time_epoch_s
+    mic_sig_epoch_s = time_center_s
     mic_sig *= utils.taper_tukey(sig_wf_or_time=mic_sig_epoch_s,
                                  fraction_cosine=0.1)  # Add taper
     mic_sig /= np.max(mic_sig)  # Max unit amplitude
@@ -87,29 +86,8 @@ if __name__ == "__main__":
                                 frequency_hz_ymin=fmin,
                                 frequency_hz_ymax=fmax)
 
-    # Compute constant Q transform (CQT) from segmented signal duration
-    mic_cqt, mic_cqt_bits, mic_cqt_time_s, mic_cqt_frequency_hz = \
-        spectra.cqt_from_sig(sig_wf=mic_sig,
-                             frequency_sample_rate_hz=mic_sig_sample_rate_hz,
-                             band_order_Nth=order_number_input)
 
-    mic_cqt_snr, mic_cqt_snr_bits, mic_cqt_snr_entropy = entropy.snr_mean_max(tfr_coeff_complex=mic_cqt)
-    pltq.plot_wf_mesh_mesh_vert(redvox_id=station_id_str,
-                                wf_panel_2_sig=mic_sig,
-                                wf_panel_2_time=mic_sig_epoch_s,
-                                mesh_time=mic_cqt_time_s,
-                                mesh_frequency=mic_cqt_frequency_hz,
-                                mesh_panel_1_trf=mic_cqt_bits,
-                                mesh_panel_1_colormap_scaling="range",
-                                mesh_panel_0_tfr=mic_cqt_snr_entropy,
-                                wf_panel_2_units="Norm",
-                                mesh_panel_1_cbar_units="bits",
-                                mesh_panel_0_cbar_units="eSNR bits",
-                                figure_title="CQT Hann for " + EVENT_NAME,
-                                frequency_hz_ymin=fmin,
-                                frequency_hz_ymax=fmax)
-
-    # Compute constant Q transform (CQT) from segmented signal duration using Gaussian window
+    # Compute quantized Stockwell transform (STYX) with a Gaussian window
     mic_cqtg, mic_cqtg_bits, mic_cqt_time_s, mic_cqt_frequency_hz = \
         spectra.cqt_from_sig(sig_wf=mic_sig,
                              frequency_sample_rate_hz=mic_sig_sample_rate_hz,
@@ -177,8 +155,8 @@ if __name__ == "__main__":
 
     # Compute the WWZ
     freq_target = scales.Slice.F1
-    freq_low = mic_cqt_frequency_hz.min()
-    freq_high = mic_cqt_frequency_hz.max()
+    freq_low = np.min(mic_cqt_frequency_hz)
+    freq_high = np.max(mic_cqt_frequency_hz)
     band_order = order_number_input
     log_scale_base = scales.Slice.G2
     override = True

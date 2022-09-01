@@ -6,11 +6,109 @@ from enum import Enum
 from typing import Tuple, Union
 
 import numpy as np
-from scipy import signal
+from scipy import interpolate, signal
 
 from scipy.integrate import cumulative_trapezoid
 from libquantum.scales import EPSILON
 from redvox.common import date_time_utils as dt
+
+""" Logical power of two flag """
+
+
+def is_power_of_two(n):
+    """ Returns not if not positive and a power of two """
+    return not (n > 0 and (n & (n - 1)))
+
+
+""" Time/Sample Duration Utils """
+
+
+def duration_points(sample_rate_hz: float, time_s: float) -> Tuple[int, int, int]:
+    """
+    Compute number of points
+    :param sample_rate_hz: sample rate in Hz
+    :param time_s: time scale, period or duration
+    :return: number of points, floor and ceiling of log2 of number of points
+    """
+    points_float: float = sample_rate_hz * time_s
+    points_int: int = int(points_float)
+    points_floor_log2: int = int(np.floor(np.log2(points_float)))
+    points_ceil_log2: int = int(np.ceil(np.log2(points_float)))
+
+    return points_int, points_floor_log2, points_ceil_log2
+
+
+def duration_ceil(sample_rate_hz: float, time_s: float) -> Tuple[int, int, float]:
+    """
+    Compute ceiling of the number of points, and convert to seconds
+    :param sample_rate_hz: sample rate in Hz
+    :param time_s: time scale, period or duration
+    :return: ceil of log 2 of number of points, power of two number of points, corresponding time in s
+    """
+    points_float: float = sample_rate_hz * time_s
+    points_ceil_log2: int = int(np.ceil(np.log2(points_float)))
+    points_ceil_pow2: int = 2**points_ceil_log2
+    time_ceil_pow2_s: float = points_ceil_pow2 / sample_rate_hz
+
+    return points_ceil_log2, points_ceil_pow2, time_ceil_pow2_s
+
+
+def duration_floor(sample_rate_hz: float, time_s: float) -> Tuple[int, int, float]:
+    """
+    Compute floor of the number of points, and convert to seconds
+    :param sample_rate_hz: sample rate in Hz
+    :param time_s: time scale, period or duration
+    :return: floor of log 2 of number of points, power of two number of points, corresponding time in s
+    """
+    points_float: float = sample_rate_hz * time_s
+    points_floor_log2: int = int(np.floor(np.log2(points_float)))
+    points_floor_pow2: int = 2**points_floor_log2
+    time_floor_pow2_s: float = points_floor_pow2 / sample_rate_hz
+
+    return points_floor_log2, points_floor_pow2, time_floor_pow2_s
+
+
+""" Sampling Utils """
+
+
+def resample_uneven_signal(sig_wf: np.ndarray,
+                           sig_epoch_s: np.ndarray,
+                           sample_rate_new_hz: float = None):
+    """
+
+    :param sig_wf:
+    :param sig_epoch_s:
+    :param sample_rate_new_hz:
+    :return:
+    """
+
+    if sample_rate_new_hz is None:
+        interval_from_epoch_s = np.mean(np.diff(sig_epoch_s))
+        # Round up
+        sample_rate_new_hz = np.ceil(1/interval_from_epoch_s)
+
+    interval_s = 1/sample_rate_new_hz
+    sig_new_epoch_s = np.arange(sig_epoch_s[0], sig_epoch_s[-1], interval_s)
+    f = interpolate.interp1d(sig_epoch_s, sig_wf)
+    sig_new_wf = f(sig_new_epoch_s)
+    return sig_new_wf, sig_new_epoch_s
+
+
+def upsample_fourier(sig_wf: np.ndarray,
+                     sig_sample_rate_hz: float,
+                     new_sample_rate_hz: float = 8000.) -> np.ndarray:
+    """
+    Upsample the Fourier way.
+
+    :param sig_wf: input signal waveform, reasonably well preprocessed
+    :param sig_sample_rate_hz: signal sample rate
+    :param new_sample_rate_hz: resampling sample rate
+    :return: resampled signal
+    """
+    sig_len = len(sig_wf)
+    new_len = int(sig_len * new_sample_rate_hz / sig_sample_rate_hz)
+    sig_resampled = signal.resample(x=sig_wf, num=new_len)
+    return sig_resampled
 
 
 def taper_tukey(sig_wf_or_time: np.ndarray,
@@ -24,6 +122,20 @@ def taper_tukey(sig_wf_or_time: np.ndarray,
     :return: tukey taper window amplitude
     """
     return signal.windows.tukey(M=np.size(sig_wf_or_time), alpha=fraction_cosine, sym=True)
+
+
+# def taper_tukey_array(number_signals: int,
+#                       number_samples: int,
+#                       fraction_cosine: float = 0.1) -> np.ndarray:
+#     """
+#     Construct a teper matrix
+#     :param number_signals:
+#     :param number_samples:
+#     :param fraction_cosine:
+#     :return:
+#     """
+#     tukey_nsamples = signal.windows.tukey(M=number_samples, alpha=fraction_cosine, sym=True)
+#     tukey_array = just_tile(tukey_nsamples)
 
 
 def datetime_now_epoch_s() -> float:
@@ -452,3 +564,22 @@ def d1tile_x_d2(d1: Union[float, np.ndarray],
     else:
         raise TypeError('Cannot handle an array of shape {}.'.format(str(d1.shape)))
     return d1_x_d2
+
+
+def decimate_array(sig_wf: np.array,
+                   downsampling_factor: int) -> np.ndarray:
+    """
+    Decimate data and timestamps for an individual station
+    All signals MUST have the same sample rate
+    :param sig_wf: signal waveform
+    :param downsampling_factor: the downsampling factor
+    :param filter_order: the order of the filter
+    :return: np.array decimated data
+    """
+    # decimate signal data
+    decimated_data = signal.decimate(x=sig_wf,
+                                    q=downsampling_factor,
+                                    axis=1,
+                                    zero_phase=True)
+
+    return decimated_data
