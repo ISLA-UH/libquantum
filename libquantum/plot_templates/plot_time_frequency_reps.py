@@ -228,7 +228,7 @@ def plot_wf_wf_wf_vert(redvox_id: str,
                        labels_panel_2: str = "(a)",
                        labels_panel_1: str = "(b)",
                        labels_panel_0: str = "(c)",
-                       labels_fontweight: str = None) -> None:
+                       labels_fontweight: str = None) -> plt.Figure:
     """
     Template for aligned time-series display
 
@@ -344,6 +344,8 @@ def plot_wf_wf_wf_vert(redvox_id: str,
     fig.tight_layout()
     fig.subplots_adjust(bottom=.1, hspace=0.13)
 
+    return fig
+
 
 def plot_wf_mesh_mesh_vert(redvox_id: str,
                            wf_panel_2_sig: np.ndarray,
@@ -374,7 +376,7 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
                            mesh_panel_1_cbar_units: str = "bits",
                            mesh_panel_0_cbar_units: str = "bits",
                            figure_title: str = "Time-Frequency Representation",
-                           figure_title_show: bool = True) -> None:
+                           figure_title_show: bool = True) -> plt.Figure:
 
     """
     Plot 3 vertical panels - mesh (top panel), mesh (middle panel) and signal waveform (bottom panel)
@@ -596,6 +598,8 @@ def plot_wf_mesh_mesh_vert(redvox_id: str,
     fig.tight_layout()
     fig.subplots_adjust(bottom=.1, hspace=0.13)
 
+    return fig
+
 
 def plot_wf_mesh_vert(redvox_id: str,
                       wf_panel_2_sig: np.ndarray,
@@ -620,7 +624,7 @@ def plot_wf_mesh_vert(redvox_id: str,
                       wf_panel_2_units: str = "Norm",
                       mesh_panel_0_cbar_units: str = "bits",
                       figure_title: str = "Time-Frequency Representation",
-                      figure_title_show: bool = True) -> None:
+                      figure_title_show: bool = True) -> plt.Figure:
     """
     Plot 2 vertical panels - mesh (top panel) and signal waveform (bottom panel)
 
@@ -774,3 +778,5 @@ def plot_wf_mesh_vert(redvox_id: str,
     fig.align_ylabels(axes)
     fig.tight_layout()
     fig.subplots_adjust(bottom=.1, hspace=0.13)
+
+    return fig

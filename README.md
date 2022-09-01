@@ -44,7 +44,7 @@ Recommended reading in chronological order:
 ```shell script
 pip install libquantum
 ```
-More details in the [Installation guide](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/intallation.md).
+More details in the [Installation guide](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/intallation.md#libquantum-installation).
 
 ### Examples
 Full examples can be found in the [examples documentation](https://github.com/RedVoxInc/libquantum/blob/master/docs/libquantum/examples.md#examples-using-libquantum).
