@@ -4,10 +4,8 @@ This module contains general utilities that can work with values containing nans
 
 from enum import Enum
 from typing import Tuple, Union
-
 import numpy as np
 from scipy import interpolate, signal
-
 from scipy.integrate import cumulative_trapezoid
 from libquantum.scales import EPSILON
 from redvox.common import date_time_utils as dt
