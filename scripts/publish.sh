@@ -21,12 +21,13 @@ set -o xtrace
 
 cd ..
 # Build the distributions
-python3 setup.py sdist bdist_wheel
+#python3 setup.py sdist bdist_wheel
+python3 -m build .
 
 # Upload the distributions to PyPi
 twine upload -r pypi -u ${USER} -p ${PASS} --skip-existing dist/*
 
 # Create a git tag for this version
-VERSION="v$(python3 setup.py --version)"
+VERSION="v$(python -c 'import toml; print(toml.load("pyproject.toml")["project"]["version"])')"
 git tag -a ${VERSION} -m"Release ${VERSION}"
 git push origin ${VERSION}
