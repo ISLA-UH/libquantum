@@ -21,7 +21,7 @@ pip show libquantum
 The terminal should return the name of the module, version, summary, home-page, author, author email, license, location of the 
 installed module and requires. An example is shown below:
 
-```shell script
+```
 Name: libquantum
 Version: 1.1.2
 Summary: Library for implementing standardized time-frequency representations.
