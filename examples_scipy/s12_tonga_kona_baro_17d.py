@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from libquantum.spectra import butter_bandpass
+from libquantum.styx_fft import butter_bandpass
 from libquantum.styx_stx import tfr_stx_fft
 from libquantum2.benchmark_signals import plot_tfr_bits
 

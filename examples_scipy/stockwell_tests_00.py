@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # Stockwell
     fmin, fmax = freqs[[0, -1]]
-    [st_power, f] = tfr_array_stockwell(data=sig_in, sfreq=sfreq, fmin=fmin, fmax=fmax, width=3.0)
+    [st_power, f, _] = tfr_array_stockwell(data=sig_in, sfreq=sfreq, fmin=fmin, fmax=fmax, width=3.0)
     print("Shape of power:", st_power.shape)
     print("Shape of frequencies:", f.shape)
     plt.figure()

@@ -137,11 +137,12 @@ def main(sample_rate, signal_time_base: str='seconds'):
 
     # Stockwell, canned version; breaks if df not 1
     # The default df = 1
-    [st_power, frequency, W] = \
-        tfr_array_stockwell(data=sig_in,
-                            sfreq=sample_rate,
-                            fmin=fmin, fmax=fmax,
-                            width=k, delta_f=1)
+    # todo: referencing a function that's no longer imported
+    # [st_power, frequency, W] = \
+    #     tfr_array_stockwell(data=sig_in,
+    #                         sfreq=sample_rate,
+    #                         fmin=fmin, fmax=fmax,
+    #                         width=k, delta_f=1)
     [psd3, freqs_s, freqs_fft, windows_f3] = \
         tfr_array_stockwell_isla(data=sig_in,
                                  sample_rate=sample_rate,
@@ -153,8 +154,8 @@ def main(sample_rate, signal_time_base: str='seconds'):
     # plot_st_window_tfr_lin(window=fftshift(windows_f3), frequency_sx=freqs_s, frequency_fft=fftshift(freqs_fft))
     # plt.show()
 
-    print("Shape of W:", st_power.shape)
-    print("Shape of frequency:", frequency.shape)
+    # print("Shape of W:", st_power.shape)
+    # print("Shape of frequency:", frequency.shape)
     print("Shape of psd3:", psd3.shape)
     print("Shape of freqs_s", freqs_s.shape)
     # print(freqs_s)
@@ -162,7 +163,7 @@ def main(sample_rate, signal_time_base: str='seconds'):
     # plot_st_window_tfr_bits(window=W, frequency_sx=freqs_s, frequency_fft=freqs_fft)
     # plot_tfr_bits(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
     # plot_tfr_bits(tfr_power=psd3, tfr_frequency=freqs_s, tfr_time=time_in)
-    plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
+    # plot_tfr_lin(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
     plot_tfr_lin(tfr_power=psd3, tfr_frequency=freqs_s, tfr_time=time_in)
     plt.show()
 

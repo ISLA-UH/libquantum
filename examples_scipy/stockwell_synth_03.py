@@ -73,7 +73,7 @@ def main(sample_rate, signal_time_base:str='seconds'):
     fmin, fmax = freqs[[0, -1]]
 
     # Stockwell
-    [st_power, frequency] = tfr_array_stockwell(data=sig_in, sfreq=sample_rate, fmin=fmin, fmax=fmax, width=1)
+    [st_power, frequency, _] = tfr_array_stockwell(data=sig_in, sfreq=sample_rate, fmin=fmin, fmax=fmax, width=1)
 
     plot_synth_tfr(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
     plt.show()

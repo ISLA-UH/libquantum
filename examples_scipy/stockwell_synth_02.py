@@ -6,6 +6,7 @@ First test synthetic: synth_00
 import numpy as np
 from libquantum.stockwell_orig import tfr_array_stockwell, calculate_rms_sig_test
 from libquantum2.benchmark_signals import synth_02
+from examples_scipy.stockwell_synth_03 import plot_synth, plot_synth_tfr
 
 from matplotlib import pyplot as plt
 print(__doc__)
@@ -34,7 +35,7 @@ def main(sample_rate, signal_time_base:str='seconds'):
     fmin, fmax = freqs[[0, -1]]
 
     # Stockwell
-    [st_power, frequency] = tfr_array_stockwell(data=sig_in, sfreq=sample_rate, fmin=fmin, fmax=fmax, width=1.0)
+    [st_power, frequency, _] = tfr_array_stockwell(data=sig_in, sfreq=sample_rate, fmin=fmin, fmax=fmax, width=1.0)
 
     plot_synth_tfr(tfr_power=st_power, tfr_frequency=frequency, tfr_time=time_in)
     plt.show()
