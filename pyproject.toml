@@ -4,7 +4,7 @@
 
 [project]
 name = "libquantum"
-version = "1.5.16"
+version = "1.5.17"
 authors = [
     { name = "RedVox, Inc", email = "support@redvox.io" }
 ]
@@ -15,7 +15,7 @@ license = { file = "LICENSE" }
 
 dependencies = [
     "librosa==0.10.1",
-    "libwwz==1.3.1",
+    "libwwz==1.3.2",
     "matplotlib==3.7.1",
     "numpy==1.23.5",
     "pandas==2.0.1",
